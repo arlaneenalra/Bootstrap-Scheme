@@ -2,13 +2,13 @@
 
 %{
 #include <stdio.h>
-#include "scheme.h"
-#include "lexer.h"
+#include "core.h"
 
-void yyerror(yyscan_t scanner, char *s);
+void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 
 %}
 
+%parse-param {interp_core_type *interp}
 %parse-param {void * scanner}
 %lex-param {yyscan_t scanner}
 
@@ -47,7 +47,7 @@ object:
 
 %%
 
-void yyerror(yyscan_t scanner, char *s) {
+void yyerror(interp_core_type *interp, yyscan_t scanner, char *s) {
     (void)fprintf(stderr,"There was an error parsing %s on line %i\n", 
 		       s, yyget_lineno(scanner));
 }

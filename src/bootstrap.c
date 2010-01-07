@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	(void)getline(&buffer, &buffer_size, stdin);
     
 	yy_scan_string(buffer, interp->scanner);
-	yyparse(interp->scanner);
+	yyparse(interp, interp->scanner);
 	
     }
 
