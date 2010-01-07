@@ -18,6 +18,6 @@ WS	{EOL}|[[:blank:]]
 "#t"      { return TRUE_OBJ; }
 "#f"      { return FALSE_OBJ; }
 
-{WS}*     /* ignore whitespace */
+{WS}*     /* Do nothing with white space */
 
 %%

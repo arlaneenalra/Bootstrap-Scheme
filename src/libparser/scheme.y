@@ -18,18 +18,25 @@ void yyerror(yyscan_t scanner, char *s);
 %token TRUE_OBJ
 %token FALSE_OBJ
 
-%token INTEGER
 
 %%
 
-tuple:
+list:
     object
-  | object tuple
+  | object list
+
+tuple:
+    OPEN_PAREN
+    list
+    CLOSE_PAREN
+  | OPEN_PAREN CLOSE_PAREN { printf("nil\n"); }
+
 
 object:
     TRUE_OBJ        { printf("true\n"); }
   | FALSE_OBJ       { printf("false\n"); }
-  | INTEGER
+  | tuple
+
 
 
 %%

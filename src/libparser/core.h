@@ -33,6 +33,7 @@ typedef struct object {
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
+    char running;
     
 
     yyscan_t scanner;
