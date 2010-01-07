@@ -15,16 +15,26 @@ void yyerror(yyscan_t scanner, char *s);
 %token OPEN_PAREN
 %token CLOSE_PAREN
 
+%token TRUE_OBJ
+%token FALSE_OBJ
+
+%token INTEGER
+
 %%
 
-s_expression:
-    OPEN_PAREN
-    CLOSE_PAREN
+tuple:
+    object
+  | object tuple
+
+object:
+    TRUE_OBJ        { printf("true\n"); }
+  | FALSE_OBJ       { printf("false\n"); }
+  | INTEGER
 
 
 %%
 
 void yyerror(yyscan_t scanner, char *s) {
-    (void)frprintf(stderr,"There was an error parsing %s on line %i\n", 
+    (void)fprintf(stderr,"There was an error parsing %s on line %i\n", 
 		       s, yyget_lineno(scanner));
 }

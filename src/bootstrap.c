@@ -2,37 +2,23 @@
 #include <strings.h>
 #include <assert.h>
 
-#include "core.h"
-
-/* Allocate and return an new object instance */
-object_type *alloc_object(interp_core_type* core, object_type_enum obj_type) {
-
-    object_type *obj=malloc(sizeof(object_type));
-
-    /* check to make sure there was memory to allocate and then
-       make sure that we have a properly typed and zeroed object */
-    if(obj) {
-	bzero(obj, sizeof(object_type));
-	obj->type=obj_type;
-	return obj;
-    }
-    
-    fprintf(stderr, "Unable to allocate memory\n");
-    assert(0);
-}
+#include "libparser/core.h"
 
 
 int main(int argc, char **argv) {
 
 
-    interp_core_type interp;
+    interp_core_type * interp=create_interp();
 
     printf("Simple Bootstrapper\n");
     printf("sizeof(object_type) %li\n", sizeof(object_type));
 
-    object_type *obj=alloc_object(&interp, INTEGER);
-
+    yyset_in(stdin, interp->scanner);
+    yyparse(interp->scanner);
+    
     printf(">\n");
+
+    cleanup_interp(interp);
 
     exit(0);
 }

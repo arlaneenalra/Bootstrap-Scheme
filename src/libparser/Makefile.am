@@ -1,6 +1,6 @@
 
 noinst_LIBRARIES=libparser.a
-libparser_a_SOURCES=lexer.l scheme.y
+libparser_a_SOURCES=lexer.l scheme.y core.c
 
 BUILT_SOURCES=lexer.c scheme.c
 

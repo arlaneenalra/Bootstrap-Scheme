@@ -6,9 +6,12 @@
 
 #include <stdint.h>
 
+#include "scheme.h"
+#include "lexer.h"
+
 /* The types of cells that we can represent */
 typedef enum {
-    INTEGER,
+    FIXNUM,
     BOOL,
     CHAR
 } object_type_enum;
@@ -31,7 +34,14 @@ typedef struct object {
    to function properly */
 typedef struct interp_core {
     
+
+    yyscan_t scanner;
 } interp_core_type;
 
+
+/* Function definitions */
+object_type *alloc_object(interp_core_type* core, object_type_enum obj_type);
+interp_core_type *create_interp();
+void cleanup_interp(interp_core_type *interp);
 
 #endif
