@@ -14,6 +14,7 @@ void yyerror(yyscan_t scanner, char *s);
 
 %token OPEN_PAREN
 %token CLOSE_PAREN
+%token DOT
 
 %token TRUE_OBJ
 %token FALSE_OBJ
@@ -28,6 +29,11 @@ list:
 tuple:
     OPEN_PAREN
     list
+    CLOSE_PAREN
+  | OPEN_PAREN
+    object
+    DOT
+    object
     CLOSE_PAREN
   | OPEN_PAREN CLOSE_PAREN { printf("nil\n"); }
 

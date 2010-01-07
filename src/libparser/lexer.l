@@ -14,6 +14,7 @@ WS	{EOL}|[[:blank:]]
 
 "("       { return OPEN_PAREN; }
 ")"       { return CLOSE_PAREN; }
+"."       { return DOT; }
 
 "#t"      { return TRUE_OBJ; }
 "#f"      { return FALSE_OBJ; }
