@@ -18,5 +18,5 @@ libtool
 missing
 ChangeLog
 log.txt
-src/bf
+src/bootstrap
 ylwrap
