@@ -7,9 +7,9 @@ AC_INIT([src/bootstrap.c])
 AM_INIT_AUTOMAKE(scheme_bootstrap, 0.1)
 
 AC_PROG_CC
-#AC_PROG_LEX
-#AC_PROG_YACC
+AC_PROG_LEX
+AC_PROG_YACC
 
-#AC_PROG_RANLIB
+AC_PROG_RANLIB
 
-AC_OUTPUT([Makefile src/Makefile])
+AC_OUTPUT([Makefile src/Makefile src/libparser/Makefile])

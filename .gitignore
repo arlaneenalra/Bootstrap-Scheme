@@ -19,4 +19,6 @@ missing
 ChangeLog
 log.txt
 src/bootstrap
+src/libparser/scheme.c
+src/
 ylwrap

@@ -20,10 +20,10 @@ typedef struct object {
     union {
 	int64_t int_val;
 	wchar_t char_val; 
+	int8_t bool_val;
     } value;
 
 } object_type;
-
 
 
 
