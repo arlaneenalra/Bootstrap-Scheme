@@ -1,14 +1,15 @@
-%option noyywrap
+%option noyywrap reentrant bison-bridge
 %option yylineno
 
+%{
+#include "scheme.h"
+
+%}
+
 %%
 
-"("       { return 1; }
+"("       { return OPEN_PAREN; }
 
-")"       { return 0; } 
+")"       { return CLOSE_PAREN; } 
 
 %%
-
-void set_stream(FILE *fin) {
-    yyin=fin;
-}

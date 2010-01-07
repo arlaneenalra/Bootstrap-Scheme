@@ -1,9 +1,14 @@
-include ../../Makefile.extra
 
 noinst_LIBRARIES=libparser.a
-libparser_a_SOURCES=scheme.l
+libparser_a_SOURCES=lexer.l scheme.y
 
-BUILT_SOURCES=scheme.c
+BUILT_SOURCES=lexer.c scheme.c
 
-CLEANFILES=$(BUILT_SOURCES)
+AM_YFLAGS=-d --verbose
+AM_LFLAGS="--header-file=`pwd`/lexer.h" # this is a stupid requirement
+
+MOSTLYCLEANFILES=lexer.h scheme.h scheme.output
+
+include ../../Makefile.extra
+
 #EXTRA_DIST=core.h
