@@ -6,6 +6,8 @@ AC_INIT([src/bootstrap.c])
 
 AM_INIT_AUTOMAKE(scheme_bootstrap, 0.1)
 
+AM_SANITY_CHECK
+
 AC_PROG_CC
 AC_PROG_LEX
 AC_PROG_YACC
