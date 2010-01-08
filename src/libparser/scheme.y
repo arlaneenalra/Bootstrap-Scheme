@@ -36,13 +36,27 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 expression:
     object         { set(interp, BARE); }
 
-tuple:
+list:
     OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
   | OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); set(interp, NONE);}
     object         { set(interp, CAR);}
+    pair_or_list
+    CLOSE_PAREN    { pop_state(interp); }
+
+pair_or_list:
+    pair
+  | list_next
+
+pair:
     DOT 
     object         { set(interp, CDR);}
-    CLOSE_PAREN    { pop_state(interp); }
+
+list_next:
+    object         { chain_state(interp);}
+  | object         { chain_state(interp);}
+    list_next
+    
+
 
 
 boolean:
@@ -63,7 +77,7 @@ object:
   | CHAR_CONSTANT   { add_char(interp, yyget_text(scanner)); }
   | string 
   | number
-  | tuple
+  | list
 
 
 

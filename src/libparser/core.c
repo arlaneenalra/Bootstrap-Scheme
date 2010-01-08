@@ -110,6 +110,23 @@ void add_float(interp_core_type *interp, char *str) {
     add_object(interp, obj);
 }
 
+/* Add a new state to the current chain of states without
+   pushing it onto the state stack */
+void chain_state(interp_core_type *interp) {
+    object_type *state=0;
+    object_type *new_state=interp->added;
+
+    state=alloc_object(interp, TUPLE);
+    add_object(interp, state);
+    set(interp, CDR);
+    
+    interp->current=state;
+
+    add_object(interp, new_state);
+    set(interp, CAR);
+
+}
+
 /* Save the current list off so that we can get back to it */
 void push_state(interp_core_type *interp) {
     object_type *state=0;
