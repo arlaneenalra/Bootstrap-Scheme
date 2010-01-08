@@ -75,7 +75,8 @@ void pop_state(interp_core_type *interp) {
 /* Parse a string */
 object_type *parse(interp_core_type *interp, const char *buf) {
 
-    interp->current=interp->root=alloc_object(interp, TUPLE);
+    /*interp->current=interp->root=alloc_object(interp, TUPLE);*/
+    interp->current=interp->root=0;
     
     yy_scan_string(buf, interp->scanner);
     yyparse(interp, interp->scanner);
@@ -85,6 +86,9 @@ object_type *parse(interp_core_type *interp, const char *buf) {
 
 /* Output an object graph to stdout */
 void output(interp_core_type *interp, object_type *obj) {
+    object_type *car=0;
+    object_type *cdr=0;
+
 
     /* make sure there is something to display */
     if(obj==0) {
@@ -109,16 +113,17 @@ void output(interp_core_type *interp, object_type *obj) {
 
     case CHAR:
 	break;
-    case TUPLE:
-	printf("(");
-	output(interp, obj->value.tuple.car); 
 
-	printf(" ");
+    case TUPLE:
+	car=obj->value.tuple.car;
+	cdr=obj->value.tuple.cdr;
 	
-	if(obj->value.tuple.cdr!=0) {
-	    output(interp, obj->value.tuple.cdr);
-	}
+	printf("(");
+	output(interp, car);
+	printf(" . ");
+	output(interp, cdr);
 	printf(")");
+
 	break;
 
     default:
