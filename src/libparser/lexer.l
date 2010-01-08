@@ -14,12 +14,14 @@ IDENT     (.)
 CHAR_VAL      (newline|space|[^{WS}])
 
 %x EXPECT_CHAR
+%x EXPECT_STRING
 
 %%
 
 "("       { return OPEN_PAREN; }
 ")"       { return CLOSE_PAREN; }
 "."       { return DOT; }
+"'"       { return QUOTE; }
 
 "#t"      { return TRUE_OBJ; }
 "#f"      { return FALSE_OBJ; }
@@ -35,6 +37,15 @@ CHAR_VAL      (newline|space|[^{WS}])
 <EXPECT_CHAR>{CHAR_VAL} {	BEGIN(INITIAL); 
 				return CHAR_CONSTANT; }
 
-[^0-9\(\)#'".[:blank:]]{IDENT}+  { return SYMBOL; }
+\"        { BEGIN(EXPECT_STRING); return DOUBLE_QUOTE;}
+
+<EXPECT_STRING>{
+
+(\\n|\\["]|\\\\|[^\\"])*  { return STRING_CONSTANT; }
+\"                  { BEGIN(INITIAL); return DOUBLE_QUOTE; }
+}
+
+
+[^0-9\(\)'#".[:blank:]]{IDENT}+  { return SYMBOL; }
 
 %%

@@ -86,6 +86,20 @@ void add_number(interp_core_type *interp, char *str) {
     add_object(interp, obj);
 }
 
+/* create an instance of a string object */
+void add_string(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+
+    /* create a new buffer for the string value */
+    char *c=malloc(strlen(str));
+    strcpy(c, str);
+
+    obj=alloc_object(interp, STRING);
+    obj->value.string_val=c;
+
+    add_object(interp,obj);
+}
+
 /* Create an instance of a floating point number */
 void add_float(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -192,6 +206,10 @@ void output(interp_core_type *interp, object_type *obj) {
 
 	break;
 
+    case STRING:
+	printf("\"%s\"", obj->value.string_val);
+	break;
+
     case TUPLE:
 	car=obj->value.tuple.car;
 	cdr=obj->value.tuple.cdr;
@@ -285,6 +303,12 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 void free_list(object_type *obj) {
     while(obj) {
 	object_type *next=obj->next;
+
+	/* make sure we clear out string buffers */
+	if(obj->type==STRING && obj->value.string_val!=0) {
+	    free(obj->value.string_val);
+	}
+	
 	free(obj);
 	printf("freed:%li\n", obj);
 	obj=next;

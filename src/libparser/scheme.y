@@ -19,6 +19,10 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 %token TRUE_OBJ
 %token FALSE_OBJ
 
+%token QUOTE
+%token DOUBLE_QUOTE
+
+%token STRING_CONSTANT
 %token CHAR_CONSTANT
 
 %token FIXED_NUMBER
@@ -48,10 +52,16 @@ boolean:
 number:
     FIXED_NUMBER    { add_number(interp, yyget_text(scanner)); }
   | FLOAT_NUMBER    { add_float(interp, yyget_text(scanner)); }
+
+string:
+    DOUBLE_QUOTE
+    STRING_CONSTANT { add_string(interp, yyget_text(scanner)); }
+    DOUBLE_QUOTE
     
 object:
     boolean
   | CHAR_CONSTANT   { add_char(interp, yyget_text(scanner)); }
+  | string 
   | number
   | tuple
 

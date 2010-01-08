@@ -2,7 +2,6 @@
 #define _CORE_
 
 #include <stdio.h>
-#include <wchar.h>
 
 #include <stdint.h>
 
@@ -18,6 +17,7 @@ typedef enum {
     FLOATNUM,
     BOOL,
     CHAR,
+    STRING,
     TUPLE
 } object_type_enum;
 
@@ -36,7 +36,8 @@ typedef struct object {
     union {
 	int64_t int_val;
 	long double float_val; /* There should be a better way to do this */
-	wchar_t char_val; 
+	char char_val; 
+	char *string_val;
 	bool bool_val;
 	struct {
 	    struct object *car;
@@ -94,6 +95,10 @@ void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, const char *buf);
 void add_object(interp_core_type *interp, object_type *obj);
+void add_char(interp_core_type *interp, char *str);
+void add_number(interp_core_type *interp, char *str);
+void add_float(interp_core_type *interp, char *str);
+void add_string(interp_core_type *interp, char *str);
 
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
