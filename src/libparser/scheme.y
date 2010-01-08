@@ -39,21 +39,24 @@ expression:
 list:
     OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
   | OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); set(interp, NONE);}
-    object         { set(interp, CAR);}
-    pair_or_list
+    object_pair_list
     CLOSE_PAREN    { pop_state(interp); }
 
-pair_or_list:
-    pair
+object_pair_list:
+    object         { set(interp, CAR);}
+  | pair
   | list_next
 
+    
+
 pair:
+    object         { set(interp, CAR);}
     DOT 
     object         { set(interp, CDR);}
 
 list_next:
-    object         { chain_state(interp);}
-  | object         { chain_state(interp);}
+    object         { chain_state(interp); }
+  | object         { chain_state(interp); }
     list_next
     
 

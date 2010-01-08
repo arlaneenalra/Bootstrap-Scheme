@@ -116,6 +116,13 @@ void chain_state(interp_core_type *interp) {
     object_type *state=0;
     object_type *new_state=interp->added;
 
+    /* handle the first list entry correctly */
+    if(interp->current->value.tuple.car==0) {
+	/* we don't need to do anythin else here */
+	set(interp, CAR);
+	return;
+    } 
+
     state=alloc_object(interp, TUPLE);
     add_object(interp, state);
     set(interp, CDR);
