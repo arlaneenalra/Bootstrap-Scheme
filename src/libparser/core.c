@@ -15,43 +15,53 @@ void clear_state_stack(interp_core_type *interp);
 
 void output(interp_core_type *interp, object_type *obj);
 
-void add_object(interp_core_type *interp, object_type *obj) {
+void set(interp_core_type *interp, setting_type_enum setting) {
     object_type *current=0;
-
-    /* replace nil if this is the first object allocated */
-    if(interp->root==0) {
-
-	interp->current=interp->root=obj; 
-	return;
-    }
+    object_type *obj=interp->added;
     
+    obj=interp->added;
     current=interp->current;
-    
-    if(current->type!=TUPLE) {
-	fail("Cannot turn object into list!");
+
+    switch(setting) {
+    case CAR:
+	if(current->value.tuple.car!=0) {
+	    fail("Car is already set!");
+	}
+	current->value.tuple.car=obj;
+	break;
+
+    case CDR:
+	if(current->value.tuple.cdr!=0) {
+	    fail("Cdr is already set!");
+	}
+	current->value.tuple.cdr=obj;
+	break;
+
+    case NONE:
+	if(interp->root==0) {
+	    interp->root=obj;
+	} 
+
+	push_state(interp);
+
+
+	break;
+    default:
+	fail("Invalide setting state!");
     }
 
-    
-    /* make sure we have an empty car to deal with */
-    if(current->value.tuple.car!=0) {
+}
 
-    	current->value.tuple.cdr=alloc_object(interp, TUPLE);
-    	current=interp->current=current->value.tuple.cdr;
-    }
-    
-    /* set the value, finally */
-    current->value.tuple.car=obj;
+void add_object(interp_core_type *interp, object_type *obj) {
+    interp->added=obj;
 }
 
 /* Save the current list off so that we can get back to it */
 void push_state(interp_core_type *interp) {
     object_type *state=0;
-    object_type *new_state=0;
+    object_type *new_state=interp->added;
 
     state=alloc_object(interp, TUPLE);
-    new_state=alloc_object(interp, TUPLE);
-
-    add_object(interp, new_state);
 
     /* push the current state onto the state stack */
     state->value.tuple.cdr=interp->state_stack;
@@ -65,13 +75,13 @@ void push_state(interp_core_type *interp) {
 void pop_state(interp_core_type *interp) {
     object_type *state=0;
     
-    
     if(interp->state_stack==0) {
 	fail("Attempt to pop non-existent state");
     }
     
     state=interp->state_stack;
     
+    interp->added=interp->current;
     interp->current=state->value.tuple.car;
     interp->state_stack=state->value.tuple.cdr;
     

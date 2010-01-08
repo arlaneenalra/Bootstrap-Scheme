@@ -24,17 +24,15 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 
 %%
 
-dot_pair:
-    object DOT object
-  | object
-
 tuple:
-    OPEN_PAREN     { push_state(interp); }
-    dot_pair
+    OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); set(interp, NONE);}
+    object         { set(interp, CAR);}
+    DOT 
+    object         { set(interp, CDR);}
     CLOSE_PAREN    { pop_state(interp); }
 
 nil:
-    OPEN_PAREN CLOSE_PAREN { add_object(interp, 0); }    
+    OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
 
 boolean:
     TRUE_OBJ        { add_object(interp, interp->boolean.true); }

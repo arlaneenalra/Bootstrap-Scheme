@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
 	if(getline(&buffer, &buffer_size, stdin)) {
 	    obj=parse(interp, buffer);
 	    output(interp, obj);
+	    printf("\n");
 	}
 	
     }

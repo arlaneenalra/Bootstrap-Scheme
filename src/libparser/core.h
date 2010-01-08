@@ -20,6 +20,13 @@ typedef enum {
     TUPLE
 } object_type_enum;
 
+/* Used to tell add object that we are setting a car or cdr */
+typedef enum {
+    NONE,
+    CAR,
+    CDR
+} setting_type_enum;
+
 /* Define a structure to represent a memory cell */
 typedef struct object {
     object_type_enum type;
@@ -56,10 +63,17 @@ typedef struct interp_core {
     
     bool_global_type boolean;
 
+    //setting_type_enum setting;
+    /* last added object */
+    object_type *added;
+
     /* root of the current object graph */
     object_type *root;
 
+    /* object we are currently working on */
     object_type *current;
+
+
     
     object_type *state_stack;
 
@@ -69,7 +83,8 @@ typedef struct interp_core {
 
 
 /* Function definitions */
-//object_type *alloc_object(interp_core_type* core, object_type_enum obj_type);
+void set(interp_core_type *interp, setting_type_enum setting);
+object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type);
 
 interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
