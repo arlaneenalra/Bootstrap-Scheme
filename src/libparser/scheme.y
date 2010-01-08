@@ -18,24 +18,23 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 
 %token TRUE_OBJ
 %token FALSE_OBJ
+
 %token SYMBOL
 
 
 %%
 
-list:
-    object
-  | object DOT object
-  | object list
+dot_pair:
+    object DOT object
+  | object
+
+tuple:
+    OPEN_PAREN     { add_object(interp, alloc_object(interp,TUPLE)); push_state(interp); }
+    dot_pair
+    CLOSE_PAREN    { pop_state(interp); }
 
 nil:
     OPEN_PAREN CLOSE_PAREN { add_object(interp, 0); }    
-
-tuple:
-    OPEN_PAREN     { push_state(interp); }
-    list
-    CLOSE_PAREN    { pop_state(interp); }
-
 
 boolean:
     TRUE_OBJ        { add_object(interp, interp->boolean.true); }
@@ -45,7 +44,7 @@ object:
     boolean
   | nil
   | SYMBOL
-  | tuple           { /* shouldn't be anything to do here */ }
+  | tuple
 
 
 

@@ -11,6 +11,7 @@ void gc_all(interp_core_type *interp);
 
 void create_booleans(interp_core_type *interp);
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type);
+void clear_state_stack(interp_core_type *interp);
 
 void output(interp_core_type *interp, object_type *obj);
 
@@ -20,17 +21,22 @@ void add_object(interp_core_type *interp, object_type *obj) {
     /* replace nil if this is the first object allocated */
     if(interp->root==0) {
 
-	interp->root=alloc_object(interp, TUPLE);
-	interp->current=interp->root; 
+	interp->current=interp->root=obj; 
+	return;
     }
     
     current=interp->current;
     
-    /* make sure we have an empty car to deal with */
-    if(current->value.tuple.car!=0) {	
+    if(current->type!=TUPLE) {
+	fail("Cannot turn object into list!");
+    }
 
-	current->value.tuple.cdr=alloc_object(interp, TUPLE);
-	current=interp->current=current->value.tuple.cdr;
+    
+    /* make sure we have an empty car to deal with */
+    if(current->value.tuple.car!=0) {
+
+    	current->value.tuple.cdr=alloc_object(interp, TUPLE);
+    	current=interp->current=current->value.tuple.cdr;
     }
     
     /* set the value, finally */
@@ -60,7 +66,7 @@ void pop_state(interp_core_type *interp) {
     object_type *state=0;
     
     
-    if(interp==0) {
+    if(interp->state_stack==0) {
 	fail("Attempt to pop non-existent state");
     }
     
@@ -72,15 +78,24 @@ void pop_state(interp_core_type *interp) {
     mark_free(interp, state);
 }
 
+/* Make sure that there are no loose state's sitting on 
+   the stack */
+void clear_state_stack(interp_core_type *interp) {
+    while(interp->state_stack!=0) {
+	pop_state(interp);
+    }
+}
+
 /* Parse a string */
 object_type *parse(interp_core_type *interp, const char *buf) {
 
     /*interp->current=interp->root=alloc_object(interp, TUPLE);*/
     interp->current=interp->root=0;
+    clear_state_stack(interp);
     
     yy_scan_string(buf, interp->scanner);
     yyparse(interp, interp->scanner);
- 
+    
     return interp->root;
 }
 
@@ -232,18 +247,26 @@ void mark_free(interp_core_type *interp, object_type *obj) {
     
     active_list=interp->gc.active_list;
     child=obj->next;
-    
+
     /* move obj to top of free list */
     obj->next=interp->gc.free_list;
     interp->gc.free_list=obj;
 
-    /* move children of obj to top of 
-       active list */
-    while(child!=0) {
-	object_type *top=child->next;
-	child->next=interp->gc.active_list;
+    /* Invert the active_list onto the top 
+       of the child list */
 
-	interp->gc.active_list=child;
-	child=top;
+    while(active_list!=child && active_list !=0) {
+	object_type *top=active_list->next;
+
+	/* Put the current active node on
+	   top of the child list */
+	active_list->next=child;
+	child=active_list;
+
+	active_list=top;
     }
+    
+    /* save the child list as the new active_list */
+    interp->gc.active_list=child;
+    
 }
