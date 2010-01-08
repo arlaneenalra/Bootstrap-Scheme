@@ -15,6 +15,7 @@ typedef int8_t bool;
 /* The types of cells that we can represent */
 typedef enum {
     FIXNUM,
+    FLOATNUM,
     BOOL,
     CHAR,
     TUPLE
@@ -34,6 +35,7 @@ typedef struct object {
 
     union {
 	int64_t int_val;
+	long double float_val; /* There should be a better way to do this */
 	wchar_t char_val; 
 	bool bool_val;
 	struct {

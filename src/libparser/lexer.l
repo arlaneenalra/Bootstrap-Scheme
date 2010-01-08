@@ -26,6 +26,10 @@ CHAR_VAL      (newline|space|[^{WS}])
 
 {WS}*     /* Do nothing with white space */
 
+[-]?{DIGITS} { return FIXED_NUMBER; }
+[-]?{DIGITS}"."{DIGITS} { return FLOAT_NUMBER; }
+
+
 #\\       { BEGIN(EXPECT_CHAR); }
 
 <EXPECT_CHAR>{CHAR_VAL} {	BEGIN(INITIAL); 

@@ -54,10 +54,12 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 
 }
 
+/* Put the passed object into the added buffer */
 void add_object(interp_core_type *interp, object_type *obj) {
     interp->added=obj;
 }
 
+/* Create a character constant object */
 void add_char(interp_core_type *interp, char *str) {
     object_type *obj=0;
     
@@ -71,6 +73,26 @@ void add_char(interp_core_type *interp, char *str) {
     
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c;
+    add_object(interp, obj);
+}
+
+/* Create a number */
+void add_number(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp, FIXNUM);
+    obj->value.int_val=strtoll(str, 0, 10);
+    
+    add_object(interp, obj);
+}
+
+/* Create an instance of a floating point number */
+void add_float(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+    
+    obj=alloc_object(interp, FLOATNUM);
+    obj->value.float_val=strtold(str, 0);
+
     add_object(interp, obj);
 }
 
@@ -142,6 +164,10 @@ void output(interp_core_type *interp, object_type *obj) {
     switch(obj->type) {
     case FIXNUM:
 	printf("%li", obj->value.int_val);
+	break;
+	
+    case FLOATNUM:
+	printf("%Lg", obj->value.float_val);
 	break;
 
     case BOOL:
