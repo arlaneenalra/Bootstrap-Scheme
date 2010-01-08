@@ -29,8 +29,12 @@ int main(int argc, char **argv) {
 
 	/* if the user actually entered anything, parse it */
 	if(getline(&buffer, &buffer_size, stdin)) {
-	    obj=parse(interp, buffer);
-	    output(interp, obj);
+	    if(buffer[0]=='\n') {
+		interp->running=0;
+	    } else {
+		obj=parse(interp, buffer);
+		output(interp, obj);
+	    }
 	    printf("\n");
 	}
 	

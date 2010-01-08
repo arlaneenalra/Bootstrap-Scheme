@@ -15,6 +15,7 @@ void clear_state_stack(interp_core_type *interp);
 
 void output(interp_core_type *interp, object_type *obj);
 
+/* Attach an added object to our graph of objects */
 void set(interp_core_type *interp, setting_type_enum setting) {
     object_type *current=0;
     object_type *obj=interp->added;
@@ -44,8 +45,8 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 
 	push_state(interp);
 
-
 	break;
+
     default:
 	fail("Invalide setting state!");
     }
@@ -54,6 +55,22 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 
 void add_object(interp_core_type *interp, object_type *obj) {
     interp->added=obj;
+}
+
+void add_char(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+    
+    char c=*str;
+    
+    if(strcmp(str, "newline")==0) {
+	c='\n';
+    } else if(strcmp(str, "space")==0) {
+	c=' ';
+    }
+    
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c;
+    add_object(interp, obj);
 }
 
 /* Save the current list off so that we can get back to it */
@@ -137,6 +154,15 @@ void output(interp_core_type *interp, object_type *obj) {
 	break;
 
     case CHAR:
+	printf("#\\");
+	if(obj->value.char_val=='\n') {
+	    printf("newline");
+	} else if(obj->value.char_val==' ') {
+	    printf("space");
+	} else {
+	    printf("%c", obj->value.char_val);
+	}
+
 	break;
 
     case TUPLE:
@@ -233,6 +259,7 @@ void free_list(object_type *obj) {
     while(obj) {
 	object_type *next=obj->next;
 	free(obj);
+	printf("freed:%li\n", obj);
 	obj=next;
     }
 }

@@ -19,6 +19,8 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 %token TRUE_OBJ
 %token FALSE_OBJ
 
+%token CHAR_CONSTANT
+
 %token SYMBOL
 
 
@@ -40,8 +42,8 @@ boolean:
     
 object:
     boolean
+  | CHAR_CONSTANT   { add_char(interp, yyget_text(scanner)); }
   | nil
-  | SYMBOL
   | tuple
 
 
