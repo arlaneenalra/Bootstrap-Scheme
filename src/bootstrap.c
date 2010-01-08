@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
     printf("sizeof(object_type) %li\n", sizeof(object_type));
 
     while(interp->running) {
+	object_type *obj=0;
 
 	printf(">\n");
 
@@ -26,10 +27,10 @@ int main(int argc, char **argv) {
 	    buffer[0]='\0';
 	}
 
-	(void)getline(&buffer, &buffer_size, stdin);
-    
-	yy_scan_string(buffer, interp->scanner);
-	yyparse(interp, interp->scanner);
+	/* if the user actually entered anything, parse it */
+	if(getline(&buffer, &buffer_size, stdin)) {
+	    obj=parse(interp, buffer);
+	}
 	
     }
 

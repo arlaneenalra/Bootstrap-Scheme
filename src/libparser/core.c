@@ -7,6 +7,10 @@
 void free_list(object_type *obj);
 void gc_all(interp_core_type *interp);
 
+void create_booleans(interp_core_type *interp);
+object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type);
+
+
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 
@@ -47,7 +51,6 @@ void create_booleans(interp_core_type *interp) {
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=0;
     interp->boolean.false=obj;
-
 }
 
 /* Create an instance of the interpreter */
@@ -62,7 +65,7 @@ interp_core_type *create_interp() {
 
 	interp->running=1;
 
-	create_booleans(&(interp->boolean));
+	create_booleans(interp);
 
 	/* create an instance of the parser/lexer */
 	yylex_init(&(interp->scanner));

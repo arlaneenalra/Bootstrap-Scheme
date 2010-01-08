@@ -29,7 +29,7 @@ typedef struct object {
 	bool bool_val;
     } value;
 
-    struct object_type *next;
+    struct object *next;
 } object_type;
 
 typedef struct bool_global {
@@ -51,13 +51,15 @@ typedef struct interp_core {
     
     bool_global_type boolean;
 
+    object_type  *root;
+
     gc_type gc; /* Where the garbage collector keeps it's data */
     yyscan_t scanner; /* an instance of the parser/lexer */
 } interp_core_type;
 
 
 /* Function definitions */
-object_type *alloc_object(interp_core_type* core, object_type_enum obj_type);
+//object_type *alloc_object(interp_core_type* core, object_type_enum obj_type);
 
 interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
