@@ -73,7 +73,7 @@ void pop_state(interp_core_type *interp) {
     state=interp->state_stack;
     
     interp->current=state->value.tuple.car;
-    interp->state_stack->value.tuple.cdr;
+    interp->state_stack=state->value.tuple.cdr;
     
     mark_free(interp, state);
 }
@@ -248,6 +248,7 @@ void mark_free(interp_core_type *interp, object_type *obj) {
     active_list=interp->gc.active_list;
     child=obj->next;
 
+
     /* move obj to top of free list */
     obj->next=interp->gc.free_list;
     interp->gc.free_list=obj;
@@ -255,7 +256,7 @@ void mark_free(interp_core_type *interp, object_type *obj) {
     /* Invert the active_list onto the top 
        of the child list */
 
-    while(active_list!=child && active_list !=0) {
+    while(active_list!=obj && active_list !=0) {
 	object_type *top=active_list->next;
 
 	/* Put the current active node on

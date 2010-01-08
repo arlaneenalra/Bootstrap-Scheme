@@ -29,7 +29,7 @@ dot_pair:
   | object
 
 tuple:
-    OPEN_PAREN     { add_object(interp, alloc_object(interp,TUPLE)); push_state(interp); }
+    OPEN_PAREN     { push_state(interp); }
     dot_pair
     CLOSE_PAREN    { pop_state(interp); }
 
