@@ -28,7 +28,10 @@ typedef struct object {
 	int64_t int_val;
 	wchar_t char_val; 
 	bool bool_val;
-	struct object *car;
+	struct {
+	    struct object *car;
+	    struct object *cdr;
+	} tuple;
     } value;
 
     struct object *next;
@@ -55,7 +58,10 @@ typedef struct interp_core {
 
     /* root of the current object graph */
     object_type *root;
+
     object_type *current;
+    
+    object_type *state_stack;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
     yyscan_t scanner; /* an instance of the parser/lexer */
@@ -70,4 +76,8 @@ void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, const char *buf);
 void add_object(interp_core_type *interp, object_type *obj);
+
+void push_state(interp_core_type *interp);
+void pop_state(interp_core_type *interp);
+
 #endif

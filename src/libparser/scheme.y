@@ -28,9 +28,9 @@ list:
   | object list
 
 tuple:
-    OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); }
+    OPEN_PAREN     { push_state(interp); }
     list
-    CLOSE_PAREN    { /* end of current chain . . . */ }
+    CLOSE_PAREN    { pop_state(interp); }
   | OPEN_PAREN CLOSE_PAREN { add_object(interp, 0); }
 
 
