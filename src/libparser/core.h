@@ -9,6 +9,9 @@
 #include "scheme.h"
 #include "lexer.h"
 
+
+typedef int8_t bool;
+
 /* The types of cells that we can represent */
 typedef enum {
     FIXNUM,
@@ -23,20 +26,25 @@ typedef struct object {
     union {
 	int64_t int_val;
 	wchar_t char_val; 
-	int8_t bool_val;
+	bool bool_val;
     } value;
 
 } object_type;
 
 
+/* Configuartion for the garbage collector */
+typedef struct gc {
+    object_type *active_list;
+} gc_type;
 
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
-    char running;
-    
+    bool running;
 
-    yyscan_t scanner;
+    gc_type gc; /* Where the garbage collector keeps it's data */
+
+    yyscan_t scanner; /* an instance of the parser/lexer */
 } interp_core_type;
 
 
