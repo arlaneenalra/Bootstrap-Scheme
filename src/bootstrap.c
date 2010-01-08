@@ -33,11 +33,7 @@ int main(int argc, char **argv) {
 	
     }
 
-    /*yyset_in(stdin, interp->scanner);
-      yyparse(interp->scanner);*/
-    
-
-
+    /* clean up the input buffer */
     if(buffer_size) {
 	free(buffer);
     }
