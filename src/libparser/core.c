@@ -10,34 +10,39 @@ void gc_all(interp_core_type *interp);
 void create_booleans(interp_core_type *interp);
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type);
 
+void add_object(interp_core_type *interp, object_type *obj) {
+    object_type *current=0;
 
-/* Allocate and return an new object instance */
-object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
+    /* replace nil if this is the first object allocated */
+    if(interp->root==0) {
 
-    object_type *obj=malloc(sizeof(object_type));
-
-    /* check to make sure there was memory to allocate and then
-       make sure that we have a properly typed and zeroed object */
-    if(obj) {
-	bzero(obj, sizeof(object_type));
-
-	/* Add this object to the active list */
-	obj->next=interp->gc.active_list;
-	interp->gc.active_list=obj;
-
-	obj->type=obj_type;
-	return obj;
+	interp->root=alloc_object(interp, TUPLE);
+	interp->current=interp->root; 
     }
     
-    fail("Unable to new object");
+    current=interp->current;
+    
+    /* make sure we have an empty car to deal with */
+    if(current->value.car!=0) {	
+
+	current->next=alloc_object(interp, TUPLE);
+	current=interp->current=current->next;
+    }
+    
+    /* set the value, finally */
+    current->value.car=obj;
 }
 
 /* Parse a string */
 object_type *parse(interp_core_type *interp, const char *buf) {
 
+    interp->current=interp->root=alloc_object(interp, TUPLE);
+    
     yy_scan_string(buf, interp->scanner);
     yyparse(interp, interp->scanner);
+    
 }
+
 
 /* Create instances of the global boolean values */
 void create_booleans(interp_core_type *interp) {
@@ -65,6 +70,7 @@ interp_core_type *create_interp() {
 
 	interp->running=1;
 
+	/* create some special values */
 	create_booleans(interp);
 
 	/* create an instance of the parser/lexer */
@@ -83,6 +89,30 @@ void cleanup_interp(interp_core_type *interp) {
     gc_all(interp);
 
     free(interp);
+}
+
+
+
+/* Allocate and return an new object instance */
+object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
+
+    object_type *obj=malloc(sizeof(object_type));
+
+    /* check to make sure there was memory to allocate and then
+       make sure that we have a properly typed and zeroed object */
+    if(obj) {
+	bzero(obj, sizeof(object_type));
+
+	/* Add this object to the active list */
+	obj->next=interp->gc.active_list;
+	interp->gc.active_list=obj;
+
+	obj->type=obj_type;
+
+	return obj;
+    }
+    
+    fail("Unable to new object");
 }
 
 /* free a list a list of objects */

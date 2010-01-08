@@ -24,24 +24,20 @@ void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
 
 list:
     object
+  | object DOT object
   | object list
 
 tuple:
-    OPEN_PAREN
+    OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); }
     list
-    CLOSE_PAREN
-  | OPEN_PAREN
-    object
-    DOT
-    object
-    CLOSE_PAREN
-  | OPEN_PAREN CLOSE_PAREN { printf("nil\n"); }
+    CLOSE_PAREN    { /* end of current chain . . . */ }
+  | OPEN_PAREN CLOSE_PAREN { add_object(interp, 0); }
 
 
 object:
-    TRUE_OBJ        {  }
-  | FALSE_OBJ       {  }
-  | tuple
+    TRUE_OBJ        { add_object(interp, interp->boolean.true); }
+  | FALSE_OBJ       { add_object(interp, interp->boolean.false); }
+  | tuple           { /* shouldn't be anything to do here */ }
 
 
 

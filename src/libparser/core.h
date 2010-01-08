@@ -16,7 +16,8 @@ typedef int8_t bool;
 typedef enum {
     FIXNUM,
     BOOL,
-    CHAR
+    CHAR,
+    TUPLE
 } object_type_enum;
 
 /* Define a structure to represent a memory cell */
@@ -27,6 +28,7 @@ typedef struct object {
 	int64_t int_val;
 	wchar_t char_val; 
 	bool bool_val;
+	struct object *car;
     } value;
 
     struct object *next;
@@ -51,7 +53,9 @@ typedef struct interp_core {
     
     bool_global_type boolean;
 
-    object_type  *root;
+    /* root of the current object graph */
+    object_type *root;
+    object_type *current;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
     yyscan_t scanner; /* an instance of the parser/lexer */
@@ -65,5 +69,5 @@ interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, const char *buf);
-
+void add_object(interp_core_type *interp, object_type *obj);
 #endif
