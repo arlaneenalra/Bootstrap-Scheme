@@ -38,6 +38,7 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	current->value.tuple.cdr=obj;
 	break;
 
+    case BARE:
     case NONE:
 	if(interp->root==0) {
 	    interp->root=obj;
