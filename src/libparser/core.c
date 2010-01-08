@@ -4,8 +4,11 @@
 #include "core.h"
 #include "util.h"
 
+void free_list(object_type *obj);
+void gc_all(interp_core_type *interp);
+
 /* Allocate and return an new object instance */
-object_type *alloc_object(interp_core_type* core, object_type_enum obj_type) {
+object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 
     object_type *obj=malloc(sizeof(object_type));
 
@@ -14,6 +17,10 @@ object_type *alloc_object(interp_core_type* core, object_type_enum obj_type) {
     if(obj) {
 	bzero(obj, sizeof(object_type));
 
+	/* Add this object to the active list */
+	obj->next=interp->gc.active_list;
+	interp->gc.active_list=obj;
+
 	obj->type=obj_type;
 	return obj;
     }
@@ -21,7 +28,29 @@ object_type *alloc_object(interp_core_type* core, object_type_enum obj_type) {
     fail("Unable to new object");
 }
 
+/* Parse a string */
+object_type *parse(interp_core_type *interp, const char *buf) {
 
+    yy_scan_string(buf, interp->scanner);
+    yyparse(interp, interp->scanner);
+}
+
+/* Create instances of the global boolean values */
+void create_booleans(interp_core_type *interp) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp,BOOL);
+    obj->value.bool_val=1;
+    interp->boolean.true=obj;
+
+    
+    obj=alloc_object(interp,BOOL);
+    obj->value.bool_val=0;
+    interp->boolean.false=obj;
+
+}
+
+/* Create an instance of the interpreter */
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
     
@@ -32,7 +61,8 @@ interp_core_type *create_interp() {
 	bzero(interp, sizeof(interp_core_type));
 
 	interp->running=1;
-	
+
+	create_booleans(&(interp->boolean));
 
 	/* create an instance of the parser/lexer */
 	yylex_init(&(interp->scanner));
@@ -43,8 +73,35 @@ interp_core_type *create_interp() {
     fail("Unable to create interpreter instance");
 }
 
+/* Clean up allocations in the interpreter. */
 void cleanup_interp(interp_core_type *interp) {
     yylex_destroy(interp->scanner);
+
+    gc_all(interp);
+
     free(interp);
+}
+
+/* free a list a list of objects */
+void free_list(object_type *obj) {
+    while(obj) {
+	object_type *next=obj->next;
+	free(obj);
+	obj=next;
+    }
+}
+
+/* clear out the garbage collector lists */
+void gc_all(interp_core_type *interp) {
+
+    if(interp->gc.active_list) {
+	free_list(interp->gc.active_list);
+	interp->gc.active_list=0;
+    }
+
+    if(interp->gc.active_list) {
+	free_list(interp->gc.free_list);
+	interp->gc.free_list=0;
+    }
 }
 

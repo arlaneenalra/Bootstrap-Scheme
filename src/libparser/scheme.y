@@ -39,8 +39,8 @@ tuple:
 
 
 object:
-    TRUE_OBJ        { printf("true\n"); }
-  | FALSE_OBJ       { printf("false\n"); }
+    TRUE_OBJ        {  }
+  | FALSE_OBJ       {  }
   | tuple
 
 
