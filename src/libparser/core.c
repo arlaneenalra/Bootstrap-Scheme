@@ -291,13 +291,39 @@ void output(interp_core_type *interp, object_type *obj) {
     case TUPLE:
 	car=obj->value.tuple.car;
 	cdr=obj->value.tuple.cdr;
-	
-	printf("(");
-	output(interp, car);
-	printf(" . ");
-	output(interp, cdr);
-	printf(")");
 
+      	printf("(");
+	output(interp, car);
+
+	if(cdr!=0) {
+	    if(cdr->type==TUPLE) {
+
+		while(cdr!=0) {
+		    printf(" ");
+
+		    car=cdr->value.tuple.car;
+		    cdr=cdr->value.tuple.cdr;
+
+		    output(interp, car);
+		    
+		    /* if the next element is not a tupple,
+		       for output it and set cdr to 0 */
+		    if(cdr!=0 && cdr->type!=TUPLE) {
+			output(interp, cdr);
+			cdr=0;
+		    }
+		    
+		}
+
+	    } else {
+		printf(" . ");
+		output(interp, cdr);
+	    }
+	}
+
+	printf(")");
+	
+       
 	break;
 
     default:
