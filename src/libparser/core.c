@@ -20,11 +20,21 @@ void set(interp_core_type *interp, setting_type_enum setting) {
     object_type *current=0;
     object_type *obj=interp->added;
     
+    
     obj=interp->added;
     current=interp->current;
 
+    if(current !=0 && current->type!=TUPLE) {
+	fail("Attempting to set on none tuple.");
+    }
+
     switch(setting) {
     case CAR:
+	TRACE("Sa");
+	if(current==0) {
+	    fail("Attempt to set car on null pointer");
+	}
+
 	if(current->value.tuple.car!=0) {
 	    fail("Car is already set!");
 	}
@@ -32,6 +42,11 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	break;
 
     case CDR:
+	TRACE("Sd");
+	if(current==0) {
+	    fail("Attempt to set cdr on null pointer");
+	}
+
 	if(current->value.tuple.cdr!=0) {
 	    fail("Cdr is already set!");
 	}
@@ -39,12 +54,24 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	break;
 
     case BARE:
-    case NONE:
-	if(interp->root==0) {
+	TRACE("B");
+
+ 	if(interp->root==0) {
 	    interp->root=obj;
 	} 
 
-	push_state(interp);
+	break;
+
+    case NONE:
+	TRACE("N");
+
+	if(interp->root==0) {
+	    interp->root=obj;
+	}
+
+	if(current==0) {
+	    interp->current=obj;
+	} 
 
 	break;
 
@@ -116,6 +143,8 @@ void chain_state(interp_core_type *interp) {
     object_type *state=0;
     object_type *new_state=interp->added;
 
+    TRACE("C")
+
     /* handle the first list entry correctly */
     if(interp->current->value.tuple.car==0) {
 	/* we don't need to do anythin else here */
@@ -123,12 +152,16 @@ void chain_state(interp_core_type *interp) {
 	return;
     } 
 
-    state=alloc_object(interp, TUPLE);
-    add_object(interp, state);
-    set(interp, CDR);
+    /* state=alloc_object(interp, TUPLE); */
+    /* add_object(interp, state); */
+    /* set(interp, CDR); */
     
-    interp->current=state;
+    /* Before throwing current, we 
+       need to make sure that it has been added */
 
+    push_state(interp);
+    interp->state_stack->type=CHAIN;
+    
     add_object(interp, new_state);
     set(interp, CAR);
 
@@ -137,7 +170,9 @@ void chain_state(interp_core_type *interp) {
 /* Save the current list off so that we can get back to it */
 void push_state(interp_core_type *interp) {
     object_type *state=0;
-    object_type *new_state=interp->added;
+    object_type *new_state=alloc_object(interp, TUPLE);
+
+    TRACE("Pu")
 
     state=alloc_object(interp, TUPLE);
 
@@ -147,23 +182,38 @@ void push_state(interp_core_type *interp) {
     interp->state_stack=state;
     
     interp->current=new_state;
+    
+    /* if this is the first object, add it as root */
+    if(interp->root==0) {
+	interp->root=new_state;
+    }
 }
 
 /* Pop a previously saved list */
 void pop_state(interp_core_type *interp) {
     object_type *state=0;
+
+    TRACE("Po")
     
     if(interp->state_stack==0) {
 	fail("Attempt to pop non-existent state");
     }
-    
+
     state=interp->state_stack;
     
     interp->added=interp->current;
     interp->current=state->value.tuple.car;
     interp->state_stack=state->value.tuple.cdr;
-    
+
+    /* we are in the depths of a chain, pop until 
+       we're out of it */
+    if(state->type==CHAIN) {
+	set(interp, CDR);
+	pop_state(interp);
+    }
+
     mark_free(interp, state);
+    
 }
 
 /* Make sure that there are no loose state's sitting on 
@@ -180,9 +230,13 @@ object_type *parse(interp_core_type *interp, const char *buf) {
     /*interp->current=interp->root=alloc_object(interp, TUPLE);*/
     interp->current=interp->root=0;
     clear_state_stack(interp);
+
+    TRACE("RESET\n");
     
     yy_scan_string(buf, interp->scanner);
     yyparse(interp, interp->scanner);
+
+    TRACE("\n")
     
     return interp->root;
 }

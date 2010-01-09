@@ -8,6 +8,17 @@
 #include "scheme.h"
 #include "lexer.h"
 
+/* Add in some debuggin messages */
+#ifdef DEBUG
+
+#define TRACE(x)  (void)fprintf(stderr, "%s",x);
+
+#else
+
+#define TRACE(x)
+
+#endif
+
 
 typedef int8_t bool;
 
@@ -18,7 +29,9 @@ typedef enum {
     BOOL,
     CHAR,
     STRING,
-    TUPLE
+    TUPLE,
+    
+    CHAIN /* internal type */
 } object_type_enum;
 
 /* Used to tell add object that we are setting a car or cdr */

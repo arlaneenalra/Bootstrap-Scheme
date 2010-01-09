@@ -38,12 +38,12 @@ expression:
 
 list:
     OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
-  | OPEN_PAREN     { add_object(interp, alloc_object(interp, TUPLE)); set(interp, NONE);}
+  | OPEN_PAREN     { push_state(interp); }
     object_pair_list
     CLOSE_PAREN    { pop_state(interp); }
 
 object_pair_list:
-    object         { set(interp, CAR);}
+    object         { set(interp, CAR); }
   | pair
   | list_next
 
