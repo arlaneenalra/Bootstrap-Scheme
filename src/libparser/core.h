@@ -6,7 +6,6 @@
 #include <stdint.h>
 
 #include "scheme.h"
-#include "lexer.h"
 
 /* Add in some debuggin messages */
 #ifdef DEBUG
@@ -95,7 +94,7 @@ typedef struct interp_core {
     object_type *state_stack;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
-    yyscan_t scanner; /* an instance of the parser/lexer */
+    void * scanner; /* an instance of the parser/lexer */
 } interp_core_type;
 
 

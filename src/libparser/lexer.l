@@ -49,3 +49,8 @@ CHAR_VAL      (newline|space|[^{WS}])
 [^0-9\(\)'#".[:blank:]]{IDENT}+  { return SYMBOL; }
 
 %%
+
+char * get_text(void * scanner) {
+	return yyget_text(scanner);
+}
+

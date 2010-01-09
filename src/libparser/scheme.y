@@ -3,14 +3,15 @@
 %{
 #include <stdio.h>
 #include "core.h"
+#include "util.h"
 
-void yyerror(interp_core_type *interp, yyscan_t scanner, char *s);
+void yyerror(interp_core_type *interp, void *scanner, char *s);
 
 %}
 
 %parse-param {interp_core_type *interp}
-%parse-param {void * scanner}
-%lex-param {yyscan_t scanner}
+%parse-param {void *scanner}
+%lex-param {void *scanner}
 
 %token OPEN_PAREN
 %token CLOSE_PAREN
@@ -67,17 +68,17 @@ boolean:
   | FALSE_OBJ       { add_object(interp, interp->boolean.false); }
 
 number:
-    FIXED_NUMBER    { add_number(interp, yyget_text(scanner)); }
-  | FLOAT_NUMBER    { add_float(interp, yyget_text(scanner)); }
+    FIXED_NUMBER    { add_number(interp, get_text(scanner)); }
+  | FLOAT_NUMBER    { add_float(interp, get_text(scanner)); }
 
 string:
     DOUBLE_QUOTE
-    STRING_CONSTANT { add_string(interp, yyget_text(scanner)); }
+    STRING_CONSTANT { add_string(interp, get_text(scanner)); }
     DOUBLE_QUOTE
     
 object:
     boolean
-  | CHAR_CONSTANT   { add_char(interp, yyget_text(scanner)); }
+  | CHAR_CONSTANT   { add_char(interp, get_text(scanner)); }
   | string 
   | number
   | list
@@ -86,7 +87,7 @@ object:
 
 %%
 
-void yyerror(interp_core_type *interp, yyscan_t scanner, char *s) {
+void yyerror(interp_core_type *interp, void *scanner, char *s) {
     (void)fprintf(stderr,"There was an error parsing %s on line %i\n", 
 		       s, yyget_lineno(scanner));
 }
