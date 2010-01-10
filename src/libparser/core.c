@@ -255,7 +255,7 @@ void output(interp_core_type *interp, object_type *obj) {
     
     switch(obj->type) {
     case FIXNUM:
-	printf("%li", obj->value.int_val);
+	printf("%" PRIi64, obj->value.int_val);
 	break;
 	
     case FLOATNUM:
