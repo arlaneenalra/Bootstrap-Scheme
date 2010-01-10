@@ -297,6 +297,7 @@ void output(interp_core_type *interp, object_type *obj) {
 		    /* if the next element is not a tupple,
 		       for output it and set cdr to 0 */
 		    if(cdr!=0 && cdr->type!=TUPLE) {
+			printf(" . ");
 			output(interp, cdr);
 			cdr=0;
 		    }
