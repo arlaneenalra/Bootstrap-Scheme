@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     interp_core_type * interp=create_interp();
 
     printf("Simple Bootstrapper\n");
-    printf("sizeof(object_type) %li\n", sizeof(object_type));
+    printf("sizeof(object_type) %i\n", sizeof(object_type));
 
     while(interp->running) {
 	object_type *obj=0;
