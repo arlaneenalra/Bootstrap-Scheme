@@ -414,7 +414,7 @@ void free_list(object_type *obj) {
 	}
 	
 	free(obj);
-	printf("freed:%li\n", obj);
+	printf("freed:%ju\n", (uintmax_t)obj);
 	obj=next;
     }
 }
