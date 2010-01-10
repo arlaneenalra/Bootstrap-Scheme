@@ -62,19 +62,6 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 
 	break;
 
-    case NONE:
-	TRACE("N");
-
-	if(interp->root==0) {
-	    interp->root=obj;
-	}
-
-	if(current==0) {
-	    interp->current=obj;
-	} 
-
-	break;
-
     default:
 	fail("Invalide setting state!");
     }
@@ -152,10 +139,6 @@ void chain_state(interp_core_type *interp) {
 	return;
     } 
 
-    /* state=alloc_object(interp, TUPLE); */
-    /* add_object(interp, state); */
-    /* set(interp, CDR); */
-    
     /* Before throwing current, we 
        need to make sure that it has been added */
 
@@ -296,7 +279,8 @@ void output(interp_core_type *interp, object_type *obj) {
 	output(interp, car);
 
 	if(cdr!=0) {
-	    if(cdr->type==TUPLE) {
+	    if(cdr->type==TUPLE && 
+	       (cdr->value.tuple.cdr==0 || cdr->value.tuple.cdr->type==TUPLE)) {
 
 		while(cdr!=0) {
 		    printf(" ");

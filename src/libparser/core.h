@@ -35,7 +35,6 @@ typedef enum {
 
 /* Used to tell add object that we are setting a car or cdr */
 typedef enum {
-    NONE,
     BARE,
     CAR,
     CDR
