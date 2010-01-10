@@ -209,18 +209,22 @@ void clear_state_stack(interp_core_type *interp) {
 
 /* Parse a string */
 object_type *parse(interp_core_type *interp, const char *buf) {
-
-    /*interp->current=interp->root=alloc_object(interp, TUPLE);*/
+    
     interp->current=interp->root=0;
     clear_state_stack(interp);
 
     TRACE("RESET\n");
     
     yy_scan_string(buf, interp->scanner);
+    
     yyparse(interp, interp->scanner);
 
     TRACE("\n")
     
+    return interp->root;
+}
+
+object_type * eval(interp_core_type *interp) {
     return interp->root;
 }
 
@@ -346,7 +350,7 @@ interp_core_type *create_interp() {
 	create_booleans(interp);
 
 	/* create an instance of the parser/lexer */
-	yylex_init(&(interp->scanner));
+	yylex_init_extra(interp, &(interp->scanner));
 
 	return interp;
     }

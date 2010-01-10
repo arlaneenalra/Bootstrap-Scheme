@@ -94,6 +94,7 @@ typedef struct interp_core {
 
     gc_type gc; /* Where the garbage collector keeps it's data */
     void * scanner; /* an instance of the parser/lexer */
+    
 } interp_core_type;
 
 
@@ -105,6 +106,8 @@ interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, const char *buf);
+object_type * eval(interp_core_type *interp);
+
 void add_object(interp_core_type *interp, object_type *obj);
 void add_char(interp_core_type *interp, char *str);
 void add_number(interp_core_type *interp, char *str);
