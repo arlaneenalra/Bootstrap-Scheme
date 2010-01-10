@@ -37,6 +37,7 @@ void yyerror(interp_core_type *interp, void *scanner, char *s);
 expression:
     object         { set(interp, BARE); }
 
+/* list processing */
 list:
     OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
   | OPEN_PAREN     { push_state(interp); }
@@ -45,24 +46,16 @@ list:
 
 object_pair_list:
     object         { set(interp, CAR); }
-  | pair
   | list_next
-
-    
-
-pair:
-    object         { set(interp, CAR);}
-    DOT 
-    object         { set(interp, CDR);}
 
 list_next:
     object         { chain_state(interp); }
   | object         { chain_state(interp); }
     list_next
+  | object         { chain_state(interp); }
+    DOT
+    object         { set(interp, CDR); }
     
-
-
-
 boolean:
     TRUE_OBJ        { add_object(interp, interp->boolean.true); }
   | FALSE_OBJ       { add_object(interp, interp->boolean.false); }
