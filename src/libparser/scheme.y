@@ -73,6 +73,7 @@ object:
     boolean
   | CHAR_CONSTANT   { add_char(interp, get_text(scanner)); }
   | string 
+  | SYMBOL          { add_symbol(interp, get_text(scanner)); }
   | number
   | list
 

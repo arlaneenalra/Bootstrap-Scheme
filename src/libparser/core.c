@@ -114,6 +114,22 @@ void add_string(interp_core_type *interp, char *str) {
     add_object(interp,obj);
 }
 
+/* create an instance of a string object */
+void add_symbol(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+
+    TRACE("Sy");
+
+    /* create a new buffer for the string value */
+    char *c=malloc(strlen(str));
+    strcpy(c, str);
+
+    obj=alloc_object(interp, SYM);
+    obj->value.symbol.name=c;
+
+    add_object(interp,obj);
+}
+
 /* Create an instance of a floating point number */
 void add_float(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -312,7 +328,9 @@ void output(interp_core_type *interp, object_type *obj) {
 
 	printf(")");
 	
-       
+	break;
+    case SYM:
+	printf("%s", obj->value.symbol.name);
 	break;
 
     default:
@@ -398,8 +416,21 @@ void free_list(object_type *obj) {
 	object_type *next=obj->next;
 
 	/* make sure we clear out string buffers */
-	if(obj->type==STRING && obj->value.string_val!=0) {
-	    free(obj->value.string_val);
+	switch(obj->type) {
+	case STRING:
+	    if(obj->value.string_val!=0) {
+		free(obj->value.string_val);
+	    }
+	    break;
+
+	case SYM:
+	    if(obj->value.symbol.name!=0) {
+		free(obj->value.symbol.name);
+	    }
+	    break;
+
+	default:
+	    break;
 	}
 	
 	free(obj);

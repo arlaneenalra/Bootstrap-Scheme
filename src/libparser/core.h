@@ -29,7 +29,8 @@ typedef enum {
     CHAR,
     STRING,
     TUPLE,
-    
+    SYM,
+
     CHAIN /* internal type */
 } object_type_enum;
 
@@ -54,6 +55,10 @@ typedef struct object {
 	    struct object *car;
 	    struct object *cdr;
 	} tuple;
+	struct {
+	    char *name;
+	    struct object *binding;
+	} symbol;
     } value;
 
     struct object *next;
