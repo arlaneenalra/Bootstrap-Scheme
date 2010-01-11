@@ -114,18 +114,56 @@ void add_string(interp_core_type *interp, char *str) {
     add_object(interp,obj);
 }
 
+
+/* Return an instance of a given symbol from the current symbol
+   list. */
+object_type *get_symbol(interp_core_type *interp, char *str) {
+    object_type *top=0;
+    object_type *sym=0;
+    
+    top=interp->symbols.list;
+    
+    while(top!=0) {
+	sym=top->value.tuple.car;
+
+	/* Is this the right symbol? */
+	if(strcmp(sym->value.symbol.name, str)==0) {
+	    return sym;
+	}
+	
+	/* move on to the next entry in the list */
+	top=top->value.tuple.cdr;
+    }
+
+    return 0;
+}
+
 /* create an instance of a string object */
 void add_symbol(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
     TRACE("Sy");
 
-    /* create a new buffer for the string value */
-    char *c=malloc(strlen(str));
-    strcpy(c, str);
+    /* check to see if the sysmbol exists first */
+    obj=get_symbol(interp, str);
 
-    obj=alloc_object(interp, SYM);
-    obj->value.symbol.name=c;
+    /* If the symbol doesn't exist, add it */
+    if(obj==0) {
+	object_type *list=0;
+	
+	/* create a new buffer for the string value */
+	char *c=malloc(strlen(str));
+	strcpy(c, str);
+
+	obj=alloc_object(interp, SYM);
+	obj->value.symbol.name=c;
+	
+	/* add our new symbol to the symbol list */
+	list=alloc_object(interp, TUPLE);
+	list->value.tuple.car=obj;
+	list->value.tuple.cdr=interp->symbols.list;
+	interp->symbols.list=list;
+    }
 
     add_object(interp,obj);
 }

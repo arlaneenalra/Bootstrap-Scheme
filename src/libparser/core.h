@@ -75,6 +75,11 @@ typedef struct gc {
     object_type *free_list;
 } gc_type;
 
+/* Stores symbols for look up latter. */
+typedef struct symbol_table {
+    object_type *list;
+} symbol_table_type;
+
 
 /* Values that are required for an instance of the interpreter 
    to function properly */
@@ -98,6 +103,7 @@ typedef struct interp_core {
     object_type *state_stack;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
+    symbol_table_type symbols;
     void * scanner; /* an instance of the parser/lexer */
     
 } interp_core_type;
