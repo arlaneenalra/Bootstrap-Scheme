@@ -337,8 +337,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	output(interp, car);
 
 	if(cdr!=0) {
-	    if(cdr->type==TUPLE /*&& 
-	       (cdr->value.tuple.cdr==0 || cdr->value.tuple.cdr->type==TUPLE) */) {
+	    if(cdr->type==TUPLE) {
 
 		while(cdr!=0) {
 		    printf(" ");
