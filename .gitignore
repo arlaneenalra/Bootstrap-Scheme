@@ -22,3 +22,4 @@ src/bootstrap
 src/libparser/scheme.c
 src/
 ylwrap
+TAGS
