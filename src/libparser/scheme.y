@@ -86,6 +86,7 @@ object:
 %%
 
 void yyerror(interp_core_type *interp, void *scanner, char *s) {
-    (void)fprintf(stderr,"There was an error parsing %s on line %i\n", 
-		       s, yyget_lineno(scanner));
+/*    (void)fprintf(stderr,"There was an error parsing %s on line %i\n", 
+		       s, yyget_lineno(scanner));*/
+      interp->error=1;
 }

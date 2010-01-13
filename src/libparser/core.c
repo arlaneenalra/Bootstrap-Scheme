@@ -281,12 +281,15 @@ object_type *parse(interp_core_type *interp, const char *buf) {
     
     interp->current=0;
     clear_state_stack(interp);
+    interp->error=0;
 
     TRACE("RESET\n");
     
     yy_scan_string(buf, interp->scanner);
     
-    yyparse(interp, interp->scanner);
+    if(yyparse(interp, interp->scanner)) {
+	return 0;
+    }
 
     TRACE("\n")
     
@@ -333,6 +336,10 @@ object_type * eval(interp_core_type *interp, object_type *obj) {
 	return cdar(obj);
     }
     
+
+    /* If we make it here the expression wasn't
+       on we could evaluate. */
+    interp->error=1;
 
     return 0;
 }
@@ -470,8 +477,6 @@ interp_core_type *create_interp() {
     /* Setup the interpreter */
     if(interp) {
 	bzero(interp, sizeof(interp_core_type));
-
-	interp->running=1;
 
 	/* create some special values */
 	create_booleans(interp);

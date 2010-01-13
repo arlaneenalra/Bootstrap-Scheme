@@ -85,7 +85,7 @@ typedef struct gc {
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
-    bool running;
+    bool error;
     
     /* Instances of #t and #f */
     bool_global_type boolean;
