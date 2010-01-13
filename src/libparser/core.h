@@ -36,7 +36,6 @@ typedef enum {
 
 /* Used to tell add object that we are setting a car or cdr */
 typedef enum {
-    BARE,
     CAR,
     CDR
 } setting_type_enum;
@@ -96,9 +95,6 @@ typedef struct interp_core {
 
     /* object to be attached to the object graph*/
     object_type *added;
-
-    /* Root of the current object graph */
-    object_type *root;
 
     /* Object we are currently working on */
     object_type *current;

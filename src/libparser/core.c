@@ -50,13 +50,6 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	cdr(current)=obj;
 	break;
 
-    case BARE:
-	TRACE("B");
-
-	interp->root=obj;
-
-	break;
-
     default:
 	fail("Invalide setting state!");
     }
@@ -244,10 +237,6 @@ void push_state(interp_core_type *interp) {
     
     interp->current=new_state;
     
-    /* if this is the first object, add it as root */
-    if(interp->root==0) {
-	interp->root=new_state;
-    }
 }
 
 /* Pop a previously saved list */
@@ -288,7 +277,7 @@ void clear_state_stack(interp_core_type *interp) {
 /* Parse a string */
 object_type *parse(interp_core_type *interp, const char *buf) {
     
-    interp->current=interp->root=0;
+    interp->current=0;
     clear_state_stack(interp);
 
     TRACE("RESET\n");
@@ -299,7 +288,7 @@ object_type *parse(interp_core_type *interp, const char *buf) {
 
     TRACE("\n")
     
-    return interp->root;
+    return interp->added;
 }
 
 /* Is this object self evaluating */
@@ -355,7 +344,7 @@ void output(interp_core_type *interp, object_type *obj) {
 
     /* make sure there is something to display */
     if(obj==0) {
-	printf("nil");
+	printf("()");
 	return;
     }
     

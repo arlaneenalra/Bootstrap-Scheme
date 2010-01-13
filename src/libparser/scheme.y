@@ -35,7 +35,7 @@ void yyerror(interp_core_type *interp, void *scanner, char *s);
 %%
 
 expression:
-    object         { set(interp, BARE); }
+    object          
 
 /* list processing */
 list:
