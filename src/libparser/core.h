@@ -88,21 +88,22 @@ typedef struct gc {
 typedef struct interp_core {
     bool running;
     
+    /* Instances of #t and #f */
     bool_global_type boolean;
 
-    /* instance of the quote symbol */
+    /*Iinstance of the quote symbol */
     object_type *quote;
 
-    /* last added object */
+    /* object to be attached to the object graph*/
     object_type *added;
 
-    /* root of the current object graph */
+    /* Root of the current object graph */
     object_type *root;
 
-    /* object we are currently working on */
+    /* Object we are currently working on */
     object_type *current;
 
-
+    /* Used by the parser to generate lists */
     object_type *state_stack;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
