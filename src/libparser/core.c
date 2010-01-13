@@ -70,6 +70,28 @@ void add_object(interp_core_type *interp, object_type *obj) {
     interp->added=obj;
 }
 
+/* Quote things objects that have been added */
+void quote(interp_core_type *interp) {
+    object_type *obj=0;
+ 
+    TRACE("Qu");
+
+    /*if(interp->added==0) {
+	fail("Nothing to quote");
+	}*/
+
+
+    obj=alloc_object(interp, TUPLE);
+    car(obj)=interp->quote;
+
+    cdr(obj)=alloc_object(interp, TUPLE);
+    car(cdr(obj))=interp->added;
+
+    add_object(interp,obj);
+    //set(interp, CAR);
+    
+}
+
 /* Create a character constant object */
 void add_char(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -135,6 +157,27 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
     return 0;
 }
 
+/* Create a new symbol instance */
+object_type *create_symbol(interp_core_type *interp, char *str) {
+    object_type *list=0;
+    object_type *obj=0;
+
+    /* create a new buffer for the string value */
+    char *c=malloc(strlen(str));
+    strcpy(c, str);
+
+    obj=alloc_object(interp, SYM);
+    obj->value.symbol.name=c;
+	
+    /* add our new symbol to the symbol list */
+    list=alloc_object(interp, TUPLE);
+    car(list)=obj;
+    cdr(list)=interp->symbols.list;
+    interp->symbols.list=list;
+
+    return obj;
+}
+
 /* create an instance of a string object */
 void add_symbol(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -146,20 +189,7 @@ void add_symbol(interp_core_type *interp, char *str) {
 
     /* If the symbol doesn't exist, add it */
     if(obj==0) {
-	object_type *list=0;
-	
-	/* create a new buffer for the string value */
-	char *c=malloc(strlen(str));
-	strcpy(c, str);
-
-	obj=alloc_object(interp, SYM);
-	obj->value.symbol.name=c;
-	
-	/* add our new symbol to the symbol list */
-	list=alloc_object(interp, TUPLE);
-	car(list)=obj;
-	cdr(list)=interp->symbols.list;
-	interp->symbols.list=list;
+	obj=create_symbol(interp, str);
     }
 
     add_object(interp,obj);
@@ -327,40 +357,49 @@ void output(interp_core_type *interp, object_type *obj) {
 	break;
 
     case TUPLE:
-      car=car(obj);
-      cdr=cdr(obj);
+	car=car(obj);
+	cdr=cdr(obj);
+	
 
-      	printf("(");
-	output(interp, car);
+	if(car==interp->quote) {
+	    printf("'");
+	    output(interp, car(cdr));
 
-	if(cdr!=0) {
-	    if(cdr->type==TUPLE) {
+	} else {
+	    printf("(");
+	    output(interp, car);
 
-		while(cdr!=0) {
-		    printf(" ");
+	    if(cdr!=0) {
+		if(cdr->type==TUPLE) {
 
-		    car=car(cdr);
-		    cdr=cdr(cdr);
+		    while(cdr!=0) {
+			printf(" ");
 
-		    output(interp, car);
+			car=car(cdr);
+			cdr=cdr(cdr);
+
+			output(interp, car);
 		    
-		    /* if the next element is not a tupple,
-		       for output it and set cdr to 0 */
-		    if(cdr!=0 && cdr->type!=TUPLE) {
-			printf(" . ");
-			output(interp, cdr);
-			cdr=0;
+			/* if the next element is not a tupple,
+			   for output it and set cdr to 0 */
+			if(cdr!=0 && cdr->type!=TUPLE) {
+			    printf(" . ");
+			    output(interp, cdr);
+			    cdr=0;
+			}
+		    
 		    }
-		    
-		}
 
-	    } else {
-		printf(" . ");
-		output(interp, cdr);
+		} else {
+		    printf(" . ");
+		    output(interp, cdr);
+		}
 	    }
+
+	    printf(")");
+
 	}
 
-	printf(")");
 	
 	break;
     case SYM:
@@ -372,6 +411,13 @@ void output(interp_core_type *interp, object_type *obj) {
     }
 }
 
+/* Create an instance of the Quote symbol */
+void create_quote(interp_core_type * interp) {
+    object_type *obj=0;
+
+    obj=create_symbol(interp, "quote");
+    interp->quote=obj;
+}
 
 /* Create instances of the global boolean values */
 void create_booleans(interp_core_type *interp) {
@@ -401,6 +447,9 @@ interp_core_type *create_interp() {
 
 	/* create some special values */
 	create_booleans(interp);
+
+	/* create quote */
+	create_quote(interp);
 
 	/* create an instance of the parser/lexer */
 	yylex_init_extra(interp, &(interp->scanner));

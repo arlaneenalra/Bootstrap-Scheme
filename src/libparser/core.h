@@ -90,7 +90,9 @@ typedef struct interp_core {
     
     bool_global_type boolean;
 
-    //setting_type_enum setting;
+    /* instance of the quote symbol */
+    object_type *quote;
+
     /* last added object */
     object_type *added;
 
@@ -101,7 +103,6 @@ typedef struct interp_core {
     object_type *current;
 
 
-    
     object_type *state_stack;
 
     gc_type gc; /* Where the garbage collector keeps it's data */
@@ -128,6 +129,8 @@ void add_char(interp_core_type *interp, char *str);
 void add_number(interp_core_type *interp, char *str);
 void add_float(interp_core_type *interp, char *str);
 void add_string(interp_core_type *interp, char *str);
+
+void quote(interp_core_type *interp);
 
 void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);

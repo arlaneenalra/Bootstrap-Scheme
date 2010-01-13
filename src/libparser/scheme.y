@@ -47,7 +47,7 @@ list:
 object_pair_list:
     object         { set(interp, CAR); }
   | list_next
-
+  
 list_next:
     object         { chain_state(interp); }
   | object         { chain_state(interp); }
@@ -55,6 +55,10 @@ list_next:
   | object         { chain_state(interp); }
     DOT
     object         { set(interp, CDR); }
+
+quoted_list:
+    QUOTE          { /*push_state(interp);*/ }
+    object         { quote(interp); }
     
 boolean:
     TRUE_OBJ        { add_object(interp, interp->boolean.true); }
@@ -76,7 +80,7 @@ object:
   | SYMBOL          { add_symbol(interp, get_text(scanner)); }
   | number
   | list
-
+  | quoted_list
 
 
 %%
