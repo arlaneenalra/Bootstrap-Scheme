@@ -69,16 +69,18 @@ typedef struct bool_global {
     object_type *false;
 } bool_global_type;
 
-/* Configuartion for the garbage collector */
-typedef struct gc {
-    object_type *active_list;
-    object_type *free_list;
-} gc_type;
 
 /* Stores symbols for look up latter. */
 typedef struct symbol_table {
     object_type *list;
 } symbol_table_type;
+
+
+/* Configuartion for the garbage collector */
+typedef struct gc {
+    object_type *active_list;
+    object_type *free_list;
+} gc_type;
 
 
 /* Values that are required for an instance of the interpreter 
@@ -109,15 +111,17 @@ typedef struct interp_core {
 } interp_core_type;
 
 
+#include "gc.h"
+
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
-object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type);
+
 
 interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, const char *buf);
-object_type * eval(interp_core_type *interp);
+object_type *eval(interp_core_type *interp);
 
 void add_object(interp_core_type *interp, object_type *obj);
 void add_char(interp_core_type *interp, char *str);
