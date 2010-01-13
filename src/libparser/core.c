@@ -3,6 +3,7 @@
 
 #include "core.h"
 #include "util.h"
+#include "scheme_funcs.h"
 
 
 void create_booleans(interp_core_type *interp);
@@ -31,10 +32,10 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	    fail("Attempt to set car on null pointer");
 	}
 
-	if(current->value.tuple.car!=0) {
+	if(car(current)!=0) {
 	    fail("Car is already set!");
 	}
-	current->value.tuple.car=obj;
+	car(current)=obj;
 	break;
 
     case CDR:
@@ -43,10 +44,10 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	    fail("Attempt to set cdr on null pointer");
 	}
 
-	if(current->value.tuple.cdr!=0) {
+	if(cdr(current)!=0) {
 	    fail("Cdr is already set!");
 	}
-	current->value.tuple.cdr=obj;
+	cdr(current)=obj;
 	break;
 
     case BARE:
@@ -120,7 +121,7 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
     top=interp->symbols.list;
     
     while(top!=0) {
-	sym=top->value.tuple.car;
+        sym=car(top);
 
 	/* Is this the right symbol? */
 	if(strcmp(sym->value.symbol.name, str)==0) {
@@ -128,7 +129,7 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
 	}
 	
 	/* move on to the next entry in the list */
-	top=top->value.tuple.cdr;
+	top=cdr(top);
     }
 
     return 0;
@@ -156,8 +157,8 @@ void add_symbol(interp_core_type *interp, char *str) {
 	
 	/* add our new symbol to the symbol list */
 	list=alloc_object(interp, TUPLE);
-	list->value.tuple.car=obj;
-	list->value.tuple.cdr=interp->symbols.list;
+	car(list)=obj;
+	cdr(list)=interp->symbols.list;
 	interp->symbols.list=list;
     }
 
@@ -183,7 +184,7 @@ void chain_state(interp_core_type *interp) {
     TRACE("C")
 
     /* handle the first list entry correctly */
-    if(interp->current->value.tuple.car==0) {
+      if(car(interp->current)==0) {
 	/* we don't need to do anythin else here */
 	set(interp, CAR);
 	return;
@@ -210,8 +211,8 @@ void push_state(interp_core_type *interp) {
     state=alloc_object(interp, TUPLE);
 
     /* push the current state onto the state stack */
-    state->value.tuple.cdr=interp->state_stack;
-    state->value.tuple.car=interp->current;
+    cdr(state)=interp->state_stack;
+    car(state)=interp->current;
     interp->state_stack=state;
     
     interp->current=new_state;
@@ -235,8 +236,8 @@ void pop_state(interp_core_type *interp) {
     state=interp->state_stack;
     
     interp->added=interp->current;
-    interp->current=state->value.tuple.car;
-    interp->state_stack=state->value.tuple.cdr;
+    interp->current=car(state);
+    interp->state_stack=cdr(state);
 
     /* we are in the depths of a chain, pop until 
        we're out of it */
@@ -326,8 +327,8 @@ void output(interp_core_type *interp, object_type *obj) {
 	break;
 
     case TUPLE:
-	car=obj->value.tuple.car;
-	cdr=obj->value.tuple.cdr;
+      car=car(obj);
+      cdr=cdr(obj);
 
       	printf("(");
 	output(interp, car);
@@ -338,8 +339,8 @@ void output(interp_core_type *interp, object_type *obj) {
 		while(cdr!=0) {
 		    printf(" ");
 
-		    car=cdr->value.tuple.car;
-		    cdr=cdr->value.tuple.cdr;
+		    car=car(cdr);
+		    cdr=cdr(cdr);
 
 		    output(interp, car);
 		    
