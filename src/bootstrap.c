@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
 	    } else {
 
 		obj=parse(interp, buffer);
+		obj=eval(interp, obj);
 		output(interp, obj);
 	    }
 

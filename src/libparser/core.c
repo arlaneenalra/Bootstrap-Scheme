@@ -53,9 +53,6 @@ void set(interp_core_type *interp, setting_type_enum setting) {
     case BARE:
 	TRACE("B");
 
- 	/*if(interp->root==0) {
-	    interp->root=obj;
-	    }*/
 	interp->root=obj;
 
 	break;
@@ -86,7 +83,7 @@ void quote(interp_core_type *interp) {
     car(obj)=interp->quote;
 
     cdr(obj)=alloc_object(interp, TUPLE);
-    car(cdr(obj))=interp->added;
+    cdar(obj)=interp->added;
 
     add_object(interp,obj);
     
@@ -305,8 +302,49 @@ object_type *parse(interp_core_type *interp, const char *buf) {
     return interp->root;
 }
 
-object_type * eval(interp_core_type *interp) {
-    return interp->root;
+/* Is this object self evaluating */
+bool is_self_evaluating(object_type *obj) {
+    object_type_enum type=0;
+    type=obj->type;
+    
+    return type==FIXNUM || type==FLOATNUM 
+	|| type==CHAR || type==BOOL
+	|| type==STRING;
+}
+
+/* Is the object a quoted list? */
+bool is_quoted(interp_core_type *interp,object_type *obj) {
+    
+    return obj!=0 && obj->type==TUPLE 
+	&& car(obj)==interp->quote;
+}
+
+object_type * eval(interp_core_type *interp, object_type *obj) {
+    
+    TRACE("E");
+
+    /* Check for the empty list */
+    if(obj==0) {
+	return 0;
+    }
+
+    /* Check for self evaluating */
+    if(is_self_evaluating(obj)) {
+	TRACE("s");
+	return obj;
+    }
+    
+    /* This should be done in a function 
+       bound to the quote symbol rather than 
+       here. */
+    if(is_quoted(interp, obj)) {
+	TRACE("q");
+	return cdar(obj);
+    }
+
+    
+
+    return 0;
 }
 
 /* Output an object graph to stdout */
@@ -361,7 +399,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	cdr=cdr(obj);
 	
 
-	if(car==interp->quote) {
+	if(is_quoted(interp, obj)) {
 	    printf("'");
 	    output(interp, car(cdr));
 
