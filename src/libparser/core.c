@@ -72,9 +72,11 @@ void quote(interp_core_type *interp) {
 	}*/
 
 
+    /* Create a (quote ...) list */
     obj=alloc_object(interp, TUPLE);
     car(obj)=interp->quote;
 
+    /* and now (quote ( ... )) */
     cdr(obj)=alloc_object(interp, TUPLE);
     cdar(obj)=interp->added;
 
@@ -330,7 +332,6 @@ object_type * eval(interp_core_type *interp, object_type *obj) {
 	TRACE("q");
 	return cdar(obj);
     }
-
     
 
     return 0;
