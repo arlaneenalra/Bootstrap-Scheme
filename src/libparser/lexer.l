@@ -48,6 +48,8 @@ CHAR_VAL      (newline|space|[^{WS}])
 
 {IDENT}+  { return SYMBOL; }
 
+[;].*$    /* Eat comments */
+
 %%
 
 char * get_text(void * scanner) {
