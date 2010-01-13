@@ -35,7 +35,7 @@ void yyerror(interp_core_type *interp, void *scanner, char *s);
 %%
 
 expression:
-    object          
+    object         { YYACCEPT; }
 
 /* list processing */
 list:
