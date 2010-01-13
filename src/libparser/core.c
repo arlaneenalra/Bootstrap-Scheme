@@ -53,9 +53,10 @@ void set(interp_core_type *interp, setting_type_enum setting) {
     case BARE:
 	TRACE("B");
 
- 	if(interp->root==0) {
+ 	/*if(interp->root==0) {
 	    interp->root=obj;
-	} 
+	    }*/
+	interp->root=obj;
 
 	break;
 
@@ -88,7 +89,6 @@ void quote(interp_core_type *interp) {
     car(cdr(obj))=interp->added;
 
     add_object(interp,obj);
-    //set(interp, CAR);
     
 }
 
