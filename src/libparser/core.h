@@ -125,6 +125,7 @@ void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *eval(interp_core_type *interp, object_type *obj);
+void output(interp_core_type *interp, object_type *obj);
 
 void add_object(interp_core_type *interp, object_type *obj);
 void add_char(interp_core_type *interp, char *str);

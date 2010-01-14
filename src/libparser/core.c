@@ -10,8 +10,6 @@ void create_booleans(interp_core_type *interp);
 
 void clear_state_stack(interp_core_type *interp);
 
-void output(interp_core_type *interp, object_type *obj);
-
 /* Attach an added object to our graph of objects */
 void set(interp_core_type *interp, setting_type_enum setting) {
     object_type *current=0;
@@ -192,7 +190,6 @@ void add_float(interp_core_type *interp, char *str) {
 /* Add a new state to the current chain of states without
    pushing it onto the state stack */
 void chain_state(interp_core_type *interp) {
-    object_type *state=0;
     object_type *new_state=interp->added;
 
     TRACE("C")
@@ -304,7 +301,7 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 	&& car(obj)==interp->quote;
 }
 
-object_type * eval(interp_core_type *interp, object_type *obj) {
+object_type *eval(interp_core_type *interp, object_type *obj) {
     
     TRACE("E");
 
