@@ -95,6 +95,10 @@ object_type *prim_define(interp_core_type *interp,
 	return interp->boolean.false;
     }
 
+    if(car(args)->type!=SYM) {
+	return interp->boolean.false;
+    }
+
     bind_symbol(interp, car(args), cdar(args));
 
     output(interp, interp->env_stack);
