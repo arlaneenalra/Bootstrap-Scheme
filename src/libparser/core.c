@@ -160,6 +160,16 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     return obj;
 }
 
+object_type *create_primitive(interp_core_type *interp,
+			      primitive_type primitive) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp, PRIM);
+    obj->value.primitive=primitive;
+    
+    return obj;
+}
+
 /* create an instance of a string object */
 void add_symbol(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -301,6 +311,19 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 	&& car(obj)==interp->quote;
 }
 
+/* Is this list a procedure call */
+bool is_procedure_call(interp_core_type *interp, 
+		       object_type *obj) {
+    return obj!=0 && obj->type==TUPLE
+	&& car(obj)!=0 && car(obj)->type==SYM;
+}
+
+/* Is this is a primitive? */
+bool is_primitive(interp_core_type *interp,
+		  object_type *obj) {
+    return obj!=0 && obj->type==PRIM;
+}
+
 object_type *eval(interp_core_type *interp, object_type *obj) {
     
     TRACE("E");
@@ -323,7 +346,57 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	TRACE("q");
 	return cdar(obj);
     }
-    
+
+    /* This should give us a means of executing 
+       primitives */
+    if(is_procedure_call(interp, obj)) {
+	object_type *binding=0;
+	object_type *args=0;
+	object_type *evaled_args=0;
+	object_type *next=0;
+
+	TRACE("p");
+
+	binding=get_binding(interp, car(obj));
+	
+	/* If the symbol is unbound, 
+	   we have an error */
+	if(binding==0) {
+	    TRACE("e");
+	    interp->error=1;
+	    return 0;
+	}
+
+	/* Evaluate each argument and pass the
+	   resulting list to the function */
+	
+	args=cdr(obj);
+	
+	/* Walk and evaluate argument list 
+	   and maintain the same order */
+	while(args) {
+	    object_type *evaled=
+		cons(interp, eval(interp, car(args)),0);
+
+	    /* Deal with the first element */
+	    if(evaled_args==0) {
+		next=evaled_args=evaled;
+	    } else {
+		cdr(next)=evaled;
+		next=evaled;
+	    }
+
+	    args=cdr(args);
+	}
+
+	/* Make sure that the procedure is callable */
+	if(is_primitive(interp, cdr(binding))) {
+	    TRACE("Pi");
+	    /* call the primitive and return */
+	    return (*(cdr(binding)->value.primitive))(interp, evaled_args);
+	}
+	TRACE("?");
+    }
 
     /* If we make it here the expression wasn't
        on we could evaluate. */
@@ -428,6 +501,9 @@ void output(interp_core_type *interp, object_type *obj) {
     case SYM:
 	printf("%s", obj->value.symbol.name);
 	break;
+    case PRIM:
+	printf("prim:%p", obj->value.primitive);
+	break;
 
     default:
 	break;
@@ -456,6 +532,28 @@ void create_booleans(interp_core_type *interp) {
     interp->boolean.false=obj;
 }
 
+/* setup the base environment */
+void create_base_environment(interp_core_type *interp) {
+    object_type *obj=0;
+    object_type *target=0;
+    
+    /* There is nothing in the environment right now
+       so, this is just the empty list */
+    interp->env_stack=cons(interp, 0, 0);
+
+    obj=create_symbol(interp, "define");
+    bind_symbol(interp, obj, 
+		create_primitive(interp, &prim_define));
+
+    obj=create_symbol(interp, "set!");
+    bind_symbol(interp, obj, 0);
+
+    obj=create_symbol(interp, "quit");
+    bind_symbol(interp, obj, 0);
+
+    output(interp, interp->env_stack);
+}
+
 /* Create an instance of the interpreter */
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
@@ -472,8 +570,13 @@ interp_core_type *create_interp() {
 	/* create quote */
 	create_quote(interp);
 
+	/* setup the base environment */
+	create_base_environment(interp);
+
 	/* create an instance of the parser/lexer */
 	yylex_init_extra(interp, &(interp->scanner));
+
+	interp->running=1;
 
 	return interp;
     }

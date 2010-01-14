@@ -18,4 +18,14 @@ object_type *cons(interp_core_type *interp, object_type *car,
 object_type *quote(interp_core_type *interp, 
 		   object_type *obj);
 
+void bind_symbol(interp_core_type *interp, object_type *obj,
+		 object_type *value);
+
+object_type *get_binding(interp_core_type *interp, 
+			 object_type *sym);
+
+
+/* Primitives */
+object_type *prim_define(interp_core_type *interp, 
+			 object_type *args);
 #endif

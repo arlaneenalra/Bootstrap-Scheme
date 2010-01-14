@@ -20,6 +20,7 @@
 
 
 typedef int8_t bool;
+struct interp_core;
 
 /* The types of cells that we can represent */
 typedef enum {
@@ -31,6 +32,7 @@ typedef enum {
     TUPLE,
     SYM,
 
+    PRIM, /* primitive c functions */
     CHAIN /* internal type */
 } object_type_enum;
 
@@ -39,6 +41,13 @@ typedef enum {
     CAR,
     CDR
 } setting_type_enum;
+
+struct object;
+
+typedef struct object *(*primitive_type)
+    (struct interp_core *interp, struct object *);
+
+
 
 /* Define a structure to represent a memory cell */
 typedef struct object {
@@ -58,6 +67,9 @@ typedef struct object {
 	    char *name;
 	    struct object *binding;
 	} symbol;
+
+	primitive_type primitive;
+
     } value;
 
     struct object *next;
@@ -81,16 +93,12 @@ typedef struct gc {
     object_type *free_list;
 } gc_type;
 
-/* Structure used to represent a scope */
-typedef struct scope {
-
-} scope_type;
-
 
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
     bool error;
+    bool running;
     
     /* Instances of #t and #f */
     bool_global_type boolean;
@@ -107,8 +115,15 @@ typedef struct interp_core {
     /* Used by the parser to generate lists */
     object_type *state_stack;
 
-    gc_type gc; /* Where the garbage collector keeps it's data */
+    /* Stores variable bindings */
+    object_type *env_stack;
+    
+    /* Where the garbage collector keeps it's data */
+    gc_type gc; 
+
+    /* List of all symbols in the system */
     symbol_table_type symbols;
+
     void * scanner; /* an instance of the parser/lexer */
     
 } interp_core_type;
