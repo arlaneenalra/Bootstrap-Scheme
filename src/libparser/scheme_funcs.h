@@ -25,6 +25,13 @@ object_type *get_binding(interp_core_type *interp,
 			 object_type *sym);
 
 
+bool is_primitive(interp_core_type *interp,
+		  object_type *obj);
+bool is_procedure_call(interp_core_type *interp, 
+		       object_type *obj);
+bool is_quoted(interp_core_type *interp,object_type *obj);
+bool is_self_evaluating(object_type *obj);
+
 /* Primitives */
 object_type *prim_define(interp_core_type *interp, 
 			 object_type *args);

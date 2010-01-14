@@ -294,117 +294,6 @@ object_type *parse(interp_core_type *interp, FILE *in) {
     return interp->added;
 }
 
-/* Is this object self evaluating */
-bool is_self_evaluating(object_type *obj) {
-    object_type_enum type=0;
-    type=obj->type;
-    
-    return type==FIXNUM || type==FLOATNUM 
-	|| type==CHAR || type==BOOL
-	|| type==STRING;
-}
-
-/* Is the object a quoted list? */
-bool is_quoted(interp_core_type *interp,object_type *obj) {
-    
-    return obj!=0 && obj->type==TUPLE 
-	&& car(obj)==interp->quote;
-}
-
-/* Is this list a procedure call */
-bool is_procedure_call(interp_core_type *interp, 
-		       object_type *obj) {
-    return obj!=0 && obj->type==TUPLE
-	&& car(obj)!=0 && car(obj)->type==SYM;
-}
-
-/* Is this is a primitive? */
-bool is_primitive(interp_core_type *interp,
-		  object_type *obj) {
-    return obj!=0 && obj->type==PRIM;
-}
-
-object_type *eval(interp_core_type *interp, object_type *obj) {
-    
-    TRACE("E");
-
-    /* Check for the empty list */
-    if(obj==0) {
-	return 0;
-    }
-
-    /* Check for self evaluating */
-    if(is_self_evaluating(obj)) {
-	TRACE("s");
-	return obj;
-    }
-    
-    /* This should be done in a function 
-       bound to the quote symbol rather than 
-       here. */
-    if(is_quoted(interp, obj)) {
-	TRACE("q");
-	return cdar(obj);
-    }
-
-    /* This should give us a means of executing 
-       primitives */
-    if(is_procedure_call(interp, obj)) {
-	object_type *binding=0;
-	object_type *args=0;
-	object_type *evaled_args=0;
-	object_type *next=0;
-
-	TRACE("p");
-
-	binding=get_binding(interp, car(obj));
-	
-	/* If the symbol is unbound, 
-	   we have an error */
-	if(binding==0) {
-	    TRACE("e");
-	    interp->error=1;
-	    return 0;
-	}
-
-	/* Evaluate each argument and pass the
-	   resulting list to the function */
-	
-	args=cdr(obj);
-	
-	/* Walk and evaluate argument list 
-	   and maintain the same order */
-	while(args) {
-	    object_type *evaled=
-		cons(interp, eval(interp, car(args)),0);
-
-	    /* Deal with the first element */
-	    if(evaled_args==0) {
-		next=evaled_args=evaled;
-	    } else {
-		cdr(next)=evaled;
-		next=evaled;
-	    }
-
-	    args=cdr(args);
-	}
-
-	/* Make sure that the procedure is callable */
-	if(is_primitive(interp, cdr(binding))) {
-	    TRACE("Pi");
-	    /* call the primitive and return */
-	    return (*(cdr(binding)->value.primitive))(interp, evaled_args);
-	}
-	TRACE("?");
-    }
-
-    /* If we make it here the expression wasn't
-       on we could evaluate. */
-    interp->error=1;
-
-    return 0;
-}
-
 /* Output an object graph to stdout */
 void output(interp_core_type *interp, object_type *obj) {
     object_type *car=0;
@@ -459,6 +348,10 @@ void output(interp_core_type *interp, object_type *obj) {
 
 	if(is_quoted(interp, obj)) {
 	    printf("'");
+	    if(cdr==0) {
+		interp->error=1;
+		return;
+	    }
 	    output(interp, car(cdr));
 
 	} else {

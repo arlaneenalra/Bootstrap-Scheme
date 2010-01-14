@@ -84,6 +84,37 @@ object_type *get_binding(interp_core_type *interp,
 }
 
 
+/* Is this object self evaluating */
+bool is_self_evaluating(object_type *obj) {
+    object_type_enum type=0;
+    type=obj->type;
+    
+    return type==FIXNUM || type==FLOATNUM 
+	|| type==CHAR || type==BOOL
+	|| type==STRING;
+}
+
+/* Is the object a quoted list? */
+bool is_quoted(interp_core_type *interp,object_type *obj) {
+    
+    return obj!=0 && obj->type==TUPLE 
+	&& car(obj)==interp->quote;
+}
+
+/* Is this list a procedure call */
+bool is_procedure_call(interp_core_type *interp, 
+		       object_type *obj) {
+    return obj!=0 && obj->type==TUPLE
+	&& car(obj)!=0 && car(obj)->type==SYM;
+}
+
+/* Is this is a primitive? */
+bool is_primitive(interp_core_type *interp,
+		  object_type *obj) {
+    return obj!=0 && obj->type==PRIM;
+}
+
+
 /* Primitives */
 
 /* define */
