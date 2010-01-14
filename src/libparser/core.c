@@ -277,7 +277,7 @@ void clear_state_stack(interp_core_type *interp) {
 }
 
 /* Parse a string */
-object_type *parse(interp_core_type *interp, const char *buf) {
+object_type *parse(interp_core_type *interp, FILE *in) {
     
     interp->current=0;
     clear_state_stack(interp);
@@ -285,7 +285,7 @@ object_type *parse(interp_core_type *interp, const char *buf) {
 
     TRACE("RESET\n");
     
-    yy_scan_string(buf, interp->scanner);
+    yyset_in(in, interp->scanner);
     
     if(yyparse(interp, interp->scanner)) {
 	return 0;

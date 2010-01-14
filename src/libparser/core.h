@@ -118,7 +118,7 @@ void set(interp_core_type *interp, setting_type_enum setting);
 interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
 
-object_type *parse(interp_core_type *interp, const char *buf);
+object_type *parse(interp_core_type *interp, FILE *in);
 object_type *eval(interp_core_type *interp, object_type *obj);
 
 void add_object(interp_core_type *interp, object_type *obj);
