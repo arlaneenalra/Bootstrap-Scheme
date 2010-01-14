@@ -102,7 +102,7 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 }
 
 /* Is this list a procedure call */
-bool is_procedure_call(interp_core_type *interp, 
+bool is_tagged_list(interp_core_type *interp, 
 		       object_type *obj) {
     return obj!=0 && obj->type==TUPLE
 	&& car(obj)!=0 && car(obj)->type==SYM;
@@ -123,19 +123,24 @@ bool is_symbol(interp_core_type *interp, object_type *obj) {
 /* Primitives */
 
 /* define */
-object_type *prim_define(interp_core_type *interp, 
-			 object_type *args) {
+object_type *prim_define(interp_core_type *interp, object_type *args) {
+    object_type *var=0;
 
     /* make sure we have the correct arguments */
     if(car(args)==0 || cdr(args)==0) {
 	return interp->boolean.false;
     }
 
-    if(car(args)->type!=SYM) {
+    /* You can bind a symbol or a 
+       special list */
+    if(!is_symbol(interp, car(args)) &&
+       !is_tagged_list(interp, car(args))) {
 	return interp->boolean.false;
     }
 
-    bind_symbol(interp, car(args), cdar(args));
+    var=car(args);
+
+    bind_symbol(interp, var, eval(interp, cdar(args)));
 
     output(interp, interp->env_stack);
 

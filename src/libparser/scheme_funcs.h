@@ -12,30 +12,21 @@
 #define cddr(obj) cdr(cdr(obj))
 
 
-object_type *cons(interp_core_type *interp, object_type *car,
-		  object_type *cdr);
+object_type *cons(interp_core_type *interp, object_type *car,object_type *cdr);
+object_type *quote(interp_core_type *interp, object_type *obj);
 
-object_type *quote(interp_core_type *interp, 
-		   object_type *obj);
-
-void bind_symbol(interp_core_type *interp, object_type *obj,
-		 object_type *value);
-
-object_type *get_binding(interp_core_type *interp, 
-			 object_type *sym);
+void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value);
+object_type *get_binding(interp_core_type *interp, object_type *sym);
 
 
-bool is_primitive(interp_core_type *interp,
-		  object_type *obj);
-bool is_procedure_call(interp_core_type *interp, 
-		       object_type *obj);
-bool is_quoted(interp_core_type *interp,object_type *obj);
+bool is_primitive(interp_core_type *interp, object_type *obj);
+bool is_tagged_list(interp_core_type *interp, object_type *obj);
+bool is_quoted(interp_core_type *interp, object_type *obj);
 bool is_self_evaluating(interp_core_type *interp, object_type *obj);
 bool is_symbol(interp_core_type *interp, object_type *obj);
 
 /* Primitives */
-object_type *prim_define(interp_core_type *interp, 
-			 object_type *args);
-object_type *prim_quit(interp_core_type *interp, 
-			 object_type *args);
+object_type *prim_define(interp_core_type *interp, object_type *args);
+object_type *prim_quit(interp_core_type *interp, object_type *args);
+
 #endif

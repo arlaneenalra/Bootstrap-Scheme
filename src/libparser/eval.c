@@ -68,7 +68,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 
     /* This should give us a means of executing 
        primitives */
-    if(is_procedure_call(interp, obj)) {
+    if(is_tagged_list(interp, obj)) {
 	object_type *evaled_args=0;
 
 
@@ -82,19 +82,22 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    TRACE("e");
 	    interp->error=1;
 	    return 0;
-	}
-
-	/* Evaluate each argument and pass the
-	   resulting list to the function */
-	evaled_args=eval_list(interp, cdr(obj));
-	
+	}	
 
 	/* Make sure that the procedure is callable */
 	if(is_primitive(interp, cdr(binding))) {
 	    TRACE("Pi");
-	    /* call the primitive and return */
-	    return (*(cdr(binding)->value.primitive))(interp, evaled_args);
+	    /* Call the primitive and return, make sure to skip the
+	       symbol ref at the start of the list */
+	    return (*(cdr(binding)->value.primitive))(interp, cdr(obj));
 	}
+
+	/* Evaluate each argument and pass the
+	   resulting list to the function */
+        //evaled_args=eval_list(interp, cdr(obj));
+	    
+	    
+	
 	TRACE("?");
     }
 
