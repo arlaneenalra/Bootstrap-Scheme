@@ -549,7 +549,8 @@ void create_base_environment(interp_core_type *interp) {
     bind_symbol(interp, obj, 0);
 
     obj=create_symbol(interp, "quit");
-    bind_symbol(interp, obj, 0);
+    bind_symbol(interp, obj, 
+		create_primitive(interp, &prim_quit));
 
     output(interp, interp->env_stack);
 }

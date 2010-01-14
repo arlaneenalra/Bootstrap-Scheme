@@ -8,14 +8,13 @@
 int main(int argc, char **argv) {
 
 
-    int running=1;
-
     interp_core_type * interp=create_interp();
 
     printf("Simple Bootstrapper\n");
     printf("sizeof(object_type) %zu\n", sizeof(object_type));
 
-    while(running) {
+    /* while the interpreter is running */
+    while(interp->running) {
 	object_type *obj=0;
 
 	printf(">\n");

@@ -28,4 +28,6 @@ object_type *get_binding(interp_core_type *interp,
 /* Primitives */
 object_type *prim_define(interp_core_type *interp, 
 			 object_type *args);
+object_type *prim_quit(interp_core_type *interp, 
+			 object_type *args);
 #endif

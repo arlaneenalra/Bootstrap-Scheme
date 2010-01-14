@@ -101,3 +101,10 @@ object_type *prim_define(interp_core_type *interp,
 
     return interp->boolean.true;
 }
+
+/* quit */
+object_type *prim_quit(interp_core_type *interp, 
+			 object_type *args) {
+    interp->running=0;
+    return 0;
+}
