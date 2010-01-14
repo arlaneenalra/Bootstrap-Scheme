@@ -30,7 +30,8 @@ bool is_primitive(interp_core_type *interp,
 bool is_procedure_call(interp_core_type *interp, 
 		       object_type *obj);
 bool is_quoted(interp_core_type *interp,object_type *obj);
-bool is_self_evaluating(object_type *obj);
+bool is_self_evaluating(interp_core_type *interp, object_type *obj);
+bool is_symbol(interp_core_type *interp, object_type *obj);
 
 /* Primitives */
 object_type *prim_define(interp_core_type *interp, 

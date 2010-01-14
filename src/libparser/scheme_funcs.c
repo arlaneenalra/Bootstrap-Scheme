@@ -85,7 +85,7 @@ object_type *get_binding(interp_core_type *interp,
 
 
 /* Is this object self evaluating */
-bool is_self_evaluating(object_type *obj) {
+bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     object_type_enum type=0;
     type=obj->type;
     
@@ -112,6 +112,11 @@ bool is_procedure_call(interp_core_type *interp,
 bool is_primitive(interp_core_type *interp,
 		  object_type *obj) {
     return obj!=0 && obj->type==PRIM;
+}
+
+/* Is this object a symbol */
+bool is_symbol(interp_core_type *interp, object_type *obj) {
+    return obj!=0 && obj->type==SYM;
 }
 
 
