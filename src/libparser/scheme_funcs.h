@@ -15,4 +15,7 @@
 object_type *cons(interp_core_type *interp, object_type *car,
 		  object_type *cdr);
 
+object_type *quote(interp_core_type *interp, 
+		   object_type *obj);
+
 #endif
