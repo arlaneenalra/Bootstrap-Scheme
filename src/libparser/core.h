@@ -81,6 +81,11 @@ typedef struct gc {
     object_type *free_list;
 } gc_type;
 
+/* Structure used to represent a scope */
+typedef struct scope {
+
+} scope_type;
+
 
 /* Values that are required for an instance of the interpreter 
    to function properly */
