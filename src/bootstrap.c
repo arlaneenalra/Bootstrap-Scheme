@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	printf(">\n");
 
 
-	obj=parse(interp, stin);
+	obj=parse(interp, stdin);
 
 	if(interp->error==0) {
 	    obj=eval(interp, obj);
