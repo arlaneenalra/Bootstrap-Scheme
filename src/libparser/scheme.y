@@ -57,8 +57,8 @@ list_next:
     object         { set(interp, CDR); }
 
 quoted_list:
-    QUOTE          { /*push_state(interp);*/ }
-    object         { quote(interp); }
+    QUOTE          
+    object         { add_quote(interp); }
     
 boolean:
     TRUE_OBJ        { add_object(interp, interp->boolean.true); }

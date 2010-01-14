@@ -60,16 +60,16 @@ void add_object(interp_core_type *interp, object_type *obj) {
 }
 
 /* Quote things objects that have been added */
-void quote(interp_core_type *interp) {
+void add_quote(interp_core_type *interp) {
     object_type *obj=0;
  
     TRACE("Qu");
 
-    /* Create a (quote ...) list */
-    /* and now (quote ( ... )) */
 
-    obj=cons(interp, interp->quote,
-	     cons(interp, interp->added, 0));
+    /* obj=cons(interp, interp->quote, */
+    /* 	     cons(interp, interp->added, 0)); */
+
+    obj=quote(interp, interp->added);
 
     add_object(interp,obj);
     
