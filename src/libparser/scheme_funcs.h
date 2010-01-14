@@ -12,5 +12,7 @@
 #define cddr(obj) cdr(cdr(obj))
 
 
+object_type *cons(interp_core_type *interp, object_type *car,
+		  object_type *cdr);
 
 #endif

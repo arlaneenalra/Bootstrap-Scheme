@@ -67,18 +67,11 @@ void quote(interp_core_type *interp) {
  
     TRACE("Qu");
 
-    /*if(interp->added==0) {
-	fail("Nothing to quote");
-	}*/
-
-
     /* Create a (quote ...) list */
-    obj=alloc_object(interp, TUPLE);
-    car(obj)=interp->quote;
-
     /* and now (quote ( ... )) */
-    cdr(obj)=alloc_object(interp, TUPLE);
-    cdar(obj)=interp->added;
+
+    obj=cons(interp, interp->quote,
+	     cons(interp, interp->added, 0));
 
     add_object(interp,obj);
     
@@ -162,9 +155,8 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     obj->value.symbol.name=c;
 	
     /* add our new symbol to the symbol list */
-    list=alloc_object(interp, TUPLE);
-    car(list)=obj;
-    cdr(list)=interp->symbols.list;
+    list=cons(interp, obj, interp->symbols.list);
+
     interp->symbols.list=list;
 
     return obj;
@@ -228,13 +220,12 @@ void push_state(interp_core_type *interp) {
     object_type *state=0;
     object_type *new_state=alloc_object(interp, TUPLE);
 
-    TRACE("Pu")
-
-    state=alloc_object(interp, TUPLE);
+    TRACE("Pu");
 
     /* push the current state onto the state stack */
-    cdr(state)=interp->state_stack;
-    car(state)=interp->current;
+    
+    state=cons(interp, interp->current, interp->state_stack);
+
     interp->state_stack=state;
     
     interp->current=new_state;
