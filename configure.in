@@ -8,10 +8,29 @@ AM_INIT_AUTOMAKE(scheme_bootstrap, 0.1)
 
 AM_SANITY_CHECK
 
+
 AC_PROG_CC
 AC_PROG_LEX
 AC_PROG_YACC
 
 AC_PROG_RANLIB
 
-AC_OUTPUT([Makefile src/Makefile src/libparser/Makefile])
+# check for valgrind
+use_valgrind=true
+
+AC_ARG_ENABLE(valgrind,
+[  --disable-valgrind	Disable valgrind when running tests],
+[use_valgrind=false])
+
+if [[ "$use_valgrind" = "true" ]]; then
+   AC_CHECK_PROG(HAVE_VALGRIND, valgrind, yes, no)
+
+   if [[ "$HAVE_VALGRIND" = "no" ]]; then
+      AC_MSG_ERROR([Valgrind not found in PATH $HAVE_VALGRIND])
+   fi 
+
+fi
+
+AM_CONDITIONAL(USE_VALGRIND, $use_valgrind)
+
+AC_OUTPUT([Makefile src/Makefile src/libparser/Makefile test/Makefile test/libtester/Makefile])
