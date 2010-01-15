@@ -15,7 +15,6 @@
 #define cdaar(obj) car(car(cdr(obj)))
 #define cadar(obj) car(cdr(car(obj)))
 #define cddar(obj) car(cdr(cdr(obj)))
-
 #define caadr(obj) cdr(car(car(obj)))
 #define cdadr(obj) cdr(car(cdr(obj)))
 #define caddr(obj) cdr(cdr(car(obj)))
