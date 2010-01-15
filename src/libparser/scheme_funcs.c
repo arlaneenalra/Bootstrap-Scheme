@@ -158,9 +158,34 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
     return interp->boolean.true;
 }
 
+/* set! */
+object_type *prim_set(interp_core_type *interp, object_type *args) {
+    object_type *binding=0;
+
+    /* make sure we have the correct arguments */
+    if(car(args)==0 || cdr(args)==0) {
+	return interp->boolean.false;
+    }
+
+    /* You can set the value of a symbol */
+    if(!is_symbol(interp, car(args))) {
+	return interp->boolean.false;
+    }
+
+    binding=get_binding(interp, car(args));
+    
+    if(binding==0) {
+	interp->error=1;
+	return interp->boolean.false;
+    }
+    
+    cdr(binding)=eval(interp, cdar(args));
+   
+    return interp->boolean.true;
+}
+
 /* quit */
-object_type *prim_quit(interp_core_type *interp, 
-			 object_type *args) {
+object_type *prim_quit(interp_core_type *interp, object_type *args) {
     interp->running=0;
     return 0;
 }
@@ -169,6 +194,7 @@ object_type *prim_quit(interp_core_type *interp,
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define},
+    {"set!", &prim_set},
     {"quit", &prim_quit},
     {0,0} /* Terminate the list */
 };
