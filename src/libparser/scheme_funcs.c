@@ -30,9 +30,19 @@ object_type *quote(interp_core_type *interp,
     return ret_val;
 }
 
+/* create an instance of a primitive object */
+object_type *create_primitive(interp_core_type *interp,
+			      primitive_type primitive) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp, PRIM);
+    obj->value.primitive=primitive;
+    
+    return obj;
+}
+
 /* Bind a symbol to a given value */
-void bind_symbol(interp_core_type *interp, object_type *sym,
-		 object_type *value) {
+void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value) {
     object_type *binding=0;
     
     /* Check to see if a binding exists, 
@@ -152,8 +162,6 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
     var=car(args);
 
     bind_symbol(interp, var, eval(interp, cdar(args)));
-
-    output(interp, interp->env_stack);
 
     return interp->boolean.true;
 }

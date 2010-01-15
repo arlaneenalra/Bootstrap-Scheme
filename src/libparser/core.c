@@ -160,16 +160,6 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     return obj;
 }
 
-object_type *create_primitive(interp_core_type *interp,
-			      primitive_type primitive) {
-    object_type *obj=0;
-
-    obj=alloc_object(interp, PRIM);
-    obj->value.primitive=primitive;
-    
-    return obj;
-}
-
 /* create an instance of a string object */
 void add_symbol(interp_core_type *interp, char *str) {
     object_type *obj=0;
@@ -435,8 +425,6 @@ void create_base_environment(interp_core_type *interp) {
     interp->env_stack=cons(interp, 0, 0);
 
     bind_symbol_list(interp, primitive_list);
-
-    output(interp, interp->env_stack);
 }
 
 /* Create an instance of the interpreter */

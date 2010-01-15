@@ -52,10 +52,11 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 
 	/* Check the binding */
 	if(binding==0) {
-	    return obj;
-	} else {
-	    return cdr(binding);
-	}
+	    /* Unbound variable */
+	    interp->error=1;
+	    return 0;
+      	}
+	return cdr(binding);
     }
     
     /* This should be done in a function 
