@@ -133,6 +133,7 @@ typedef struct interp_core {
 
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
+int list_length(object_type *args); /* Find the length of a passed in list */
 
 
 interp_core_type *create_interp();
@@ -152,5 +153,7 @@ void add_quote(interp_core_type *interp);
 void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
+
+object_type *create_symbol(interp_core_type *interp, char *str);
 
 #endif

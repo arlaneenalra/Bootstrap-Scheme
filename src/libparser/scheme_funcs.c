@@ -1,6 +1,7 @@
 
 #include "core.h"
 #include "scheme_funcs.h"
+#include "util.h"
 
 /* Create a new tuple object with a
    given car and cdr */
@@ -140,6 +141,11 @@ bool is_symbol(interp_core_type *interp, object_type *obj) {
     return obj!=0 && obj->type==SYM;
 }
 
+/* Check to see if the object represents truth */
+bool is_true(interp_core_type *interp, object_type *obj) {
+    /* anything other than false is true */
+    return interp->boolean.false!=obj;
+}
 
 /* Primitives */
 
@@ -148,7 +154,7 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
     object_type *var=0;
 
     /* make sure we have the correct arguments */
-    if(car(args)==0 || cdr(args)==0) {
+    if(list_length(args)!=2) {
 	return interp->boolean.false;
     }
 
@@ -171,7 +177,7 @@ object_type *prim_set(interp_core_type *interp, object_type *args) {
     object_type *binding=0;
 
     /* make sure we have the correct arguments */
-    if(car(args)==0 || cdr(args)==0) {
+    if(list_length(args)!=2) {
 	return interp->boolean.false;
     }
 
@@ -201,7 +207,39 @@ object_type *prim_quit(interp_core_type *interp, object_type *args) {
 /* quote */
 object_type *prim_quote(interp_core_type *interp, object_type *args) {
     /* quote just says, don't evaluate my arguments */
+    if(list_length(args)<1) {
+	interp->error=1;
+	return interp->boolean.false;
+    }
+
     return car(args);
+}
+
+/* An if then constrcut */
+object_type *prim_if(interp_core_type *interp, object_type *args) {
+    object_type *predicate=0;
+    int arg_count=0;
+
+    /* make sure we have a predicate and at least
+       a then clause */
+    arg_count=list_length(args);
+    if(arg_count<2 || arg_count>3) {
+	interp->error=1;
+	return interp->boolean.false;
+    }
+    
+    /* evaluate the predicate */
+    predicate=eval(interp, car(args));
+    
+    if(is_true(interp, predicate)) {
+	return cdar(args);
+    } else {
+	if(arg_count==2) {
+	    return interp->boolean.false;
+	} else {
+	    return cddar(args);
+	}
+    }
 }
 
 
@@ -211,5 +249,6 @@ binding_type primitive_list[]={
     {"set!", &prim_set},
     {"quit", &prim_quit},
     {"quote", &prim_quote},
+    {"if", &prim_if},
     {0,0} /* Terminate the list */
 };

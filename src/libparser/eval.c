@@ -40,52 +40,41 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	   symbol ref at the start of the list */
 	return (*(cdr(binding)->value.primitive))(interp, cdr(obj));
     }
-
-    /* Evaluate each argument and pass the
-       resulting list to the function */
-    //evaled_args=eval_list(interp, cdr(obj));
-	    
-	    
-    
 }
 
-/* Evaluate every object in a list of objects */
-object_type *eval_list(interp_core_type *interp, object_type *obj) {
-    object_type *args=0;
-    object_type *next=0;
-    object_type *evaled_args=0;
+/* /\* Evaluate every object in a list of objects *\/ */
+/* object_type *eval_list(interp_core_type *interp, object_type *obj) { */
+/*     object_type *args=0; */
+/*     object_type *next=0; */
+/*     object_type *evaled_args=0; */
 
-    args=obj;
+/*     args=obj; */
 
-    /* Walk and evaluate argument list 
-       and maintain the same order */
-    while(args) {
-	object_type *evaled=
-	    cons(interp, eval(interp, car(args)),0);
+/*     /\* Walk and evaluate argument list  */
+/*        and maintain the same order *\/ */
+/*     while(args) { */
+/* 	object_type *evaled= */
+/* 	    cons(interp, eval(interp, car(args)),0); */
 
-	/* Deal with the first element */
-	if(evaled_args==0) {
-	    next=evaled_args=evaled;
-	} else {
-	    cdr(next)=evaled;
-	    next=evaled;
-	}
+/* 	/\* Deal with the first element *\/ */
+/* 	if(evaled_args==0) { */
+/* 	    next=evaled_args=evaled; */
+/* 	} else { */
+/* 	    cdr(next)=evaled; */
+/* 	    next=evaled; */
+/* 	} */
 
-	args=cdr(args);
-    }
-    return evaled_args;
-}
+/* 	args=cdr(args); */
+/*     } */
+/*     return evaled_args; */
+/* } */
 
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
     
     TRACE("E");
 
-    /* Check for the empty list */
-    if(obj==0) {
-	return 0;
-    }
-
+    
     /* Check for self evaluating */
     if(is_self_evaluating(interp, obj)) {
 	TRACE("s");
@@ -102,13 +91,16 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
        primitives */
     if(is_tagged_list(interp, obj)) {
 	TRACE("p");
+	/* handle tail calls clean */
 	return eval_tagged_list(interp, obj);
+    } else {
+	/* we don't know how to evaluate this object */
+	TRACE("?");
+	/* If we make it here the expression wasn't
+	   on we could evaluate. */
+	interp->error=1;
     }
 
-    TRACE("?");
-    /* If we make it here the expression wasn't
-       on we could evaluate. */
-    interp->error=1;
 
     return 0;
 }

@@ -467,3 +467,14 @@ void cleanup_interp(interp_core_type *interp) {
     free(interp);
 }
 
+/* Find the length of a passed in list */
+int list_length(object_type *args) {
+    int count=0;
+    
+    while(args) {
+	count++;
+	args=cdr(args);
+    }
+
+    return count;
+}
