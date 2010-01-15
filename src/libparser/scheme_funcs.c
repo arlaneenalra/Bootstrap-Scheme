@@ -230,6 +230,9 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     
     /* evaluate the predicate */
     predicate=eval(interp, car(args));
+
+    /* setup a tail call */
+    set_tail(interp);
     
     if(is_true(interp, predicate)) {
 	return cdar(args);

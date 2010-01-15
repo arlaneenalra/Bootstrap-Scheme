@@ -3,6 +3,11 @@
 #include "scheme_funcs.h"
 
 
+/* The returned object is a tail call and not a terminal one */
+void set_tail(interp_core_type *interp, object_type *obj) {
+    interp->tail=1;
+}
+
 /* Evaluate a symbol */
 object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
     object_type *binding=0;
@@ -42,65 +47,55 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     }
 }
 
-/* /\* Evaluate every object in a list of objects *\/ */
-/* object_type *eval_list(interp_core_type *interp, object_type *obj) { */
-/*     object_type *args=0; */
-/*     object_type *next=0; */
-/*     object_type *evaled_args=0; */
-
-/*     args=obj; */
-
-/*     /\* Walk and evaluate argument list  */
-/*        and maintain the same order *\/ */
-/*     while(args) { */
-/* 	object_type *evaled= */
-/* 	    cons(interp, eval(interp, car(args)),0); */
-
-/* 	/\* Deal with the first element *\/ */
-/* 	if(evaled_args==0) { */
-/* 	    next=evaled_args=evaled; */
-/* 	} else { */
-/* 	    cdr(next)=evaled; */
-/* 	    next=evaled; */
-/* 	} */
-
-/* 	args=cdr(args); */
-/*     } */
-/*     return evaled_args; */
-/* } */
-
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
+
+    do {
+	interp->tail=0; /* reset the tail call indicator */
+
+	TRACE("E");
     
-    TRACE("E");
+	/* check for the empty list */
+	if(obj==0) {
+	    return 0;
+	}
 
+	/* Check for self evaluating */
+	if(is_self_evaluating(interp, obj)) {
+	    TRACE("s");
+	    return obj;
+	}
+
+	/* Check for a symbol */
+	if(is_symbol(interp, obj)) {
+	    TRACE("v");
+	    return eval_symbol(interp, obj);
+	}
     
-    /* Check for self evaluating */
-    if(is_self_evaluating(interp, obj)) {
-	TRACE("s");
-	return obj;
-    }
+	/* This should give us a means of executing 
+	   primitives */
+	if(is_tagged_list(interp, obj)) {
+	    TRACE("p");
+	    /* handle tail calls clean */
+	    obj=eval_tagged_list(interp, obj);
+	
+	    /* If this was not a tail call, 
+	       return the result */
+	    if(!interp->tail) {
+		interp->tail=0;
+		return obj;
+	    }
+	} else {
+	    /* we don't know how to evaluate this object */
+	    TRACE("?");
 
-    /* Check for a symbol */
-    if(is_symbol(interp, obj)) {
-	TRACE("v");
-	return eval_symbol(interp, obj);
-    }
-    
-    /* This should give us a means of executing 
-       primitives */
-    if(is_tagged_list(interp, obj)) {
-	TRACE("p");
-	/* handle tail calls clean */
-	return eval_tagged_list(interp, obj);
-    } else {
-	/* we don't know how to evaluate this object */
-	TRACE("?");
-	/* If we make it here the expression wasn't
-	   on we could evaluate. */
-	interp->error=1;
-    }
+	    /* If we make it here the expression wasn't
+	       on we could evaluate. */
+	    interp->error=1;
+	    return interp->boolean.false;
+	}
 
+    } while(interp->tail);
 
-    return 0;
+    return obj;
 }

@@ -97,16 +97,17 @@ typedef struct gc {
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
-    bool error;
-    bool running;
+    bool error; /* An error has occured */
+    bool running; /* The interpreter is running */
+    bool tail; /* Used in evaluating tail calls */
     
     /* Instances of #t and #f */
     bool_global_type boolean;
 
-    /*Iinstance of the quote symbol */
+    /* Instance of the quote symbol */
     object_type *quote;
 
-    /* object to be attached to the object graph*/
+    /* Object to be attached to the object graph */
     object_type *added;
 
     /* Object we are currently working on */
