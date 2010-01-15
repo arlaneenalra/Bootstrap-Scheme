@@ -14,31 +14,21 @@ int main(int argc, char **argv) {
     printf("sizeof(object_type) %zu\n", sizeof(object_type));
 
     /* while the interpreter is running */
-    while(interp->running) {
+    while(1) {
 	object_type *obj=0;
 
-	printf(">\n");
-
+	printf(">");
 
 	obj=parse(interp, stdin);
-
-	if(interp->error==0) {
-	    obj=eval(interp, obj);
-	}
-
-	if(interp->error==0) {
+	obj=eval(interp, obj);
+	
+	// if there was no error, output the result
+	if(!has_error(interp)) {
 	    output(interp, obj);
-	}
-		
-	if(interp->error!=0) {
+	} else {	       
 	    printf("There was an error executing the given expression");
 	}
-
+	
 	printf("\n");
     }
-
-
-    cleanup_interp(interp);
-
-    exit(0);
 }

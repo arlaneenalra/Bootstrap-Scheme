@@ -49,6 +49,11 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
+    
+    /* make sure that the interpreter is alive */
+    if(has_error(interp)) {
+	return 0;
+    }
 
     do {
 	interp->tail=0; /* reset the tail call indicator */

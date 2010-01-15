@@ -105,6 +105,10 @@ object_type *get_binding(interp_core_type *interp,
     return 0;
 }
 
+/* Is the interpreter currently in a runnable state? */
+bool has_error(interp_core_type *interp) {
+    return interp->error;
+}
 
 /* Is this object self evaluating */
 bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
@@ -200,7 +204,8 @@ object_type *prim_set(interp_core_type *interp, object_type *args) {
 
 /* quit */
 object_type *prim_quit(interp_core_type *interp, object_type *args) {
-    interp->running=0;
+    cleanup_interp(interp);
+    exit(0);
     return 0;
 }
 

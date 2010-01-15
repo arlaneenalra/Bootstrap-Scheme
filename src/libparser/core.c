@@ -265,6 +265,10 @@ void clear_state_stack(interp_core_type *interp) {
     }
 }
 
+void end_of_file(interp_core_type *interp) {
+    interp->running=0;
+}
+
 /* Parse a string */
 object_type *parse(interp_core_type *interp, FILE *in) {
     

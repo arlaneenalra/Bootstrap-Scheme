@@ -144,6 +144,8 @@ object_type *parse(interp_core_type *interp, FILE *in);
 object_type *eval(interp_core_type *interp, object_type *obj);
 void output(interp_core_type *interp, object_type *obj);
 
+bool has_error(interp_core_type *interp);
+
 void add_object(interp_core_type *interp, object_type *obj);
 void add_char(interp_core_type *interp, char *str);
 void add_number(interp_core_type *interp, char *str);
@@ -154,6 +156,8 @@ void add_quote(interp_core_type *interp);
 void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
+
+void end_of_file(interp_core_type *interp);
 
 object_type *create_symbol(interp_core_type *interp, char *str);
 

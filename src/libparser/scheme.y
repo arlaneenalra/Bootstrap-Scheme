@@ -31,11 +31,13 @@ void yyerror(interp_core_type *interp, void *scanner, char *s);
 
 %token SYMBOL
 
+%token END_OF_FILE
 
 %%
 
 expression:
     object         { YYACCEPT; }
+  | END_OF_FILE    { end_of_file(interp); YYACCEPT; }
 
 /* list processing */
 list:
