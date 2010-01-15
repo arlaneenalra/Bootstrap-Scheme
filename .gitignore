@@ -20,8 +20,5 @@ ChangeLog
 log.txt
 src/bootstrap
 src/libparser/scheme.c
-src/
-test_tester
-test_fail
 ylwrap
 TAGS

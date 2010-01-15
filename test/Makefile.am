@@ -1,13 +1,13 @@
 include ../Makefile.extra
 
 DEPENDENCIES=libtester/libtester.a
-LDADD=@LIBOBJS@ libtester/libtester.a
+LDADD=@LIBOBJS@ libtester/libtester.a ../src/libparser/libparser.a
 
-TESTS=test_tester test_fail
+TESTS=test_tester test_fail create_interp
 
 XFAIL_TESTS=test_fail
 
-check_PROGRAMS=test_tester test_fail
+check_PROGRAMS=test_tester test_fail create_interp
 
 #test_tester_SOURCES=test_tester.c
 
