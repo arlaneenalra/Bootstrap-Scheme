@@ -107,7 +107,7 @@ void add_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
     /* create a new buffer for the string value */
-    char *c=malloc(strlen(str));
+    char *c=malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, STRING);
@@ -153,7 +153,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     }
 
     /* create a new buffer for the string value */
-    char *c=malloc(strlen(str));
+    char *c=malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);

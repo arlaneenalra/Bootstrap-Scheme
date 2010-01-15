@@ -1,10 +1,8 @@
 #include<stdlib.h>
 #include<strings.h>
 
-
 #include "core.h"
 #include "util.h"
-
 
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
@@ -52,7 +50,6 @@ void free_list(object_type *obj) {
 	}
 	
 	free(obj);
-	printf("freed:%p\n", obj);
 	obj=next;
     }
 }
@@ -65,7 +62,7 @@ void gc_all(interp_core_type *interp) {
 	interp->gc.active_list=0;
     }
 
-    if(interp->gc.active_list) {
+    if(interp->gc.free_list) {
 	free_list(interp->gc.free_list);
 	interp->gc.free_list=0;
     }

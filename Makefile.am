@@ -1,5 +1,5 @@
 include Makefile.extra
 
-SUBDIRS=src
+SUBDIRS=src test
 
 #EXTRA_DIST=
