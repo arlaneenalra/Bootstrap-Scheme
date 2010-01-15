@@ -434,16 +434,7 @@ void create_base_environment(interp_core_type *interp) {
        so, this is just the empty list */
     interp->env_stack=cons(interp, 0, 0);
 
-    obj=create_symbol(interp, "define");
-    bind_symbol(interp, obj, 
-		create_primitive(interp, &prim_define));
-
-    obj=create_symbol(interp, "set!");
-    bind_symbol(interp, obj, 0);
-
-    obj=create_symbol(interp, "quit");
-    bind_symbol(interp, obj, 
-		create_primitive(interp, &prim_quit));
+    bind_symbol_list(interp, primitive_list);
 
     output(interp, interp->env_stack);
 }
@@ -486,5 +477,4 @@ void cleanup_interp(interp_core_type *interp) {
 
     free(interp);
 }
-
 

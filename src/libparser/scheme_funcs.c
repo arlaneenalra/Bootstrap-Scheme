@@ -2,7 +2,6 @@
 #include "core.h"
 #include "scheme_funcs.h"
 
-
 /* Create a new tuple object with a
    given car and cdr */
 object_type *cons(interp_core_type *interp, object_type *car,
@@ -51,6 +50,18 @@ void bind_symbol(interp_core_type *interp, object_type *sym,
     /* add our new binding to the list of bindings */
     car(interp->env_stack)=cons(interp, binding, 
 			  car(interp->env_stack));
+}
+
+void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
+    object_type *obj=0;
+    int i=0;
+
+    /* bind every symbol in the list of primitives */
+    for(i=0; binding_list[i].symbol!=0;i++) {
+	obj=create_symbol(interp, binding_list[i].symbol);
+	bind_symbol(interp, obj, 
+		    create_primitive(interp, binding_list[i].primitive));
+    }
 }
 
 object_type *get_binding(interp_core_type *interp, 
@@ -153,3 +164,11 @@ object_type *prim_quit(interp_core_type *interp,
     interp->running=0;
     return 0;
 }
+
+
+/* Setup scheme primitive function bindings */
+binding_type primitive_list[]={
+    {"define", &prim_define},
+    {"quit", &prim_quit},
+    {0,0} /* Terminate the list */
+};

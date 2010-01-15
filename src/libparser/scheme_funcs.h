@@ -29,4 +29,13 @@ bool is_symbol(interp_core_type *interp, object_type *obj);
 object_type *prim_define(interp_core_type *interp, object_type *args);
 object_type *prim_quit(interp_core_type *interp, object_type *args);
 
+typedef struct binding {
+    char *symbol;
+    primitive_type primitive;
+} binding_type;
+
+
+/* List of primitives to bind */
+extern binding_type primitive_list[];
+
 #endif
