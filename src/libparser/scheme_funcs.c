@@ -198,11 +198,18 @@ object_type *prim_quit(interp_core_type *interp, object_type *args) {
     return 0;
 }
 
+/* quote */
+object_type *prim_quote(interp_core_type *interp, object_type *args) {
+    /* quote just says, don't evaluate my arguments */
+    return car(args);
+}
+
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define},
     {"set!", &prim_set},
     {"quit", &prim_quit},
+    {"quote", &prim_quote},
     {0,0} /* Terminate the list */
 };

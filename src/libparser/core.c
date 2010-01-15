@@ -145,6 +145,13 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     object_type *list=0;
     object_type *obj=0;
 
+    obj=get_symbol(interp, str);
+    
+    /* does the symbol already exist? */
+    if(obj) {
+	return obj;
+    }
+
     /* create a new buffer for the string value */
     char *c=malloc(strlen(str));
     strcpy(c, str);
@@ -166,14 +173,8 @@ void add_symbol(interp_core_type *interp, char *str) {
 
     TRACE("Sy");
 
-    /* check to see if the sysmbol exists first */
-    obj=get_symbol(interp, str);
-
-    /* If the symbol doesn't exist, add it */
-    if(obj==0) {
-	obj=create_symbol(interp, str);
-    }
-
+    obj=create_symbol(interp, str);
+    
     add_object(interp,obj);
 }
 

@@ -3,6 +3,52 @@
 #include "scheme_funcs.h"
 
 
+/* Evaluate a symbol */
+object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
+    object_type *binding=0;
+
+    binding=get_binding(interp, obj);
+
+    /* Check the binding */
+    if(binding==0) {
+	/* Unbound variable */
+	interp->error=1;
+	return 0;
+    }
+    return cdr(binding);
+}
+
+/* evaluate a tagged list */
+object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
+    object_type *evaled_args=0;
+    object_type *binding=0;
+
+    binding=get_binding(interp, car(obj));
+	
+    /* If the symbol is unbound, 
+       we have an error */
+    if(binding==0) {
+	TRACE("e");
+	interp->error=1;
+	return 0;
+    }	
+
+    /* Make sure that the procedure is callable */
+    if(is_primitive(interp, cdr(binding))) {
+	TRACE("Pi");
+	/* Call the primitive and return, make sure to skip the
+	   symbol ref at the start of the list */
+	return (*(cdr(binding)->value.primitive))(interp, cdr(obj));
+    }
+
+    /* Evaluate each argument and pass the
+       resulting list to the function */
+    //evaled_args=eval_list(interp, cdr(obj));
+	    
+	    
+    
+}
+
 /* Evaluate every object in a list of objects */
 object_type *eval_list(interp_core_type *interp, object_type *obj) {
     object_type *args=0;
@@ -30,8 +76,8 @@ object_type *eval_list(interp_core_type *interp, object_type *obj) {
     return evaled_args;
 }
 
+/* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
-    object_type *binding=0;
     
     TRACE("E");
 
@@ -48,60 +94,18 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 
     /* Check for a symbol */
     if(is_symbol(interp, obj)) {
-	binding=get_binding(interp, obj);
-
-	/* Check the binding */
-	if(binding==0) {
-	    /* Unbound variable */
-	    interp->error=1;
-	    return 0;
-      	}
-	return cdr(binding);
+	TRACE("v");
+	return eval_symbol(interp, obj);
     }
     
-    /* This should be done in a function 
-       bound to the quote symbol rather than 
-       here. */
-    if(is_quoted(interp, obj)) {
-	TRACE("q");
-	return cdar(obj);
-    }
-
     /* This should give us a means of executing 
        primitives */
     if(is_tagged_list(interp, obj)) {
-	object_type *evaled_args=0;
-
-
 	TRACE("p");
-
-	binding=get_binding(interp, car(obj));
-	
-	/* If the symbol is unbound, 
-	   we have an error */
-	if(binding==0) {
-	    TRACE("e");
-	    interp->error=1;
-	    return 0;
-	}	
-
-	/* Make sure that the procedure is callable */
-	if(is_primitive(interp, cdr(binding))) {
-	    TRACE("Pi");
-	    /* Call the primitive and return, make sure to skip the
-	       symbol ref at the start of the list */
-	    return (*(cdr(binding)->value.primitive))(interp, cdr(obj));
-	}
-
-	/* Evaluate each argument and pass the
-	   resulting list to the function */
-        //evaled_args=eval_list(interp, cdr(obj));
-	    
-	    
-	
-	TRACE("?");
+	return eval_tagged_list(interp, obj);
     }
 
+    TRACE("?");
     /* If we make it here the expression wasn't
        on we could evaluate. */
     interp->error=1;
