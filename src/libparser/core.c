@@ -269,16 +269,34 @@ void end_of_file(interp_core_type *interp) {
     interp->running=0;
 }
 
-/* Parse a string */
-object_type *parse(interp_core_type *interp, FILE *in) {
-    
+void reset(interp_core_type *interp) {
     interp->current=0;
     clear_state_stack(interp);
     interp->error=0;
 
     TRACE("RESET\n");
+}
+
+/* Parse a file */
+object_type *parse(interp_core_type *interp, FILE *in) {
+    reset(interp);
     
     yyset_in(in, interp->scanner);
+    
+    if(yyparse(interp, interp->scanner)) {
+	return 0;
+    }
+
+    TRACE("\n")
+    
+    return interp->added;
+}
+
+/* Parse a string */
+object_type *parse_string(interp_core_type *interp, char *in) {
+    reset(interp);
+    
+    yy_scan_string(in, interp->scanner);
     
     if(yyparse(interp, interp->scanner)) {
 	return 0;

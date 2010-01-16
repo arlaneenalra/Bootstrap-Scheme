@@ -3,17 +3,13 @@ include ../Makefile.extra
 DEPENDENCIES=libtester/libtester.a
 LDADD=@LIBOBJS@ libtester/libtester.a ../src/libparser/libparser.a
 
-TESTS=test_tester test_fail create_interp
+TESTS=test_tester test_fail create_interp scheme_define
 
 XFAIL_TESTS=test_fail
 
-check_PROGRAMS=test_tester test_fail create_interp
-
-#test_tester_SOURCES=test_tester.c
-
+check_PROGRAMS=${TESTS} ${XFAIL_TESTS}
 
 SUBDIRS=libtester
-
 
 
 # do we want to use valgrind?

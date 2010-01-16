@@ -10,9 +10,13 @@ int main(int argv, char** argc) {
 
     for(count=0;cases[count].test!=0;count++) {
 
+	printf("%s:", cases[count].message);
+
 	if((*cases[count].test)()) {
-	    printf("%s\n", cases[count].fail_message);
+	    printf("FAILED\n");
 	    failed++;
+	} else {
+	    printf("PASSED\n");
 	}
     }
 
