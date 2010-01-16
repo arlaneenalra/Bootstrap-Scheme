@@ -35,6 +35,10 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
     while(next!=0) {
 	evaled=eval(interp, car(next));
 	
+	if(interp->error) {
+	    return 0;
+	}
+	
 	/* first value has to be treated differently */
 	if(evaled_args==0) {
 	    next_val=evaled_args=cons(interp, evaled, 0);
@@ -73,6 +77,11 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     /* do we evaluate the arguments before passing them? */
     if(primitive->value.primitive.eval_first) {
 	evaled_args=eval_list(interp, cdr(obj));
+
+	/* propagate errors */
+	if(interp->error) {
+	    return 0;
+	}
     } else {
 	evaled_args=cdr(obj);
     }
@@ -139,7 +148,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    return interp->boolean.false;
 	}
 
-    } while(interp->tail);
+    } while(interp->tail && !interp->error);
 
     return obj;
 }

@@ -252,9 +252,36 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* Converts a fixnum into a floatnum */
+void fixnum_to_floatnum(interp_core_type *interp, object_type **num) {
+    object_type  *new_float=0;
+
+    /* We don't need to change anything here */
+    if((*num)->type==FLOATNUM) {
+	return;
+    }
+    
+    /* convert our int to a float */
+    new_float=alloc_object(interp, FLOATNUM);
+    new_float->value.float_val=(*num)->value.int_val;
+    (*num)=new_float;
+}
+
+/* Convert numbers into a mutually acceptable representation */
+void normalize_numbers(interp_core_type *interp, object_type **num, 
+		       object_type **num2) {
+
+    if((*num)->type!=(*num2)->type) {
+	fixnum_to_floatnum(interp, num);
+	fixnum_to_floatnum(interp, num);
+    }
+}
+
 /* Addition */
 object_type *prim_plus(interp_core_type *interp, object_type *args) {
     object_type *result=0;
+    object_type *operand=0;
+
     int arg_count=0;
 
     result=alloc_object(interp, FIXNUM);
@@ -267,7 +294,23 @@ object_type *prim_plus(interp_core_type *interp, object_type *args) {
 
     /* walk argument list and evaluate each one */
     while(args!=0) {
-	result->value.int_val+=car(args)->value.int_val;
+	operand=car(args);
+	
+	/* Make sure that everything is the same 
+	   kind of number */
+	normalize_numbers(interp, &result, &operand);
+	
+
+	/* Make sure to operate on the right field */
+	switch(result->type) {
+	case FIXNUM:
+	    result->value.int_val+=operand->value.int_val;
+	    break;
+	case FLOATNUM:
+	    result->value.float_val+=operand->value.float_val;
+	    break;
+	}
+
 	args=cdr(args);
     }
     
