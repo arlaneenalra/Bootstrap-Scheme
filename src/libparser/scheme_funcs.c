@@ -1,3 +1,4 @@
+#include <stdlib.h>
 
 #include "core.h"
 #include "scheme_funcs.h"
@@ -277,45 +278,54 @@ void normalize_numbers(interp_core_type *interp, object_type **num,
     }
 }
 
-/* Addition */
-object_type *prim_plus(interp_core_type *interp, object_type *args) {
-    object_type *result=0;
-    object_type *operand=0;
+/* Math in Macros */
+#define OPERATION(oper, name)						\
+    object_type *name(interp_core_type *interp, object_type *args) {	\
+	object_type *result=0;						\
+	object_type *operand=0;						\
+									\
+	int arg_count=0;						\
+									\
+									\
+	/* No argument means we return 0 */				\
+	if(args==0) {							\
+	    result=alloc_object(interp, FIXNUM);			\
+	    result->value.int_val=0;					\
+	    return result;						\
+	}								\
+									\
+	/* clone the first argument into a new number for our result */	\
+	result=clone(interp, car(args));				\
+	args=cdr(args);							\
+									\
+	/* walk argument list and evaluate each one */			\
+	while(args!=0) {						\
+	    operand=car(args);						\
+									\
+	    /* Make sure that everything is the same kind of number */	\
+	    normalize_numbers(interp, &result, &operand);		\
+									\
+									\
+	    /* Make sure to operate on the right field */		\
+	    switch(result->type) {					\
+	    case FIXNUM:						\
+		result->value.int_val oper operand->value.int_val;	\
+		break;							\
+	    case FLOATNUM:						\
+		result->value.float_val oper operand->value.float_val;	\
+		break;							\
+	    }								\
+									\
+	    args=cdr(args);						\
+	}								\
+									\
+	return result;							\
+    }									\
 
-    int arg_count=0;
-
-    result=alloc_object(interp, FIXNUM);
-    result->value.int_val=0;
-
-    /* No argument means we return 0 */
-    if(args==0) {
-    	return result;
-    }
-
-    /* walk argument list and evaluate each one */
-    while(args!=0) {
-	operand=car(args);
-	
-	/* Make sure that everything is the same 
-	   kind of number */
-	normalize_numbers(interp, &result, &operand);
-	
-
-	/* Make sure to operate on the right field */
-	switch(result->type) {
-	case FIXNUM:
-	    result->value.int_val+=operand->value.int_val;
-	    break;
-	case FLOATNUM:
-	    result->value.float_val+=operand->value.float_val;
-	    break;
-	}
-
-	args=cdr(args);
-    }
-    
-    return result;
-}
+OPERATION(+=, prim_plus);
+OPERATION(-=, prim_minus);
+OPERATION(*=, prim_multi);
+OPERATION(/=, prim_div);
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
@@ -326,5 +336,8 @@ binding_type primitive_list[]={
     {"if", &prim_if, 0},
 
     {"+", &prim_plus, 1},
+    {"-", &prim_minus, 1},
+    {"*", &prim_multi, 1},
+    {"/", &prim_div, 1},
     {0,0} /* Terminate the list */
 };
