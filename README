@@ -1,0 +1,10 @@
+This project has been through some 94 commits now with nothing in the README file, I thought it might be worthwhile to add one.  This code is primarily meant as an attempt to actually learn Scheme to a sufficient degree to make the language useful to me.  As such, the exercise of actually building a Scheme interpreter has helped tremendously in my understanding of the basics.  Not to mention the fact that it has given me an excuse to work through some rather interesting problems in C and practice with autotools.
+
+So far, this code has followed the timeline laid out in:
+
+http://peter.michaux.ca/articles/scheme-from-scratch-introduction
+
+I would highly suggest that you read through the articles in the Scheme From Scratch series.  While this code has been developed along with Peter's it has paid very little attention to the style and implementation choices made in his code.  For instance, this code uses a context structure that is passed to every pertinent function rather than global variables.  There are also several other implementations that have been constructed in parallel to Peter's linked in his posts and comments.
+
+
+Chris S.
