@@ -39,7 +39,8 @@ bool is_true(interp_core_type *interp, object_type *obj);
 
 typedef struct binding {
     char *symbol;
-    primitive_type primitive;
+    fn_type primitive;
+    bool eval_first;
 } binding_type;
 
 

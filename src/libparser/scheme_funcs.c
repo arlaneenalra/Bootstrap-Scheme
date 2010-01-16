@@ -32,12 +32,13 @@ object_type *quote(interp_core_type *interp,
 }
 
 /* create an instance of a primitive object */
-object_type *create_primitive(interp_core_type *interp,
-			      primitive_type primitive) {
+object_type *create_primitive(interp_core_type *interp, fn_type primitive,
+			      bool eval_first) {
     object_type *obj=0;
 
     obj=alloc_object(interp, PRIM);
-    obj->value.primitive=primitive;
+    obj->value.primitive.fn=primitive;
+    obj->value.primitive.eval_first=eval_first;
     
     return obj;
 }
@@ -71,7 +72,8 @@ void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
     for(i=0; binding_list[i].symbol!=0;i++) {
 	obj=create_symbol(interp, binding_list[i].symbol);
 	bind_symbol(interp, obj, 
-		    create_primitive(interp, binding_list[i].primitive));
+		    create_primitive(interp, binding_list[i].primitive, 
+				     binding_list[i].eval_first));
     }
 }
 
@@ -250,13 +252,36 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* Addition */
+object_type *prim_plus(interp_core_type *interp, object_type *args) {
+    object_type *result=0;
+    int arg_count=0;
+
+    result=alloc_object(interp, FIXNUM);
+    result->value.int_val=0;
+
+    /* No argument means we return 0 */
+    if(args==0) {
+    	return result;
+    }
+
+    /* walk argument list and evaluate each one */
+    while(args!=0) {
+	result->value.int_val+=car(args)->value.int_val;
+	args=cdr(args);
+    }
+    
+    return result;
+}
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
-    {"define", &prim_define},
-    {"set!", &prim_set},
-    {"quit", &prim_quit},
-    {"quote", &prim_quote},
-    {"if", &prim_if},
+    {"define", &prim_define, 0},
+    {"set!", &prim_set, 0},
+    {"quit", &prim_quit, 0},
+    {"quote", &prim_quote, 0},
+    {"if", &prim_if, 0},
+
+    {"+", &prim_plus, 1},
     {0,0} /* Terminate the list */
 };

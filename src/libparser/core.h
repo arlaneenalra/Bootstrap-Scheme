@@ -44,8 +44,13 @@ typedef enum {
 
 struct object;
 
-typedef struct object *(*primitive_type)
+typedef struct object *(*fn_type)
     (struct interp_core *interp, struct object *);
+
+typedef struct primitive {
+    fn_type fn;
+    bool eval_first;
+} primitive_type;
 
 
 

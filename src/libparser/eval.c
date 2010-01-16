@@ -23,10 +23,40 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
     return cdr(binding);
 }
 
+/* Walk a list of values and return an object result */
+object_type *eval_list(interp_core_type *interp, object_type *args) {
+    object_type *next=0;
+    object_type *evaled_args=0;
+    object_type *next_val=0;
+    object_type *evaled=0;
+    
+    next=args;
+    
+    while(next!=0) {
+	evaled=eval(interp, car(next));
+	
+	/* first value has to be treated differently */
+	if(evaled_args==0) {
+	    next_val=evaled_args=cons(interp, evaled, 0);
+	} else {
+	    /* build a list of the evaled arguments keeping 
+	       the same order */
+	    cdr(next_val)=cons(interp, evaled, 0);
+	    next_val=cdr(next_val);
+	}
+	
+	next=cdr(next);
+    }
+
+    return evaled_args;
+}
+
+
 /* evaluate a tagged list */
 object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     object_type *evaled_args=0;
     object_type *binding=0;
+    object_type *primitive=0;
 
     binding=get_binding(interp, car(obj));
 	
@@ -36,14 +66,23 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	TRACE("e");
 	interp->error=1;
 	return 0;
-    }	
+    }
+
+    primitive=cdr(binding);
+
+    /* do we evaluate the arguments before passing them? */
+    if(primitive->value.primitive.eval_first) {
+	evaled_args=eval_list(interp, cdr(obj));
+    } else {
+	evaled_args=cdr(obj);
+    }
 
     /* Make sure that the procedure is callable */
     if(is_primitive(interp, cdr(binding))) {
 	TRACE("Pi");
 	/* Call the primitive and return, make sure to skip the
 	   symbol ref at the start of the list */
-	return (*(cdr(binding)->value.primitive))(interp, cdr(obj));
+	return (*(primitive->value.primitive.fn))(interp, evaled_args);
     }
 }
 
