@@ -19,6 +19,9 @@ missing
 ChangeLog
 log.txt
 src/bootstrap
+src/libparser/lexer.c
+src/libparser/scheme.output
+src/libparser/scheme.h
 src/libparser/scheme.c
 ylwrap
 TAGS
