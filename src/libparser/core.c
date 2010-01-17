@@ -436,7 +436,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	printf("%s", obj->value.symbol.name);
 	break;
     case PRIM:
-	printf("#<:primitive procedure@%p>", obj->value.primitive);
+	printf("#<:primitive procedure@%p>", obj->value.primitive.fn);
 	break;
 
     default:
