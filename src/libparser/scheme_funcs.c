@@ -203,7 +203,7 @@ object_type *prim_set_car(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    caar(args)=cdar(args);
+    caar(args)=cadr(args);
     return true;
 }
 
@@ -214,7 +214,7 @@ object_type *prim_cdr(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    return cadr(args);
+    return cdar(args);
 }
 
 /* set-cdr! */
@@ -226,7 +226,7 @@ object_type *prim_set_cdr(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    cadr(args)=cdar(args);
+    cadr(args)=cadr(args);
     return true;
 }
 
@@ -241,7 +241,7 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    obj=cons(interp, car(args), cdar(args));
+    obj=cons(interp, car(args), cadr(args));
     
     return obj;
 }
@@ -266,7 +266,7 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 
     var=car(args);
 
-    bind_symbol(interp, var, eval(interp, cdar(args)));
+    bind_symbol(interp, var, eval(interp, cadr(args)));
 
     return true;
 }
@@ -292,7 +292,7 @@ object_type *prim_set(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    cdr(binding)=eval(interp, cdar(args));
+    cdr(binding)=eval(interp, cadr(args));
    
     return true;
 }
@@ -335,12 +335,12 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     set_tail(interp);
     
     if(is_true(interp, predicate)) {
-	return cdar(args);
+	return cadr(args);
     } else {
 	if(arg_count==2) {
 	    return false;
 	} else {
-	    return cddar(args);
+	    return caddr(args);
 	}
     }
 }
@@ -537,7 +537,7 @@ object_type *prim_mod(interp_core_type *interp, object_type *args) {
     }
 
     dividend=car(args);
-    divisor=cdar(args);
+    divisor=cadr(args);
 
     /* You can set the value of a symbol */
     if(dividend==0 || divisor==0 ||
@@ -565,7 +565,7 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
     }
 
     dividend=car(args);
-    divisor=cdar(args);
+    divisor=cadr(args);
 
     /* You can set the value of a symbol */
     if(dividend==0 || divisor==0 ||

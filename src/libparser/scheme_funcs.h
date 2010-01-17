@@ -7,17 +7,17 @@
 
 
 #define caar(obj) car(car(obj))
-#define cdar(obj) car(cdr(obj))
-#define cadr(obj) cdr(car(obj))
+#define cadr(obj) car(cdr(obj))
+#define cdar(obj) cdr(car(obj))
 #define cddr(obj) cdr(cdr(obj))
 
 #define caaar(obj) car(car(car(obj)))
-#define cdaar(obj) car(car(cdr(obj)))
+#define caadr(obj) car(car(cdr(obj)))
 #define cadar(obj) car(cdr(car(obj)))
-#define cddar(obj) car(cdr(cdr(obj)))
-#define caadr(obj) cdr(car(car(obj)))
+#define caddr(obj) car(cdr(cdr(obj)))
+#define cdaar(obj) cdr(car(car(obj)))
 #define cdadr(obj) cdr(car(cdr(obj)))
-#define caddr(obj) cdr(cdr(car(obj)))
+#define cddar(obj) cdr(cdr(car(obj)))
 #define cdddr(obj) cdr(cdr(cdr(obj)))
 
 
