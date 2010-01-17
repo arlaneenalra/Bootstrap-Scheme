@@ -184,6 +184,41 @@ bool is_true(interp_core_type *interp, object_type *obj) {
 
 /* Primitives */
 
+/* car */
+object_type *prim_car(interp_core_type *interp, object_type *args) {
+    if(args==0 || car(args)==0 || car(args)->type != TUPLE) {
+	interp->error=1;
+	return false;
+    }
+
+    return caar(args);
+}
+
+/* cdr */
+object_type *prim_cdr(interp_core_type *interp, object_type *args) {
+    if(args==0 || car(args)==0 || car(args)->type != TUPLE) {
+	interp->error=1;
+	return false;
+    }
+
+    return cadr(args);
+}
+
+/* cons */
+object_type *prim_cons(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+
+    /* make sure we have the correct arguments */
+    if(list_length(args)!=2) {
+	interp->error=1;
+	return false;
+    }
+    
+    obj=cons(interp, car(args), cdar(args));
+    
+    return obj;
+}
+
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
     object_type *var=0;
@@ -638,6 +673,11 @@ binding_type primitive_list[]={
     {"quit", &prim_quit, 0},
     {"quote", &prim_quote, 0},
     {"if", &prim_if, 0},
+
+    {"cons", &prim_cons, 1},
+    {"car", &prim_car, 1},
+    {"cdr", &prim_cdr, 1},
+
 
     {"+", &prim_plus, 1},
     {"-", &prim_minus, 1},
