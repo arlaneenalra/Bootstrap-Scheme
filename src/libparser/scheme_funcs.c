@@ -35,6 +35,31 @@ object_type *quote(interp_core_type *interp,
     return ret_val;
 }
 
+/* Converts a fixnum into a floatnum */
+void fixnum_to_floatnum(interp_core_type *interp, object_type **num) {
+    object_type  *new_float=0;
+
+    /* We don't need to change anything here */
+    if((*num)->type==FLOATNUM) {
+	return;
+    }
+    
+    /* convert our int to a float */
+    new_float=alloc_object(interp, FLOATNUM);
+    new_float->value.float_val=(*num)->value.int_val;
+    (*num)=new_float;
+}
+
+/* Convert numbers into a mutually acceptable representation */
+void normalize_numbers(interp_core_type *interp, object_type **num, 
+		       object_type **num2) {
+
+    if((*num)->type!=(*num2)->type) {
+	fixnum_to_floatnum(interp, num);
+	fixnum_to_floatnum(interp, num);
+    }
+}
+
 /* create an instance of a primitive object */
 object_type *create_primitive(interp_core_type *interp, fn_type primitive,
 			      bool eval_first) {
@@ -258,31 +283,6 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 }
 
-/* Converts a fixnum into a floatnum */
-void fixnum_to_floatnum(interp_core_type *interp, object_type **num) {
-    object_type  *new_float=0;
-
-    /* We don't need to change anything here */
-    if((*num)->type==FLOATNUM) {
-	return;
-    }
-    
-    /* convert our int to a float */
-    new_float=alloc_object(interp, FLOATNUM);
-    new_float->value.float_val=(*num)->value.int_val;
-    (*num)=new_float;
-}
-
-/* Convert numbers into a mutually acceptable representation */
-void normalize_numbers(interp_core_type *interp, object_type **num, 
-		       object_type **num2) {
-
-    if((*num)->type!=(*num2)->type) {
-	fixnum_to_floatnum(interp, num);
-	fixnum_to_floatnum(interp, num);
-    }
-}
-
 /* Math in Macros */
 #define OPERATION(oper, name)						\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -354,6 +354,8 @@ TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
 TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
+
+
 
 
 /* Setup scheme primitive function bindings */
