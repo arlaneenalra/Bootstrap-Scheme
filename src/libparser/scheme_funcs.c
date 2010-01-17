@@ -328,6 +328,97 @@ object_type *prim_int_to_char(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* Number to String */
+object_type *prim_num_to_string(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char buf[2048];
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    obj=car(args);
+
+    /* make sure that there is an argument */
+    if(obj==0) {
+	interp->error=1;
+	return false;
+    }
+    
+    switch(obj->type) {
+    case FIXNUM:
+	sprintf(buf, "%" PRIi64, obj->value.int_val);
+	break;
+
+    case FLOATNUM:
+	sprintf(buf, "%Lg", obj->value.float_val);
+	break;
+
+    default:
+	interp->error=1;
+	return false;
+    }
+    
+    return create_string(interp, buf);
+}
+
+
+/* String to Number */
+object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *str=0;
+    char *walk=0;
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    if(car(args)==0 || car(args)->type!=STRING) {
+	interp->error=1;
+	return false;	
+    }
+    
+    walk=str=car(args)->value.string_val;
+
+    /* check for an initial negative */
+    if(*walk=='-') {
+	walk++;
+    }
+    
+    /* assume we have an integer until otherwise determined */
+    obj=alloc_object(interp, FIXNUM);
+
+    /*scan the string and determine if we have an integer or a float */
+    while(walk!=0 && (*walk)!=0) {
+	
+	if(*walk=='.') {
+	    obj->type=FLOATNUM;
+	    walk=0;
+	} else if(!isdigit(*walk)) {
+	    walk=0;
+	}else {
+	    walk++;
+	}
+    }
+
+    /* do the actual conversion */
+    switch(obj->type) {
+    case FIXNUM:
+	obj->value.int_val=strtoll(str,0,10);
+	break;
+    case FLOATNUM:
+	obj->value.float_val=strtold(str, 0);
+	break;
+    }
+    
+
+    return obj;
+}
+
 /* Math in Macros */
 #define OPERATION(oper, name)						\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -426,6 +517,8 @@ binding_type primitive_list[]={
     
     {"char->integer", &prim_char_to_int, 1},
     {"integer->char", &prim_int_to_char, 1},
+    {"number->string", &prim_num_to_string, 1},
+    {"string->number", &prim_string_to_num, 1},
     
 
     {0,0} /* Terminate the list */

@@ -106,13 +106,7 @@ void add_number(interp_core_type *interp, char *str) {
 void add_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
-    /* create a new buffer for the string value */
-    char *c=malloc(strlen(str)+1);
-    strcpy(c, str);
-
-    obj=alloc_object(interp, STRING);
-    obj->value.string_val=c;
-
+    obj=create_string(interp, str);
     add_object(interp,obj);
 }
 
@@ -139,6 +133,21 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
 
     return 0;
 }
+
+/* Create a new symbol instance */
+object_type *create_string(interp_core_type *interp, char *str) {
+    object_type *obj=0;
+
+    /* create a new buffer for the string value */
+    char *c=malloc(strlen(str)+1);
+    strcpy(c, str);
+
+    obj=alloc_object(interp, STRING);
+    obj->value.string_val=c;
+	
+    return obj;
+}
+
 
 /* Create a new symbol instance */
 object_type *create_symbol(interp_core_type *interp, char *str) {

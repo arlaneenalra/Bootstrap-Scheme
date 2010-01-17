@@ -159,6 +159,8 @@ void add_float(interp_core_type *interp, char *str);
 void add_string(interp_core_type *interp, char *str);
 void add_quote(interp_core_type *interp);
 
+object_type *create_string(interp_core_type *interp, char *str);
+
 void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
