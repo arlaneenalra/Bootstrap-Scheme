@@ -283,6 +283,48 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* Symbol to String */
+object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *name=0;
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    if(car(args)==0 || car(args)->type!=SYM) {
+	interp->error=1;
+	return false;	
+    }
+
+    obj=create_string(interp, car(args)->value.symbol.name);
+    
+    return obj;
+}
+
+/* String to Symbol */
+object_type *prim_string_to_sym(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *name=0;
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    if(car(args)==0 || car(args)->type!=STRING) {
+	interp->error=1;
+	return false;	
+    }
+
+    obj=create_symbol(interp, car(args)->value.string_val);
+    
+    return obj;
+}
+
 /* Character to Integer */
 object_type *prim_char_to_int(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -519,6 +561,8 @@ binding_type primitive_list[]={
     {"integer->char", &prim_int_to_char, 1},
     {"number->string", &prim_num_to_string, 1},
     {"string->number", &prim_string_to_num, 1},
+    {"symbol->string", &prim_sym_to_string, 1},
+    {"string->symbol", &prim_string_to_sym, 1},
     
 
     {0,0} /* Terminate the list */

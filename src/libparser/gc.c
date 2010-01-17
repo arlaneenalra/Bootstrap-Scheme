@@ -30,10 +30,20 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 object_type *clone(interp_core_type *interp, object_type *obj) {
     object_type *new_obj;
     object_type *next=0;
+    char *str=0;
 
     /* don't try to clone a null */
     if(obj==0) {
 	return 0;
+    }
+    
+    if(obj->type==STRING) {
+	return create_string(interp, obj->value.string_val);
+    }
+
+    /* There should only be one instance of a given symbol */
+    if(obj->type==SYM) {
+	return obj;
     }
 
     new_obj=alloc_object(interp, obj->type);

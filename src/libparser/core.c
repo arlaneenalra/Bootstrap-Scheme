@@ -134,7 +134,7 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
     return 0;
 }
 
-/* Create a new symbol instance */
+/* Create a new string instance */
 object_type *create_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
