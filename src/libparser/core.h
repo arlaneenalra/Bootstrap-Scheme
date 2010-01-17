@@ -33,6 +33,7 @@ typedef enum {
     SYM,
 
     PRIM, /* primitive c functions */
+    CLOSURE, /* a closure */
     CHAIN /* internal type */
 } object_type_enum;
 
@@ -44,6 +45,16 @@ typedef enum {
 
 struct object;
 
+typedef	struct tuple {
+    struct object *car;
+    struct object *cdr;
+} tuple_type;
+
+typedef	struct symbol {
+    char *name;
+    struct object *binding;
+} symbol_type;
+
 typedef struct object *(*fn_type)
     (struct interp_core *interp, struct object *);
 
@@ -52,7 +63,11 @@ typedef struct primitive {
     bool eval_first;
 } primitive_type;
 
-
+typedef struct closure {
+    struct object *param;
+    struct object *body;
+    struct object *env;
+} closure_type;
 
 /* Define a structure to represent a memory cell */
 typedef struct object {
@@ -64,17 +79,10 @@ typedef struct object {
 	char char_val; 
 	char *string_val;
 	bool bool_val;
-	struct {
-	    struct object *car;
-	    struct object *cdr;
-	} tuple;
-	struct {
-	    char *name;
-	    struct object *binding;
-	} symbol;
-
+	tuple_type tuple;
+	symbol_type symbol;
 	primitive_type primitive;
-
+	closure_type closure;
     } value;
 
     struct object *next;

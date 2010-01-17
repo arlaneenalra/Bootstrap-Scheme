@@ -60,7 +60,7 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     object_type *evaled_args=0;
     object_type *binding=0;
-    object_type *primitive=0;
+    object_type *proc=0;
 
     binding=get_binding(interp, car(obj));
 	
@@ -72,26 +72,34 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	return 0;
     }
 
-    primitive=cdr(binding);
+    proc=cdr(binding);
 
-    /* do we evaluate the arguments before passing them? */
-    if(primitive->value.primitive.eval_first) {
-	evaled_args=eval_list(interp, cdr(obj));
-
-	/* propagate errors */
-	if(interp->error) {
-	    return 0;
-	}
-    } else {
-	evaled_args=cdr(obj);
-    }
 
     /* Make sure that the procedure is callable */
     if(is_primitive(interp, cdr(binding))) {
 	TRACE("Pi");
+
+	/* do we evaluate the arguments before passing them? */
+	if(proc->value.primitive.eval_first) {
+	    evaled_args=eval_list(interp, cdr(obj));
+
+	    /* propagate errors */
+	    if(interp->error) {
+		return 0;
+	    }
+	} else {
+	    evaled_args=cdr(obj);
+	}
+
 	/* Call the primitive and return, make sure to skip the
 	   symbol ref at the start of the list */
-	return (*(primitive->value.primitive.fn))(interp, evaled_args);
+	return (*(proc->value.primitive.fn))(interp, evaled_args);
+    } else {
+	/* We have something that looks like a compound procedure */
+	push_environment(interp);
+	
+
+	pop_environment(interp);
     }
 }
 
@@ -127,7 +135,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     
 	/* This should give us a means of executing 
 	   primitives */
-	if(is_tagged_list(interp, obj)) {
+	if(is_tuple(interp, obj)) {
 	    TRACE("p");
 	    /* handle tail calls clean */
 	    obj=eval_tagged_list(interp, obj);

@@ -158,16 +158,19 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 	&& car(obj)==interp->quote;
 }
 
-/* Is this list a procedure call */
-bool is_tagged_list(interp_core_type *interp, 
-		       object_type *obj) {
+/* Does this list start with a symbol? */
+bool is_tagged_list(interp_core_type *interp, object_type *obj) {
     return obj!=0 && obj->type==TUPLE
 	&& car(obj)!=0 && car(obj)->type==SYM;
 }
 
+/* Is this object a tuple? */
+bool is_tuple(interp_core_type *interp, object_type *obj) {
+    return obj!=0 && obj->type==TUPLE;
+}
+
 /* Is this is a primitive? */
-bool is_primitive(interp_core_type *interp,
-		  object_type *obj) {
+bool is_primitive(interp_core_type *interp, object_type *obj) {
     return obj!=0 && obj->type==PRIM;
 }
 
@@ -248,10 +251,15 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
 
 /* lambda */
 object_type *prim_lambda(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
     
-    return cons(interp, car(args), /* variable list */
-		cadr(args)); /* procedure body */
-
+    obj=alloc_object(interp, CLOSURE);
+    
+    obj->value.closure.env=interp->env_stack;
+    obj->value.closure.param=car(args);
+    obj->value.closure.body=cdr(args);
+    
+    return obj;
 }
 
 

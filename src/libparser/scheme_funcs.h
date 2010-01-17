@@ -34,6 +34,8 @@ bool is_quoted(interp_core_type *interp, object_type *obj);
 bool is_self_evaluating(interp_core_type *interp, object_type *obj);
 bool is_symbol(interp_core_type *interp, object_type *obj);
 bool is_true(interp_core_type *interp, object_type *obj);
+bool is_tuple(interp_core_type *interp, object_type *obj);
+
 
 /* Primitives */
 

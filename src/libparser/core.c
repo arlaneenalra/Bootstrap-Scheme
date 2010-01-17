@@ -429,14 +429,22 @@ void output(interp_core_type *interp, object_type *obj) {
 	    printf(")");
 
 	}
-
 	
 	break;
     case SYM:
 	printf("%s", obj->value.symbol.name);
 	break;
     case PRIM:
-	printf("#<:primitive procedure@%p>", obj->value.primitive.fn);
+	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);
+	break;
+    case CLOSURE:
+	printf("#<closure:\nparams:");
+	output(interp, obj->value.closure.param);
+	printf("\nbody:");
+	output(interp, obj->value.closure.body);
+	printf("\nenvironment:");
+	output(interp, obj->value.closure.env);
+	printf("\n>\n");
 	break;
 
     default:
