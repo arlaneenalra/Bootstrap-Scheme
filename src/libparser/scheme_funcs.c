@@ -246,12 +246,20 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* lambda */
+object_type *prim_lambda(interp_core_type *interp, object_type *args) {
+    
+    return cons(interp, car(args), /* variable list */
+		cadr(args)); /* procedure body */
+
+}
+
+
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
-    object_type *var=0;
 
     /* make sure we have the correct arguments */
-    if(list_length(args)!=2) {
+    if(list_length(args)<2) {
 	interp->error=1;
 	return false;
     }
@@ -264,9 +272,16 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    var=car(args);
+    if(is_symbol(interp, car(args))) {
+	bind_symbol(interp, car(args), /* Symbol */
+		    eval(interp, cadr(args))); /* Value */
+    } else {
+	/* It can only be a tagged list then */
 
-    bind_symbol(interp, var, eval(interp, cadr(args)));
+	bind_symbol(interp, caar(args), /* Symbol */
+		    cons(interp, cdar(args), /* Arguments */
+			 cadr(args))); /* Body */
+    }
 
     return true;
 }
@@ -700,6 +715,7 @@ binding_type primitive_list[]={
     {"quit", &prim_quit, 0},
     {"quote", &prim_quote, 0},
     {"if", &prim_if, 0},
+    {"lambda", &prim_lambda, 0},
 
     {"cons", &prim_cons, 1},
     {"car", &prim_car, 1},
