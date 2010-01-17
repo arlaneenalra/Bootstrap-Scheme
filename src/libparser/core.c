@@ -274,6 +274,25 @@ void clear_state_stack(interp_core_type *interp) {
     }
 }
 
+/* Add a new environment on top of the current one */
+void push_environment(interp_core_type *interp) {
+
+    TRACE("Peu");
+    
+    /* Add the new environment */
+    interp->env_stack=cons(interp, 0, interp->env_stack);
+}
+
+/* Pop off the current environment */
+void pop_environment(interp_core_type *interp) {
+
+    TRACE("Peo");
+    
+    /* Add the new environment */
+    interp->env_stack=cdr(interp->env_stack);
+}
+
+
 void end_of_file(interp_core_type *interp) {
     interp->running=0;
 }
@@ -454,9 +473,12 @@ void create_base_environment(interp_core_type *interp) {
     
     /* There is nothing in the environment right now
        so, this is just the empty list */
-    interp->env_stack=cons(interp, 0, 0);
+    push_environment(interp);
+    /*interp->env_stack=cons(interp, 0, 0);*/
 
     bind_symbol_list(interp, primitive_list);
+
+    push_environment(interp);
 }
 
 /* Create an instance of the interpreter */

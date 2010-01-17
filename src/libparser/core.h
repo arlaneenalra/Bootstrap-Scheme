@@ -165,6 +165,9 @@ void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
 
+void push_environment(interp_core_type *interp);
+void pop_environment(interp_core_type *interp);
+
 void end_of_file(interp_core_type *interp);
 
 object_type *create_symbol(interp_core_type *interp, char *str);
