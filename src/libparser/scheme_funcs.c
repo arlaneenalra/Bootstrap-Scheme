@@ -283,6 +283,51 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* Character to Integer */
+object_type *prim_char_to_int(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    if(car(args)==0 || car(args)->type!=CHAR) {
+	interp->error=1;
+	return false;	
+    }
+
+    /* convert our char to a string */
+    obj=alloc_object(interp, FIXNUM);
+    obj->value.int_val=car(args)->value.char_val;
+    
+    return obj;
+}
+
+
+/* Integer to Character */
+object_type *prim_int_to_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    /* make sure we have enough arguments */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    if(car(args)==0 || car(args)->type!=FIXNUM) {
+	interp->error=1;
+	return false;	
+    }
+
+    /* convert our char to a string */
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=car(args)->value.int_val;
+    
+    return obj;
+}
+
 /* Math in Macros */
 #define OPERATION(oper, name)						\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -357,7 +402,6 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 
 
 
-
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0},
@@ -379,6 +423,10 @@ binding_type primitive_list[]={
     {"string?", &prim_is_string, 1},
     {"pair?", &prim_is_tuple, 1},
     {"procedure?", &prim_is_prim, 1},
+    
+    {"char->integer", &prim_char_to_int, 1},
+    {"integer->char", &prim_int_to_char, 1},
+    
 
     {0,0} /* Terminate the list */
 };
