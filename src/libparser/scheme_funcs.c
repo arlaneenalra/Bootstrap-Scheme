@@ -590,6 +590,45 @@ TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
 TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 
+#define NUMERIC_TEST(test, name)					\
+    object_type *name(interp_core_type *interp, object_type *args) {	\
+	object_type *first=0;						\
+	object_type *next=0;						\
+	if(args==0) {							\
+	    return true;						\
+	}								\
+	first=car(args);						\
+									\
+	args=cdr(args);							\
+									\
+	while(args!=0) {						\
+	    next=car(args);						\
+	    normalize_numbers(interp, &first, &next);			\
+									\
+	    switch(first->type) {					\
+	    case FIXNUM:						\
+		if(!(first->value.int_val test next->value.int_val)) {	\
+		    return false;					\
+		}							\
+		break;							\
+	    case FLOATNUM:						\
+		if(!(first->value.float_val test next->value.float_val)) { \
+		    return false;					\
+		}							\
+		break;							\
+	    }								\
+	    first=next;							\
+	    args=cdr(args);						\
+	}								\
+									\
+	/* default to true */						\
+	return true;							\
+    }									\
+
+NUMERIC_TEST(==, prim_equal)
+NUMERIC_TEST(<, prim_less)
+NUMERIC_TEST(>, prim_greater)
+
 
 
 /* Setup scheme primitive function bindings */
@@ -606,6 +645,10 @@ binding_type primitive_list[]={
     {"/", &prim_div, 1},
     {"quotient", &prim_div_int, 1},
     {"remainder", &prim_mod, 1},
+
+    {"=", &prim_equal, 1},
+    {"<", &prim_less, 1},
+    {">", &prim_greater, 1},
 
     {"null?", &prim_is_null, 1},
     {"boolean?", &prim_is_boolean, 1},
