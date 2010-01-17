@@ -159,19 +159,6 @@ bool is_true(interp_core_type *interp, object_type *obj) {
 
 /* Primitives */
 
-/* null? */
-object_type *prim_is_null(interp_core_type *interp, object_type *args) {
-    
-    /* accept one argument and only one argument */
-    if(list_length(args)!=1) {
-	interp->error=1;
-	return 0;
-    }
-
-    return car(args)==0 ? true : false;
-}
-
-
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
     object_type *var=0;
@@ -340,14 +327,33 @@ void normalize_numbers(interp_core_type *interp, object_type **num,
 	return result;							\
     }									\
 
-OPERATION(+=, prim_plus);
-OPERATION(-=, prim_minus);
-OPERATION(*=, prim_multi);
-OPERATION(/=, prim_div);
+/* Four basic math operations */
+OPERATION(+=, prim_plus)
+OPERATION(-=, prim_minus)
+OPERATION(*=, prim_multi)
+OPERATION(/=, prim_div)
+
+#define TEST(test, name)						\
+    object_type *name(interp_core_type *interp, object_type *args) {	\
+									\
+	/* accept one argument and only one argument */			\
+	if(list_length(args)!=1) {					\
+	    interp->error=1;						\
+	    return 0;							\
+	}								\
+									\
+	return test ? true : false;					\
+    }									\
 
 
-
-
+TEST(car(args)==0, prim_is_null)
+TEST(car(args)!=0 && car(args)->type==BOOL, prim_is_boolean)
+TEST(car(args)!=0 && car(args)->type==SYM, prim_is_symbol)
+TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
+TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
+TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
+TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
+TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 
 
 /* Setup scheme primitive function bindings */
@@ -364,5 +370,13 @@ binding_type primitive_list[]={
     {"/", &prim_div, 1},
 
     {"null?", &prim_is_null, 1},
+    {"boolean?", &prim_is_boolean, 1},
+    {"symbol?", &prim_is_symbol, 1},
+    {"integer?", &prim_is_integer, 1},
+    {"char?", &prim_is_char, 1},
+    {"string?", &prim_is_string, 1},
+    {"pair?", &prim_is_tuple, 1},
+    {"procedure?", &prim_is_prim, 1},
+
     {0,0} /* Terminate the list */
 };
