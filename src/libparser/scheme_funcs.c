@@ -56,7 +56,7 @@ void normalize_numbers(interp_core_type *interp, object_type **num,
 
     if((*num)->type!=(*num2)->type) {
 	fixnum_to_floatnum(interp, num);
-	fixnum_to_floatnum(interp, num);
+	fixnum_to_floatnum(interp, num2);
     }
 }
 
@@ -461,6 +461,63 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+
+/* Calculate the remainder of a division */
+object_type *prim_mod(interp_core_type *interp, object_type *args) {
+    object_type *dividend=0;
+    object_type *divisor=0;
+    object_type *result=0;
+
+    /* make sure we have the correct arguments */
+    if(list_length(args)!=2) {
+	interp->error=1;
+	return false;
+    }
+
+    dividend=car(args);
+    divisor=cdar(args);
+
+    /* You can set the value of a symbol */
+    if(dividend==0 || divisor==0 ||
+       dividend->type!=FIXNUM || divisor->type !=FIXNUM) {
+	interp->error=1;
+	return false;
+    }
+
+    result=clone(interp, dividend);
+    result->value.int_val%=divisor->value.int_val;
+
+    return result;
+}
+
+/* Calculate the quotient of a division */
+object_type *prim_div_int(interp_core_type *interp, object_type *args) {
+    object_type *dividend=0;
+    object_type *divisor=0;
+    object_type *result=0;
+
+    /* make sure we have the correct arguments */
+    if(list_length(args)!=2) {
+	interp->error=1;
+	return false;
+    }
+
+    dividend=car(args);
+    divisor=cdar(args);
+
+    /* You can set the value of a symbol */
+    if(dividend==0 || divisor==0 ||
+       dividend->type!=FIXNUM || divisor->type !=FIXNUM) {
+	interp->error=1;
+	return false;
+    }
+
+    result=clone(interp, dividend);
+    result->value.int_val/=divisor->value.int_val;
+
+    return result;
+}
+
 /* Math in Macros */
 #define OPERATION(oper, name)						\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -547,6 +604,8 @@ binding_type primitive_list[]={
     {"-", &prim_minus, 1},
     {"*", &prim_multi, 1},
     {"/", &prim_div, 1},
+    {"quotient", &prim_div_int, 1},
+    {"remainder", &prim_mod, 1},
 
     {"null?", &prim_is_null, 1},
     {"boolean?", &prim_is_boolean, 1},
