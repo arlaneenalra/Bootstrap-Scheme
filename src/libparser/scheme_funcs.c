@@ -707,7 +707,6 @@ binding_type primitive_list[]={
     {"set-car!", &prim_set_car, 1},
     {"set-cdr!", &prim_set_cdr, 1},
 
-
     {"+", &prim_plus, 1},
     {"-", &prim_minus, 1},
     {"*", &prim_multi, 1},
@@ -734,7 +733,6 @@ binding_type primitive_list[]={
     {"string->number", &prim_string_to_num, 1},
     {"symbol->string", &prim_sym_to_string, 1},
     {"string->symbol", &prim_string_to_sym, 1},
-    
 
     {0,0} /* Terminate the list */
 };
