@@ -194,6 +194,19 @@ object_type *prim_car(interp_core_type *interp, object_type *args) {
     return caar(args);
 }
 
+/* set-car! */
+object_type *prim_set_car(interp_core_type *interp, object_type *args) {
+
+    /* make sure we have values to work with */
+    if(list_length(args)!=2 && car(args)->type != TUPLE) {
+	interp->error=1;
+	return false;
+    }
+
+    caar(args)=cdar(args);
+    return true;
+}
+
 /* cdr */
 object_type *prim_cdr(interp_core_type *interp, object_type *args) {
     if(args==0 || car(args)==0 || car(args)->type != TUPLE) {
@@ -203,6 +216,20 @@ object_type *prim_cdr(interp_core_type *interp, object_type *args) {
 
     return cadr(args);
 }
+
+/* set-cdr! */
+object_type *prim_set_cdr(interp_core_type *interp, object_type *args) {
+
+    /* make sure we have values to work with */
+    if(list_length(args)!=2 && car(args)->type != TUPLE) {
+	interp->error=1;
+	return false;
+    }
+
+    cadr(args)=cdar(args);
+    return true;
+}
+
 
 /* cons */
 object_type *prim_cons(interp_core_type *interp, object_type *args) {
@@ -677,6 +704,8 @@ binding_type primitive_list[]={
     {"cons", &prim_cons, 1},
     {"car", &prim_car, 1},
     {"cdr", &prim_cdr, 1},
+    {"set-car!", &prim_set_car, 1},
+    {"set-cdr!", &prim_set_cdr, 1},
 
 
     {"+", &prim_plus, 1},
