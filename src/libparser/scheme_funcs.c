@@ -4,6 +4,9 @@
 #include "scheme_funcs.h"
 #include "util.h"
 
+#define false interp->boolean.false
+#define true interp->boolean.true
+
 /* Create a new tuple object with a
    given car and cdr */
 object_type *cons(interp_core_type *interp, object_type *car,
@@ -151,10 +154,23 @@ bool is_symbol(interp_core_type *interp, object_type *obj) {
 /* Check to see if the object represents truth */
 bool is_true(interp_core_type *interp, object_type *obj) {
     /* anything other than false is true */
-    return interp->boolean.false!=obj;
+    return false!=obj;
 }
 
 /* Primitives */
+
+/* null? */
+object_type *prim_is_null(interp_core_type *interp, object_type *args) {
+    
+    /* accept one argument and only one argument */
+    if(list_length(args)!=1) {
+	interp->error=1;
+	return 0;
+    }
+
+    return car(args)==0 ? true : false;
+}
+
 
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
@@ -162,21 +178,23 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 
     /* make sure we have the correct arguments */
     if(list_length(args)!=2) {
-	return interp->boolean.false;
+	interp->error=1;
+	return false;
     }
 
     /* You can bind a symbol or a 
        special list */
     if(!is_symbol(interp, car(args)) &&
        !is_tagged_list(interp, car(args))) {
-	return interp->boolean.false;
+	interp->error=1;
+	return false;
     }
 
     var=car(args);
 
     bind_symbol(interp, var, eval(interp, cdar(args)));
 
-    return interp->boolean.true;
+    return true;
 }
 
 /* set! */
@@ -185,24 +203,24 @@ object_type *prim_set(interp_core_type *interp, object_type *args) {
 
     /* make sure we have the correct arguments */
     if(list_length(args)!=2) {
-	return interp->boolean.false;
+	return false;
     }
 
     /* You can set the value of a symbol */
     if(!is_symbol(interp, car(args))) {
-	return interp->boolean.false;
+	return false;
     }
 
     binding=get_binding(interp, car(args));
     
     if(binding==0) {
 	interp->error=1;
-	return interp->boolean.false;
+	return false;
     }
     
     cdr(binding)=eval(interp, cdar(args));
    
-    return interp->boolean.true;
+    return true;
 }
 
 /* quit */
@@ -217,7 +235,7 @@ object_type *prim_quote(interp_core_type *interp, object_type *args) {
     /* quote just says, don't evaluate my arguments */
     if(list_length(args)<1) {
 	interp->error=1;
-	return interp->boolean.false;
+	return false;
     }
 
     return car(args);
@@ -233,7 +251,7 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     arg_count=list_length(args);
     if(arg_count<2 || arg_count>3) {
 	interp->error=1;
-	return interp->boolean.false;
+	return false;
     }
     
     /* evaluate the predicate */
@@ -246,7 +264,7 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
 	return cdar(args);
     } else {
 	if(arg_count==2) {
-	    return interp->boolean.false;
+	    return false;
 	} else {
 	    return cddar(args);
 	}
@@ -327,6 +345,11 @@ OPERATION(-=, prim_minus);
 OPERATION(*=, prim_multi);
 OPERATION(/=, prim_div);
 
+
+
+
+
+
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0},
@@ -339,5 +362,7 @@ binding_type primitive_list[]={
     {"-", &prim_minus, 1},
     {"*", &prim_multi, 1},
     {"/", &prim_div, 1},
+
+    {"null?", &prim_is_null, 1},
     {0,0} /* Terminate the list */
 };
