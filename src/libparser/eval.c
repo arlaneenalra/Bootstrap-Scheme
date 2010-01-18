@@ -59,25 +59,28 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 /* evaluate a tagged list */
 object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     object_type *evaled_args=0;
-    object_type *binding=0;
     object_type *proc=0;
     object_type *body=0;
 
-    binding=get_binding(interp, car(obj));
+    /* binding=get_binding(interp, car(obj)); */
 	
-    /* If the symbol is unbound, 
-       we have an error */
-    if(binding==0) {
-	TRACE("e");
-	interp->error=1;
-	return 0;
-    }
+    /* /\* If the symbol is unbound,  */
+    /*    we have an error *\/ */
+    /* if(binding==0) { */
+    /* 	TRACE("e"); */
+    /* 	interp->error=1; */
+    /* 	return 0; */
+    /* } */
 
-    proc=cdr(binding);
+    /* proc=cdr(binding); */
+
+    /* Evaluate our object to see what we have */
+    proc=eval(interp, car(obj));
+
 
 
     /* Make sure that the procedure is callable */
-    if(is_primitive(interp, cdr(binding))) {
+    if(is_primitive(interp, proc)) {
 	TRACE("Pi");
 
 	/* do we evaluate the arguments before passing them? */
@@ -100,13 +103,11 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	printf("\n");
 	output(interp, proc);
 	printf("\n");
+
 	/* Call the primitive and return, make sure to skip the
 	   symbol ref at the start of the list */
 	return (*(proc->value.primitive.fn))(interp, evaled_args);
     } else {
-
-	/* We have something that looks like a compound procedure */
-	proc=eval(interp, proc);
 
 	/* always evaluate arguments of compound procecdures */
 	evaled_args=eval_list(interp, cdr(obj));
