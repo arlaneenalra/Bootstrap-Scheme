@@ -65,10 +65,6 @@ void add_quote(interp_core_type *interp) {
  
     TRACE("Qu");
 
-
-    /* obj=cons(interp, interp->quote, */
-    /* 	     cons(interp, interp->added, 0)); */
-
     obj=quote(interp, interp->added);
 
     add_object(interp,obj);
@@ -284,10 +280,12 @@ void push_environment(interp_core_type *interp, object_type *env) {
     /* save off the current environment */
     if(!is_tail(interp)) {
 	interp->env_stack=cons(interp, interp->cur_env, interp->env_stack);
+    } else {
+	clear_tail(interp);
     }
     
     /* replace it with the passed in stack */
-    interp->cur_env=cons(interp, 0, env);
+    interp->cur_env=cons(interp, interp->empty_list, env);
 }
 
 /* Pop off the current environment */
@@ -309,7 +307,7 @@ void end_of_file(interp_core_type *interp) {
 }
 
 void reset(interp_core_type *interp) {
-    interp->current=0;
+    interp->current=interp->empty_list;
     clear_state_stack(interp);
     interp->error=0;
 
@@ -354,8 +352,13 @@ void output(interp_core_type *interp, object_type *obj) {
 
 
     /* make sure there is something to display */
-    if(obj==0) {
+    if(obj==interp->empty_list) {
 	printf("()");
+	return;
+    }
+    
+    if(obj==0) {
+	printf("nil");
 	return;
     }
     
@@ -444,7 +447,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	
 	break;
     case SYM:
-	printf("%s@%p", obj->value.symbol.name, obj);
+	printf("%s", obj->value.symbol.name);
 	break;
     case PRIM:
 	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);
@@ -496,6 +499,15 @@ void create_booleans(interp_core_type *interp) {
     interp->boolean.false=obj;
 }
 
+/* Create a marker for the empty list */
+void create_empty_list(interp_core_type *interp) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp,TUPLE);
+    interp->empty_list=obj;
+   
+}
+
 /* setup the base environment */
 void create_base_environment(interp_core_type *interp) {
     object_type *obj=0;
@@ -503,7 +515,7 @@ void create_base_environment(interp_core_type *interp) {
     
     /* There is nothing in the environment right now
        so, this is just the empty list */
-    push_environment(interp,0);
+    push_environment(interp,interp->empty_list);
 
     bind_symbol_list(interp, primitive_list);
 
@@ -524,6 +536,9 @@ interp_core_type *create_interp() {
 
 	/* create quote */
 	create_quote(interp);
+	
+	/* create the empty list */
+	create_empty_list(interp);
 
 	/* setup the base environment */
 	create_base_environment(interp);

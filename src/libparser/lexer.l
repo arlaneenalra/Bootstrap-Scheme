@@ -17,7 +17,6 @@ CHAR_VAL      (newline|space|[^{WS}])
 %x EXPECT_STRING
 
 %%
-
 "("       { return OPEN_PAREN; }
 ")"       { return CLOSE_PAREN; }
 "."       { return DOT; }

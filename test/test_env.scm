@@ -6,7 +6,7 @@
 
 (dump_env)
 
-(define (id2 x) (dump_env) (id x))
+(define (id2 y) (dump_env) (id y))
 
 (id2 2)
 

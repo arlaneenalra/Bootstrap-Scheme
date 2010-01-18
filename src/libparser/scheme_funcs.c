@@ -134,11 +134,11 @@ object_type *get_binding(interp_core_type *interp,
     env=interp->cur_env;
 
     /* Walk each environment */
-    while(env) {
+    while(!is_empty_list(interp, env)) {
 	list=car(env);
 	
 	/* walk every binding */
-	while(list) {
+	while(!is_empty_list(interp, list)) {
 	    binding=car(list);
 	    
 	    /* we found the binding! */
@@ -177,6 +177,11 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 	&& car(obj)==interp->quote;
 }
 
+/* Is this the empty list? */
+bool is_empty_list(interp_core_type *interp,object_type *obj) {
+    return obj!=interp->empty_list;
+}
+
 /* Does this list start with a symbol? */
 bool is_tagged_list(interp_core_type *interp, object_type *obj) {
     return obj!=0 && obj->type==TUPLE
@@ -203,6 +208,13 @@ bool is_true(interp_core_type *interp, object_type *obj) {
     /* anything other than false is true */
     return false!=obj;
 }
+
+/* Check to see if the object represents a closure */
+bool is_closure(interp_core_type *interp, object_type *obj) {
+    /* anything other than false is true */
+    return obj!=0 && obj->type==CLOSURE;
+}
+
 
 /* Primitives */
 
@@ -277,6 +289,15 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     obj->value.closure.env=interp->cur_env;
     obj->value.closure.param=car(args);
     obj->value.closure.body=cdr(args);
+
+    printf("\nClosureDef:");
+    printf("\nargs:");
+    output(interp, args);
+    printf("\nparam:");
+    output(interp, car(args));
+    printf("\nbody:");
+    output(interp, cdr(args));
+
     
     return obj;
 }
@@ -746,8 +767,8 @@ NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\n\nenv_stack: %p=", interp->env_stack);
-    output(interp, interp->env_stack);
+    printf("\n\nenv: %p=", interp->cur_env);
+    output(interp, interp->cur_env);
     printf("\n");
     return true;
 }

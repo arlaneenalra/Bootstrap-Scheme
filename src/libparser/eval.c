@@ -71,14 +71,23 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 
 
 /* evaluate a tagged list */
-object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
+object_type *eval_tagged_list(interp_core_type *interp, object_type *proc, 
+			      object_type *obj) {
     object_type *evaled_args=0;
-    object_type *proc=0;
     object_type *body=0;
     object_type *result=0;
 
-    /* Evaluate our object to see what we have */
-    proc=eval(interp, car(obj));
+    printf("\nobj:");
+    output(interp, obj);
+    printf("\nproc:");
+    output(interp, proc);
+    printf("\nargs:");
+    output(interp, cdr(obj));
+    /*printf("\nenv %i:", interp->tail);
+      output(interp, interp->cur_env);*/
+    /*printf("\nenv_stack:");
+    output(interp, interp->env_stack);*/
+    printf("\n");
     
     /* Make sure that the procedure is callable */
     if(is_primitive(interp, proc)) {
@@ -106,6 +115,9 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	/* always evaluate arguments of compound procecdures */
 	evaled_args=eval_list(interp, cdr(obj));
 
+	printf("\nclosure:");
+	output(interp, proc->value.closure.env);
+
 	push_environment(interp, proc->value.closure.env); /* enter the procedure */
 
 	bind_argument_list(interp, proc->value.closure.param, evaled_args);
@@ -132,27 +144,23 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	}	
     }
 
+    TRACE("Ret");
     return result;
 }
 
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
+    object_type *proc=0;
     
     /* make sure that the interpreter is alive */
     if(has_error(interp)) {
 	return 0;
     }
 
-    do {
-	//interp->tail=0; /* reset the tail call indicator */
+    while(!interp->error) {
 
 	TRACE("E");
     
-	/* check for the empty list */
-	if(obj==0) {
-	    return 0;
-	}
-
 	/* Check for self evaluating */
 	if(is_self_evaluating(interp, obj)) {
 	    TRACE("s");
@@ -164,24 +172,27 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    TRACE("v");
 	    return eval_symbol(interp, obj);
 	}
+
+	if(is_closure(interp, obj)) {
+	    TRACE("c");
+	    return obj;
+	}
     
 	/* This should give us a means of executing 
 	   primitives */
 	if(is_tuple(interp, obj)) {
 
 	    TRACE("p");
+	    
+	    /* Evaluate our object to see what we have */
+	    proc=eval(interp, car(obj));
 
-	    /* handle tail calls clean */
-	    obj=eval_tagged_list(interp, obj);
+	    if(is_primitive(interp, proc)) {
+		return eval_tagged_list(interp, proc, obj);
+	    }
+	    
+	    obj=eval_tagged_list(interp, proc, obj);
 	
-	    /* /\* If this was not a tail call,  */
-	    /*    return the result *\/ */
-	    /* if(!is_tail(interp)) { */
-
-	    /* 	/\* pop off the environment created by the function call *\/ */
-	    /* 	pop_environment(interp); */
-	    /* 	return obj; */
-	    /* } */
 	} else {
 	    /* we don't know how to evaluate this object */
 	    TRACE("?");
@@ -192,7 +203,9 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    return interp->boolean.false;
 	}
 
-    } while(interp->tail && !interp->error);
+    }
 
+    printf("WTF!\n");
+    output(interp, obj);
     return obj;
 }

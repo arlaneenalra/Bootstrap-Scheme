@@ -1,16 +1,29 @@
+(define simple
+  (lambda () (+ 1 1 )))
+
+(simple)
+
+
 (define count
-  	((lambda (total)
-	   (lambda (increment)
-	     (set! total (+ total increment))
-	     total))
-	   0))
-count 
-(count 3)
+  (lambda (inc)
+    (define n 0)
+    (lambda ()
+      (set! n (+ inc n))
+      n)))
 
-(count 5)
+(define step
+  (count 3))
+     
 
-(define (a x) (if (= x 0) 0 (a (- x 1))))
+count
+step
 
-(a 10)
+(step)
+(step)
+(step)
+
+;(count 3)
+
+;(count 5)
 
 (quit)

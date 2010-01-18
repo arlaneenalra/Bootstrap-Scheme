@@ -39,12 +39,14 @@ expression:
     object         { YYACCEPT; }
   | END_OF_FILE    { end_of_file(interp); YYACCEPT; }
 
-/* list processing */
-list:
-    OPEN_PAREN CLOSE_PAREN  { add_object(interp, 0); }
-  | OPEN_PAREN     { push_state(interp); }
+list_end:
     object_pair_list
     CLOSE_PAREN    { pop_state(interp); }
+  | CLOSE_PAREN    { pop_state(interp); add_object(interp, interp->empty_list);}
+
+list:
+    OPEN_PAREN     { push_state(interp); }
+    list_end       
 
 object_pair_list:
     object         { set(interp, CAR); }

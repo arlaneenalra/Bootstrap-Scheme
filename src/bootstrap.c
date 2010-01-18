@@ -20,6 +20,9 @@ int main(int argc, char **argv) {
 	printf(">");
 
 	obj=parse(interp, stdin);
+	printf("parsed:");
+	output(interp, obj);
+	printf("\n");
 	obj=eval(interp, obj);
 	
 	// if there was no error, output the result

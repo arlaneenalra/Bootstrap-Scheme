@@ -10,7 +10,7 @@
 /* Add in some debuggin messages */
 #ifdef DEBUG
 
-#define TRACE(x)  (void)fprintf(stderr, "%s\n",x);
+#define TRACE(x)  (void)fprintf(stderr, "%s",x);
 
 #else
 
@@ -116,6 +116,9 @@ typedef struct interp_core {
     
     /* Instances of #t and #f */
     bool_global_type boolean;
+    
+    /* The empty list */
+    object_type *empty_list;
 
     /* Instance of the quote symbol */
     object_type *quote;
