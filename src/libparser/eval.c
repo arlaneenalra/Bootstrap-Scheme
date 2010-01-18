@@ -61,22 +61,10 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     object_type *evaled_args=0;
     object_type *proc=0;
     object_type *body=0;
-
-    /* binding=get_binding(interp, car(obj)); */
-	
-    /* /\* If the symbol is unbound,  */
-    /*    we have an error *\/ */
-    /* if(binding==0) { */
-    /* 	TRACE("e"); */
-    /* 	interp->error=1; */
-    /* 	return 0; */
-    /* } */
-
-    /* proc=cdr(binding); */
+    object_type *result=0;
 
     /* Evaluate our object to see what we have */
     proc=eval(interp, car(obj));
-
 
 
     /* Make sure that the procedure is callable */
@@ -96,17 +84,17 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	}
 
 	TRACE("Cpi");
-	printf("\n");
-	output(interp, cdr(obj));
-	printf("\n");
-	output(interp, evaled_args);
-	printf("\n");
-	output(interp, proc);
-	printf("\n");
 
 	/* Call the primitive and return, make sure to skip the
 	   symbol ref at the start of the list */
-	return (*(proc->value.primitive.fn))(interp, evaled_args);
+	result=(*(proc->value.primitive.fn))(interp, evaled_args);
+	
+	/* The unneeded push here allows us to pop later without 
+	   having to worry about whether a primitive was called or
+	   a compound procedure. */
+	push_environment(interp, interp->env_stack); 
+
+	return result;
     } else {
 
 	/* always evaluate arguments of compound procecdures */
@@ -171,6 +159,9 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    /* If this was not a tail call, 
 	       return the result */
 	    if(!interp->tail) {
+
+		/* pop off the environment created by the function call */
+		pop_environment(interp);
 		return obj;
 	    }
 	} else {
