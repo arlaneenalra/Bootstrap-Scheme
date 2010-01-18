@@ -30,9 +30,6 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	    fail("Attempt to set car on null pointer");
 	}
 
-	if(car(current)!=0) {
-	    fail("Car is already set!");
-	}
 	car(current)=obj;
 	break;
 
@@ -42,9 +39,6 @@ void set(interp_core_type *interp, setting_type_enum setting) {
 	    fail("Attempt to set cdr on null pointer");
 	}
 
-	if(cdr(current)!=0) {
-	    fail("Cdr is already set!");
-	}
 	cdr(current)=obj;
 	break;
 
@@ -401,7 +395,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	car=car(obj);
 	cdr=cdr(obj);
 	
-
+	/* TODO: This could probably be simplified */
 	if(is_quoted(interp, obj)) {
 	    printf("'");
 	    if(cdr==0) {
@@ -414,10 +408,10 @@ void output(interp_core_type *interp, object_type *obj) {
 	    printf("(");
 	    output(interp, car);
 
-	    if(cdr!=0) {
+	    if(!is_empty_list(interp, cdr)) {
 		if(cdr->type==TUPLE) {
 
-		    while(cdr!=0) {
+		    while(!is_empty_list(interp, cdr) && is_tuple(interp, cdr)) {
 			printf(" ");
 
 			car=car(cdr);
@@ -425,12 +419,11 @@ void output(interp_core_type *interp, object_type *obj) {
 
 			output(interp, car);
 		    
-			/* if the next element is not a tupple,
-			   for output it and set cdr to 0 */
-			if(cdr!=0 && cdr->type!=TUPLE) {
+			/* if the next element is not the empty list
+			   end with . cdr */
+			if(!is_empty_list(interp, cdr) && !is_tuple(interp,cdr)) {
 			    printf(" . ");
 			    output(interp, cdr);
-			    cdr=0;
 			}
 		    
 		    }
@@ -466,8 +459,6 @@ void output(interp_core_type *interp, object_type *obj) {
 	output(interp, obj->value.closure.param);
 	printf(" body:");
 	output(interp, obj->value.closure.body);
-	/*printf("\nenvironment:");
-	  output(interp, obj->value.closure.env);*/
 	printf(">");
 	last_closure=0;
 	break;
@@ -512,7 +503,9 @@ void create_empty_list(interp_core_type *interp) {
 void create_base_environment(interp_core_type *interp) {
     object_type *obj=0;
     object_type *target=0;
-    
+
+    interp->env_stack=interp->cur_env=interp->empty_list;
+
     /* There is nothing in the environment right now
        so, this is just the empty list */
     push_environment(interp,interp->empty_list);

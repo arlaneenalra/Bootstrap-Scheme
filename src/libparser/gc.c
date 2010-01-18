@@ -3,6 +3,7 @@
 
 #include "core.h"
 #include "util.h"
+#include "scheme_funcs.h"
 
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
@@ -19,6 +20,15 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 	interp->gc.active_list=obj;
 
 	obj->type=obj_type;
+
+	/* do some special purpose init */
+	switch(obj_type) {
+	case TUPLE:
+	    cdr(obj)=interp->empty_list;
+	    break;
+	default:
+	    break;
+	}
 
 	return obj;
     }

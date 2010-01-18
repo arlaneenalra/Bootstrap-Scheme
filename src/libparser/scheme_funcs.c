@@ -179,7 +179,7 @@ bool is_quoted(interp_core_type *interp,object_type *obj) {
 
 /* Is this the empty list? */
 bool is_empty_list(interp_core_type *interp,object_type *obj) {
-    return obj!=interp->empty_list;
+    return obj==interp->empty_list;
 }
 
 /* Does this list start with a symbol? */
