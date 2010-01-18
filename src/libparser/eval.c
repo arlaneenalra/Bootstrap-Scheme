@@ -26,7 +26,10 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
-	printf("\nUnound Variable: %s\n", obj->value.symbol.name);
+	printf("\nUnound Variable: %s@%p\n", obj->value.symbol.name, obj);
+	printf("env: %p=", interp->cur_env);
+	output(interp, interp->cur_env);
+	printf("\n");
 	/* Unbound variable */
 	interp->error=1;
 	return 0;
@@ -99,22 +102,11 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	   symbol ref at the start of the list */
 	result=(*(proc->value.primitive.fn))(interp, evaled_args);
 	
-	/* The unneeded push here allows us to pop later without 
-	   having to worry about whether a primitive was called or
-	   a compound procedure. */
-	if(!is_tail(interp)) {
-	    set_tail(interp);
-	    push_environment(interp, interp->cur_env); 
-	} 
-	
-	return result;
     } else {
 	/* always evaluate arguments of compound procecdures */
 	evaled_args=eval_list(interp, cdr(obj));
-	
-	if(!is_tail(interp)) {
-	    push_environment(interp, proc->value.closure.env); /* enter the procedure */
-	}
+
+	push_environment(interp, proc->value.closure.env); /* enter the procedure */
 
 	bind_argument_list(interp, proc->value.closure.param, evaled_args);
 
@@ -132,12 +124,15 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	   a tail call */
 	if(is_tuple(interp, body)) {
 	    set_tail(interp);
-	    return body;	
+	    result=body;	
 	} else {
 	    clear_tail(interp);
-	    return eval(interp, body);
-	}
+	    result=eval(interp, body);
+	    pop_environment(interp);
+	}	
     }
+
+    return result;
 }
 
 /* Main entry point to evaluator */
@@ -179,14 +174,14 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    /* handle tail calls clean */
 	    obj=eval_tagged_list(interp, obj);
 	
-	    /* If this was not a tail call, 
-	       return the result */
-	    if(!is_tail(interp)) {
+	    /* /\* If this was not a tail call,  */
+	    /*    return the result *\/ */
+	    /* if(!is_tail(interp)) { */
 
-		/* pop off the environment created by the function call */
-		pop_environment(interp);
-		return obj;
-	    }
+	    /* 	/\* pop off the environment created by the function call *\/ */
+	    /* 	pop_environment(interp); */
+	    /* 	return obj; */
+	    /* } */
 	} else {
 	    /* we don't know how to evaluate this object */
 	    TRACE("?");

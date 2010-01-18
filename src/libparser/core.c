@@ -279,9 +279,12 @@ void push_environment(interp_core_type *interp, object_type *env) {
     object_type *old_env=0;
 
     TRACE("Peu");
+    printf("\nPeu\n");
     
     /* save off the current environment */
-    interp->env_stack=cons(interp, interp->cur_env, interp->env_stack);
+    if(!is_tail(interp)) {
+	interp->env_stack=cons(interp, interp->cur_env, interp->env_stack);
+    }
     
     /* replace it with the passed in stack */
     interp->cur_env=cons(interp, 0, env);
@@ -291,6 +294,7 @@ void push_environment(interp_core_type *interp, object_type *env) {
 void pop_environment(interp_core_type *interp) {
 
     TRACE("Peo");
+    printf("\nPeo\n");
     
     /* Restore and Pop old environment */
     interp->cur_env=car(interp->env_stack);
@@ -440,7 +444,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	
 	break;
     case SYM:
-	printf("%s", obj->value.symbol.name);
+	printf("%s@%p", obj->value.symbol.name, obj);
 	break;
     case PRIM:
 	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);

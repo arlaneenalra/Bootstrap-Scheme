@@ -96,8 +96,16 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value)
 void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
 			object_type *value_list) {
 
+    object_type *binding=0;
+
     while(sym_list!=0) {
-	bind_symbol(interp, car(sym_list), car(value_list));
+
+	/* create a new binding as we didn't find one */
+	binding=cons(interp, car(sym_list), car(value_list));
+    
+	/* add our new binding to the list of bindings */
+	car(interp->cur_env)=cons(interp, binding, 
+				  car(interp->cur_env));
 
 	sym_list=cdr(sym_list);
 	value_list=cdr(value_list);
@@ -159,7 +167,7 @@ bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     
     return type==FIXNUM || type==FLOATNUM 
 	|| type==CHAR || type==BOOL
-	|| type==STRING || type==CLOSURE;
+	|| type==STRING;
 }
 
 /* Is the object a quoted list? */
@@ -353,6 +361,7 @@ object_type *prim_quote(interp_core_type *interp, object_type *args) {
 /* An if then constrcut */
 object_type *prim_if(interp_core_type *interp, object_type *args) {
     object_type *predicate=0;
+    object_type *result=0;
     int arg_count=0;
 
     /* make sure we have a predicate and at least
@@ -366,18 +375,28 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     /* evaluate the predicate */
     predicate=eval(interp, car(args));
 
-    /* setup a tail call */
-    set_tail(interp);
-    
     if(is_true(interp, predicate)) {
-	return cadr(args);
+	result=cadr(args);
     } else {
 	if(arg_count==2) {
-	    return false;
+	    result=false;
 	} else {
-	    return caddr(args);
+	    result=caddr(args);
 	}
     }
+
+    /* properly handle tail calling code */
+    if(is_tail(interp)) {
+	if(is_tuple(interp, result)) {
+	    set_tail(interp);
+	} else {
+	    clear_tail(interp);
+	    result=eval(interp, result);
+	    pop_environment(interp);
+	}
+    }
+    
+    return result;
 }
 
 /* Symbol to String */
@@ -727,8 +746,8 @@ NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\n\nenv:");
-    output(interp, interp->cur_env);
+    printf("\n\nenv_stack: %p=", interp->env_stack);
+    output(interp, interp->env_stack);
     printf("\n");
     return true;
 }

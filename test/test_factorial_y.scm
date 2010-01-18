@@ -1,7 +1,11 @@
+(dump_env)
+
 (define Y
   (lambda (f)
     ((lambda (x) (f (lambda (y) ((x x) y))))
      (lambda (x) (f (lambda (y) ((x x) y)))))))
+
+(dump_env)
 
 (define factorialy
   (Y (lambda (fact) 
