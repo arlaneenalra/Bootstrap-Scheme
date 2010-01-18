@@ -275,12 +275,12 @@ void clear_state_stack(interp_core_type *interp) {
 }
 
 /* Add a new environment on top of the current one */
-void push_environment(interp_core_type *interp) {
+void push_environment(interp_core_type *interp, object_type *env) {
 
     TRACE("Peu");
     
     /* Add the new environment */
-    interp->env_stack=cons(interp, 0, interp->env_stack);
+    interp->env_stack=cons(interp, 0, env);
 }
 
 /* Pop off the current environment */
@@ -337,6 +337,7 @@ object_type *parse_string(interp_core_type *interp, char *in) {
 
 /* Output an object graph to stdout */
 void output(interp_core_type *interp, object_type *obj) {
+    static object_type *last_closure=0;
     object_type *car=0;
     object_type *cdr=0;
 
@@ -438,6 +439,15 @@ void output(interp_core_type *interp, object_type *obj) {
 	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);
 	break;
     case CLOSURE:
+
+	/* avoid infinite recursion */
+	if(last_closure==obj) {
+	    printf("#<closure:current>\n");
+	    return;
+	}
+
+	last_closure=obj;
+
 	printf("#<closure:\nparams:");
 	output(interp, obj->value.closure.param);
 	printf("\nbody:");
@@ -445,6 +455,7 @@ void output(interp_core_type *interp, object_type *obj) {
 	printf("\nenvironment:");
 	output(interp, obj->value.closure.env);
 	printf("\n>\n");
+	last_closure=0;
 	break;
 
     default:
@@ -481,12 +492,11 @@ void create_base_environment(interp_core_type *interp) {
     
     /* There is nothing in the environment right now
        so, this is just the empty list */
-    push_environment(interp);
+    push_environment(interp,0);
     /*interp->env_stack=cons(interp, 0, 0);*/
 
     bind_symbol_list(interp, primitive_list);
 
-    push_environment(interp);
 }
 
 /* Create an instance of the interpreter */

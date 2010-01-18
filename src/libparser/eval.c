@@ -4,7 +4,7 @@
 
 
 /* The returned object is a tail call and not a terminal one */
-void set_tail(interp_core_type *interp, object_type *obj) {
+void set_tail(interp_core_type *interp) {
     interp->tail=1;
 }
 
@@ -61,6 +61,7 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
     object_type *evaled_args=0;
     object_type *binding=0;
     object_type *proc=0;
+    object_type *body=0;
 
     binding=get_binding(interp, car(obj));
 	
@@ -91,15 +92,39 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	    evaled_args=cdr(obj);
 	}
 
+	TRACE("Cpi");
+	printf("\n");
+	output(interp, cdr(obj));
+	printf("\n");
+	output(interp, evaled_args);
+	printf("\n");
+	output(interp, proc);
+	printf("\n");
 	/* Call the primitive and return, make sure to skip the
 	   symbol ref at the start of the list */
 	return (*(proc->value.primitive.fn))(interp, evaled_args);
     } else {
-	/* We have something that looks like a compound procedure */
-	push_environment(interp);
-	
 
-	pop_environment(interp);
+	/* We have something that looks like a compound procedure */
+	proc=eval(interp, proc);
+
+	/* always evaluate arguments of compound procecdures */
+	evaled_args=eval_list(interp, cdr(obj));
+
+	push_environment(interp, proc->value.closure.env); /* enter the procedure */
+	
+	bind_argument_list(interp, proc->value.closure.param, evaled_args);
+
+	body=proc->value.closure.body;
+	
+	/* loop until we have the last call */
+	while(cdr(body)!=0) {
+	    eval(interp, car(body));
+	    body=cdr(body);
+	}
+	
+	set_tail(interp);
+	return car(body);	
     }
 }
 
@@ -136,14 +161,15 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	/* This should give us a means of executing 
 	   primitives */
 	if(is_tuple(interp, obj)) {
+
 	    TRACE("p");
+
 	    /* handle tail calls clean */
 	    obj=eval_tagged_list(interp, obj);
 	
 	    /* If this was not a tail call, 
 	       return the result */
 	    if(!interp->tail) {
-		interp->tail=0;
 		return obj;
 	    }
 	} else {

@@ -93,6 +93,18 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value)
 			  car(interp->env_stack));
 }
 
+/* bind a parallel list of symbols and arguments */
+void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
+			object_type *value_list) {
+
+    while(sym_list!=0) {
+	bind_symbol(interp, car(sym_list), car(value_list));
+
+	sym_list=cdr(sym_list);
+	value_list=cdr(value_list);
+    }
+}
+
 void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
     object_type *obj=0;
     int i=0;
@@ -148,7 +160,7 @@ bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     
     return type==FIXNUM || type==FLOATNUM 
 	|| type==CHAR || type==BOOL
-	|| type==STRING;
+	|| type==STRING || type==CLOSURE;
 }
 
 /* Is the object a quoted list? */

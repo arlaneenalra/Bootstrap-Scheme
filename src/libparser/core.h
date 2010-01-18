@@ -148,6 +148,7 @@ typedef struct interp_core {
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
 int list_length(object_type *args); /* Find the length of a passed in list */
+void set_tail(interp_core_type *interp);
 
 
 interp_core_type *create_interp();
@@ -173,7 +174,7 @@ void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);
 void pop_state(interp_core_type *interp);
 
-void push_environment(interp_core_type *interp);
+void push_environment(interp_core_type *interp, object_type *env);
 void pop_environment(interp_core_type *interp);
 
 void end_of_file(interp_core_type *interp);
