@@ -276,11 +276,15 @@ void clear_state_stack(interp_core_type *interp) {
 
 /* Add a new environment on top of the current one */
 void push_environment(interp_core_type *interp, object_type *env) {
+    object_type *old_env=0;
 
     TRACE("Peu");
     
-    /* Add the new environment */
-    interp->env_stack=cons(interp, 0, env);
+    /* save off the current environment */
+    interp->env_stack=cons(interp, interp->cur_env, interp->env_stack);
+    
+    /* replace it with the passed in stack */
+    interp->cur_env=cons(interp, 0, env);
 }
 
 /* Pop off the current environment */
@@ -288,8 +292,11 @@ void pop_environment(interp_core_type *interp) {
 
     TRACE("Peo");
     
-    /* Add the new environment */
+    /* Restore and Pop old environment */
+    interp->cur_env=car(interp->env_stack);
     interp->env_stack=cdr(interp->env_stack);
+
+    //interp->cur_env=cdr(interp->cur_env);
 }
 
 
@@ -442,19 +449,19 @@ void output(interp_core_type *interp, object_type *obj) {
 
 	/* avoid infinite recursion */
 	if(last_closure==obj) {
-	    printf("#<closure:current>\n");
+	    printf("#<closure:current>");
 	    return;
 	}
 
 	last_closure=obj;
 
-	printf("#<closure:\nparams:");
+	printf("#<closure: params:");
 	output(interp, obj->value.closure.param);
-	printf("\nbody:");
+	printf(" body:");
 	output(interp, obj->value.closure.body);
-	printf("\nenvironment:");
-	output(interp, obj->value.closure.env);
-	printf("\n>\n");
+	/*printf("\nenvironment:");
+	  output(interp, obj->value.closure.env);*/
+	printf(">");
 	last_closure=0;
 	break;
 
@@ -493,7 +500,6 @@ void create_base_environment(interp_core_type *interp) {
     /* There is nothing in the environment right now
        so, this is just the empty list */
     push_environment(interp,0);
-    /*interp->env_stack=cons(interp, 0, 0);*/
 
     bind_symbol_list(interp, primitive_list);
 

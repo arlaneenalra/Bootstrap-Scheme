@@ -8,6 +8,16 @@ void set_tail(interp_core_type *interp) {
     interp->tail=1;
 }
 
+/* returned object is a terminal one */
+void clear_tail(interp_core_type *interp) {
+    interp->tail=0;
+}
+
+/* Are we in a tail call chain? */
+bool is_tail(interp_core_type *interp) {
+    return interp->tail;
+}
+
 /* Evaluate a symbol */
 object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
     object_type *binding=0;
@@ -16,6 +26,7 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
+	printf("\nUnound Variable: %s\n", obj->value.symbol.name);
 	/* Unbound variable */
 	interp->error=1;
 	return 0;
@@ -65,8 +76,7 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 
     /* Evaluate our object to see what we have */
     proc=eval(interp, car(obj));
-
-
+    
     /* Make sure that the procedure is callable */
     if(is_primitive(interp, proc)) {
 	TRACE("Pi");
@@ -92,16 +102,20 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	/* The unneeded push here allows us to pop later without 
 	   having to worry about whether a primitive was called or
 	   a compound procedure. */
-	push_environment(interp, interp->env_stack); 
-
+	if(!is_tail(interp)) {
+	    set_tail(interp);
+	    push_environment(interp, interp->cur_env); 
+	} 
+	
 	return result;
     } else {
-
 	/* always evaluate arguments of compound procecdures */
 	evaled_args=eval_list(interp, cdr(obj));
-
-	push_environment(interp, proc->value.closure.env); /* enter the procedure */
 	
+	if(!is_tail(interp)) {
+	    push_environment(interp, proc->value.closure.env); /* enter the procedure */
+	}
+
 	bind_argument_list(interp, proc->value.closure.param, evaled_args);
 
 	body=proc->value.closure.body;
@@ -112,8 +126,17 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *obj) {
 	    body=cdr(body);
 	}
 	
-	set_tail(interp);
-	return car(body);	
+	body=car(body);
+
+	/* if we don't have a tuple here, we cannot have
+	   a tail call */
+	if(is_tuple(interp, body)) {
+	    set_tail(interp);
+	    return body;	
+	} else {
+	    clear_tail(interp);
+	    return eval(interp, body);
+	}
     }
 }
 
@@ -126,7 +149,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     }
 
     do {
-	interp->tail=0; /* reset the tail call indicator */
+	//interp->tail=0; /* reset the tail call indicator */
 
 	TRACE("E");
     
@@ -158,7 +181,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	
 	    /* If this was not a tail call, 
 	       return the result */
-	    if(!interp->tail) {
+	    if(!is_tail(interp)) {
 
 		/* pop off the environment created by the function call */
 		pop_environment(interp);

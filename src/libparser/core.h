@@ -10,7 +10,7 @@
 /* Add in some debuggin messages */
 #ifdef DEBUG
 
-#define TRACE(x)  (void)fprintf(stderr, "%s",x);
+#define TRACE(x)  (void)fprintf(stderr, "%s\n",x);
 
 #else
 
@@ -131,6 +131,7 @@ typedef struct interp_core {
 
     /* Stores variable bindings */
     object_type *env_stack;
+    object_type *cur_env;
     
     /* Where the garbage collector keeps it's data */
     gc_type gc; 
@@ -149,6 +150,8 @@ typedef struct interp_core {
 void set(interp_core_type *interp, setting_type_enum setting);
 int list_length(object_type *args); /* Find the length of a passed in list */
 void set_tail(interp_core_type *interp);
+void clear_tail(interp_core_type *interp);
+bool is_tail(interp_core_type *interp);
 
 
 interp_core_type *create_interp();

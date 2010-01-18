@@ -88,8 +88,8 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value)
     binding=cons(interp, sym, value);
     
     /* add our new binding to the list of bindings */
-    car(interp->env_stack)=cons(interp, binding, 
-			  car(interp->env_stack));
+    car(interp->cur_env)=cons(interp, binding, 
+			  car(interp->cur_env));
 }
 
 /* bind a parallel list of symbols and arguments */
@@ -123,7 +123,7 @@ object_type *get_binding(interp_core_type *interp,
     object_type *env=0;
     object_type *list=0;
 
-    env=interp->env_stack;
+    env=interp->cur_env;
 
     /* Walk each environment */
     while(env) {
@@ -266,7 +266,7 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     
     obj=alloc_object(interp, CLOSURE);
     
-    obj->value.closure.env=interp->env_stack;
+    obj->value.closure.env=interp->cur_env;
     obj->value.closure.param=car(args);
     obj->value.closure.body=cdr(args);
     
@@ -301,10 +301,6 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 		    prim_lambda(interp, 
 				cons(interp, cdar(args), /* Arguments */
 				     cdr(args)))); /* Body */
-					     
-
-		    /* cons(interp, cdar(args), /\* Arguments *\/ */
-		    /* 	 cadr(args))); /\* Body *\/ */
     }
 
     return true;
@@ -730,6 +726,12 @@ NUMERIC_TEST(==, prim_equal)
 NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
+object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
+    printf("\n\nenv:");
+    output(interp, interp->cur_env);
+    printf("\n");
+    return true;
+}
 
 
 /* Setup scheme primitive function bindings */
@@ -773,6 +775,8 @@ binding_type primitive_list[]={
     {"string->number", &prim_string_to_num, 1},
     {"symbol->string", &prim_sym_to_string, 1},
     {"string->symbol", &prim_string_to_sym, 1},
+
+    {"dump_env", &prim_dump_env, 1},
 
     {0,0} /* Terminate the list */
 };

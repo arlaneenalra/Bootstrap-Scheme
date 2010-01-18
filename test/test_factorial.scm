@@ -7,8 +7,13 @@
 	      max-count)))
   (iter 1 1 n))
 
+(dump_env)
+
 factorial
 
 (factorial 4)
 (factorial 5)
+
 (quit)
+
+
