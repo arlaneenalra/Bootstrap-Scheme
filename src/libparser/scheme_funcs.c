@@ -21,8 +21,7 @@ object_type *cons(interp_core_type *interp, object_type *car,
 }
 
 /* Applies the quote symbol to an object */
-object_type *quote(interp_core_type *interp, 
-		   object_type *obj) {
+object_type *quote(interp_core_type *interp, object_type *obj) {
 
     object_type *ret_val=0;
     
@@ -299,8 +298,13 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 	/* It can only be a tagged list then */
 
 	bind_symbol(interp, caar(args), /* Symbol */
-		    cons(interp, cdar(args), /* Arguments */
-			 cadr(args))); /* Body */
+		    prim_lambda(interp, 
+				cons(interp, cdar(args), /* Arguments */
+				     cdr(args)))); /* Body */
+					     
+
+		    /* cons(interp, cdar(args), /\* Arguments *\/ */
+		    /* 	 cadr(args))); /\* Body *\/ */
     }
 
     return true;
