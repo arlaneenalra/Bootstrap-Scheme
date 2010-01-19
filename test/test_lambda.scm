@@ -3,6 +3,10 @@
 
 (simple)
 
+(dump_env)
+
+(simple)
+(dump_env)
 
 (define count
   (lambda (inc)
@@ -11,16 +15,21 @@
       (set! n (+ inc n))
       n)))
 
+(dump_env)
+
 (define step
   (count 3))
-     
 
-count
-step
+(dump_env)     
 
 (step)
+
+(dump_env)
+
 (step)
 (step)
+
+(dump_env)
 
 ;(count 3)
 

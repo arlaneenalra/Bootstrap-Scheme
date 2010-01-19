@@ -100,6 +100,12 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 	   symbol ref at the start of the list */
 	result=(*(proc->value.primitive.fn))(interp, evaled_args);
 	
+	/* if we didn't have a tail call, add an environment for 
+	   eval to pop */
+	if(!is_tail(interp)) {
+	    push_environment(interp, proc->value.closure.env);
+	}
+	
     } else {
 	TRACE("Co");
 
@@ -129,7 +135,7 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 	} else {
 	    clear_tail(interp);
 	    result=eval(interp, body);
-	    pop_environment(interp);
+	    /*pop_environment(interp);*/
 	}	
     }
 
@@ -140,32 +146,35 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
     object_type *proc=0;
+    bool loop=1;
     
     /* make sure that the interpreter is alive */
     if(has_error(interp)) {
 	return 0;
     }
 
-    while(!interp->error) {
+    while(!has_error(interp) && loop) {
 
 	TRACE("E");
     
 	/* Check for self evaluating */
 	if(is_self_evaluating(interp, obj)) {
+
 	    TRACE("s");
-	    return obj;
-	}
+	    loop=0;
+	    
+	    /* can't tail call an self evaled symbol */
+	    clear_tail(interp);
 
-	/* Check for a symbol */
-	if(is_symbol(interp, obj)) {
+	} else if(is_symbol(interp, obj)) { 	/* Check for a symbol */
+
 	    TRACE("v");
-	    return eval_symbol(interp, obj);
-	}
 
-	/* This should give us a means of executing 
-	   primitives */
-	if(is_tuple(interp, obj)) {
+	    obj=eval_symbol(interp, obj);
+	    loop=0;
 
+	} else if(is_tuple(interp, obj)) { 	/* This should give us a means 
+						   of executing primitives */
 	    TRACE("p");
 	    
 	    /* Evaluate our object to see what we have */
@@ -176,10 +185,14 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		obj=eval_tagged_list(interp, proc, obj);
 		
 		if(proc->value.primitive.eval_end) {
-		    return obj;
+		    loop=0;
 		}
 	    } else {	    
 		obj=eval_tagged_list(interp, proc, obj);
+	    }
+
+	    if(!is_tail(interp)) {
+		pop_environment(interp);
 	    }
 	} else {
 	    /* we don't know how to evaluate this object */
@@ -188,12 +201,9 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    /* If we make it here the expression wasn't
 	       on we could evaluate. */
 	    interp->error=1;
-	    return interp->boolean.false;
+	    return false;
 	}
-
     }
 
-    printf("WTF!\n");
-    output(interp, obj);
     return obj;
 }

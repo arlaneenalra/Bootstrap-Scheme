@@ -32,9 +32,9 @@ void output(interp_core_type *interp, object_type *obj) {
 	break;
 
     case BOOL:
-	if(obj==interp->boolean.true) {
+	if(obj==true) {
 	    printf("#t");
-	} else if (obj==interp->boolean.false) {
+	} else if (obj==false) {
 	    printf("#f");
 	} else {
 	    fail("BOOL is not a boolean");

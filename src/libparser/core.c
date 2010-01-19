@@ -269,7 +269,6 @@ void push_environment(interp_core_type *interp, object_type *env) {
     object_type *old_env=0;
 
     TRACE("Peu");
-    printf("\nPeu\n");
     
     /* save off the current environment */
     if(!is_tail(interp)) {
@@ -286,7 +285,6 @@ void push_environment(interp_core_type *interp, object_type *env) {
 void pop_environment(interp_core_type *interp) {
 
     TRACE("Peo");
-    printf("\nPeo\n");
     
     /* Restore and Pop old environment */
     interp->cur_env=car(interp->env_stack);
@@ -350,14 +348,16 @@ void create_quote(interp_core_type * interp) {
 void create_booleans(interp_core_type *interp) {
     object_type *obj=0;
 
+    /* true and false are defined by macros to be 
+       memvers of interp->boolean */
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=1;
-    interp->boolean.true=obj;
+    true=obj;
 
     
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=0;
-    interp->boolean.false=obj;
+    false=obj;
 }
 
 /* Create a marker for the empty list */

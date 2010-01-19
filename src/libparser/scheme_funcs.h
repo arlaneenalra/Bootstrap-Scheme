@@ -20,6 +20,8 @@
 #define cddar(obj) cdr(cdr(car(obj)))
 #define cdddr(obj) cdr(cdr(cdr(obj)))
 
+#define false interp->boolean.false
+#define true interp->boolean.true
 
 object_type *cons(interp_core_type *interp, object_type *car,object_type *cdr);
 object_type *quote(interp_core_type *interp, object_type *obj);

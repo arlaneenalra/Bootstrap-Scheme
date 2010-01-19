@@ -4,9 +4,6 @@
 #include "scheme_funcs.h"
 #include "util.h"
 
-#define false interp->boolean.false
-#define true interp->boolean.true
-
 /* Create a new tuple object with a
    given car and cdr */
 object_type *cons(interp_core_type *interp, object_type *car,
@@ -292,15 +289,6 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     obj->value.closure.param=car(args);
     obj->value.closure.body=cdr(args);
 
-    printf("\nClosureDef:");
-    printf("\nargs:");
-    output(interp, args);
-    printf("\nparam:");
-    output(interp, car(args));
-    printf("\nbody:");
-    output(interp, cdr(args));
-
-    
     return obj;
 }
 
@@ -765,7 +753,8 @@ NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\n\nenv: %p=", interp->cur_env);
+    printf("\ntail: %i", interp->tail);
+    printf("\nenv: %p=", interp->cur_env);
     output(interp, interp->cur_env);
     printf("\n");
     return true;
