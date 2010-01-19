@@ -114,7 +114,7 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 	body=proc->value.closure.body;
 	
 	/* loop until we have the last call */
-	while(cdr(body)!=0) {
+	while(!is_empty_list(interp, cdr(body))) {
 	    eval(interp, car(body));
 	    body=cdr(body);
 	}
