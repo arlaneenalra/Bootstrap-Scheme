@@ -134,7 +134,6 @@ typedef struct interp_core {
     object_type *state_stack;
 
     /* Stores variable bindings */
-    object_type *env_stack;
     object_type *cur_env;
     
     /* Where the garbage collector keeps it's data */

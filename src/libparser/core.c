@@ -355,7 +355,7 @@ void create_base_environment(interp_core_type *interp) {
     object_type *obj=0;
     object_type *target=0;
 
-    interp->env_stack=interp->cur_env=interp->empty_list;
+    interp->cur_env=interp->empty_list;
 
     /* There is nothing in the environment right now
        so, this is just the empty list */
