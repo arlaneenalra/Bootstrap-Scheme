@@ -292,6 +292,24 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* begin */
+object_type *prim_begin(interp_core_type *interp, object_type *args) {
+    
+    /* If we don't have any arguments, return an 
+       empty list */
+    if(is_empty_list(interp, args)) {
+	return quote(interp, interp->empty_list);
+    }
+    
+    /* evalueate each argument */
+    while(!is_empty_list(interp, cdr(args))) {
+	eval(interp, car(args));
+	args=cdr(args);
+    }
+    
+    /* return the last argument */
+    return car(args);
+}
 
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
@@ -769,6 +787,7 @@ binding_type primitive_list[]={
     {"quote", &prim_quote, 0, 1},
     {"if", &prim_if, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
+    {"begin", &prim_begin, 0, 0},
 
     {"cons", &prim_cons, 1, 0},
     {"car", &prim_car, 1, 0},
