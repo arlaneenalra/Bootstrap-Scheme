@@ -7,8 +7,20 @@
 
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
+    object_type *obj=0;
+	
+    /* Do we have any objects already allocate? */
+    /* if(interp->gc.free_list==0) { */
+    /* 	obj=malloc(sizeof(object_type)); */
+    /* 	printf("$"); */
+    /* } else { */
+    /* 	printf("R"); */
+    /* 	/\* Use a previously allocated object *\/ */
+    /* 	obj=interp->gc.free_list; */
+    /* 	interp->gc.free_list=obj->next; */
+    /* } */
 
-    object_type *obj=malloc(sizeof(object_type));
+    obj=malloc(sizeof(object_type));
 
     /* check to make sure there was memory to allocate and then
        make sure that we have a properly typed and zeroed object */
@@ -20,11 +32,16 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 	interp->gc.active_list=obj;
 
 	obj->type=obj_type;
+	obj->mark=interp->gc.cur_mark;
 
 	/* do some special purpose init */
 	switch(obj_type) {
 	case TUPLE:
 	    cdr(obj)=interp->empty_list;
+	    break;
+
+	case SYM: /* symbols are not gc'd */
+	    mark_perm(interp, obj);
 	    break;
 	default:
 	    break;
@@ -64,29 +81,35 @@ object_type *clone(interp_core_type *interp, object_type *obj) {
     new_obj->next=next;
 }
 
-/* free a list a list of objects */
-void free_list(object_type *obj) {
-    while(obj) {
-	object_type *next=obj->next;
-
-	/* make sure we clear out string buffers */
+/* free strings and such */
+void free_internal(object_type *obj) {
 	switch(obj->type) {
 	case STRING:
 	    if(obj->value.string_val!=0) {
 		free(obj->value.string_val);
+		obj->value.string_val=0;
 	    }
 	    break;
 
 	case SYM:
 	    if(obj->value.symbol.name!=0) {
 		free(obj->value.symbol.name);
+		obj->value.symbol.name=0;
 	    }
 	    break;
 
 	default:
 	    break;
 	}
-	
+}
+
+/* free a list a list of objects */
+void free_list(object_type *obj) {
+    while(obj) {
+	object_type *next=obj->next;
+
+	/* make sure we clear out string buffers */
+	free_internal(obj);
 	free(obj);
 	obj=next;
     }
@@ -106,33 +129,118 @@ void gc_all(interp_core_type *interp) {
     }
 }
 
-void mark_free(interp_core_type *interp, object_type *obj) {
-    object_type *active_list=0;
-    object_type *child=0;
+void free_marked(interp_core_type *interp, gc_mark_type mark) {
+    object_type *active=0;
+    object_type *new_active=0;
+    object_type *temp_next=0;
     
-    active_list=interp->gc.active_list;
-    child=obj->next;
+    active=interp->gc.active_list;
+    
+    while(active!=0) {
+	if(active->mark==mark) {
+	    temp_next=active->next;
+	    
+	    /* clean up the stuff that isn't an object */
+	    //	    free_internal(active);
+	    
+	    /* add to the top of the free list */
+	    active->next=interp->gc.free_list;
+	    interp->gc.free_list=active;
 
+	    /* move on to the next object */
+	    active=temp_next;
+	} else {
+	    temp_next=active->next;
 
-    /* move obj to top of free list */
-    obj->next=interp->gc.free_list;
-    interp->gc.free_list=obj;
+	    active->next=new_active;
+	    new_active=active;
 
-    /* Invert the active_list onto the top 
-       of the child list */
-
-    while(active_list!=obj && active_list !=0) {
-	object_type *top=active_list->next;
-
-	/* Put the current active node on
-	   top of the child list */
-	active_list->next=child;
-	child=active_list;
-
-	active_list=top;
+	    printf("Marked:");
+	    output(interp, active);
+	    printf("\n");
+	    
+	    active=temp_next;
+	}
     }
     
-    /* save the child list as the new active_list */
-    interp->gc.active_list=child;
-    
+    interp->gc.active_list=new_active;
+}
+
+
+/* get the next mark value */
+gc_mark_type next_mark(interp_core_type *interp) {
+    return interp->gc.cur_mark==MARK_RED ? MARK_BLACK : MARK_RED;
+}
+
+/* mark an object with the opposite of the current mark */
+void mark_obj(interp_core_type *interp, object_type *obj, gc_mark_type mark) {
+    if(obj->mark==MARK_PERM) {
+	return;
+    }
+
+    obj->mark=mark;
+}
+
+/* Is the passed in object marked */
+bool is_marked(interp_core_type *interp, object_type *obj, gc_mark_type mark) {
+    return obj->mark==mark;
+}
+
+/* Mark all reachable objects in the given object graph*/
+void mark_reachable(interp_core_type *interp, object_type *obj, gc_mark_type mark) {
+    bool looping=1;
+
+    /* Return immediately on null */
+    if(obj==0) {
+	return;
+    }
+
+    /* Walk every object in our object graph 
+       and mark the ones we can see */
+    while(looping) {
+	/* if the object is marked, we're done with 
+	   this branch */
+	if(is_marked(interp, obj, mark)) {
+	    return;
+	}
+	
+	mark_obj(interp, obj, mark);
+
+	/* special types that need marking */
+	switch(obj->type) {
+	case CHAIN:
+	case TUPLE:
+
+	    /* Mark any referenced objects */
+	    mark_reachable(interp, car(obj), mark);
+
+	    obj=cdr(obj); /* move on to the next object */
+	    if(is_empty_list(interp, obj)) {
+		looping=0;
+	    }
+
+	    break;
+
+	case CLOSURE:
+	    
+	    /* mark the components of the closure */
+	    mark_reachable(interp, obj->value.closure.param, mark);
+	    mark_reachable(interp, obj->value.closure.body, mark);
+	    mark_reachable(interp, obj->value.closure.env, mark);
+	    
+	    looping=0;
+	    break;
+
+	default:
+	    looping=0;
+	    break;
+	}
+    }
+
+}
+
+/* Used to mark objects that will not be deallocated 
+   while the interpreter is running */
+void mark_perm(interp_core_type *interp, object_type *obj) {
+    mark_obj(interp, obj, MARK_PERM);
 }

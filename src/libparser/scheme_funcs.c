@@ -3,6 +3,7 @@
 #include "core.h"
 #include "scheme_funcs.h"
 #include "util.h"
+#include "gc.h"
 
 /* Create a new tuple object with a
    given car and cdr */
@@ -770,6 +771,19 @@ object_type *prim_gc_stats(interp_core_type *interp, object_type *args) {
     object_type *next=0;
     uint64_t depth_free=0;
     uint64_t depth_active=0;
+    uint64_t num_perm=0;
+    uint64_t marked=0;
+
+    gc_mark_type new_mark=next_mark(interp); /* get the new mark */
+    
+    /* mark all reachable objects */
+    mark_reachable(interp, interp->cur_env, new_mark);
+
+    /* if we have an argument, actually free them */
+    if(list_length(interp, args)==1) {
+	free_marked(interp,  interp->gc.cur_mark);
+	interp->gc.cur_mark=new_mark;
+    }
 
     next=interp->gc.free_list;
 
@@ -782,12 +796,20 @@ object_type *prim_gc_stats(interp_core_type *interp, object_type *args) {
 
     while(next!=0) {
 	depth_active++;
+
+	if(next->mark==MARK_PERM) {
+	    num_perm++;
+	} else if(next->mark==new_mark) {
+	    marked++;
+	}
+
 	next=next->next;
     }
 
 
-    printf("\nGC: free:%" PRIi64 " active:%" PRIi64 " total:%" PRIi64 "\n",
-	   depth_free, depth_active, depth_free+depth_active);
+    printf("\nGC: free:%" PRIi64 " active:%" PRIi64 " perm:%" PRIi64 " total:%" PRIi64 "\n",
+	   depth_free, depth_active, num_perm, depth_free+depth_active);
+    printf("marked:%" PRIi64 "\n", marked);
     
     return true;
 }

@@ -43,6 +43,14 @@ typedef enum {
     CDR
 } setting_type_enum;
 
+/* used by the gc */
+typedef enum {
+    MARK_RED, /* Everything else */
+    MARK_BLACK,
+
+    MARK_PERM,  /* Things that will not be deallocated while we are running */
+} gc_mark_type;
+
 struct object;
 
 typedef	struct tuple {
@@ -86,6 +94,7 @@ typedef struct object {
 	closure_type closure;
     } value;
 
+    gc_mark_type mark;
     struct object *next;
 } object_type;
 
@@ -105,6 +114,7 @@ typedef struct symbol_table {
 typedef struct gc {
     object_type *active_list;
     object_type *free_list;
+    gc_mark_type cur_mark;
 } gc_type;
 
 
