@@ -1,5 +1,4 @@
 (define (factorial n)
-  (dump_env)
   (define (iter product counter max-count)
     (dump_env)
     (if (> counter max-count)
@@ -7,17 +6,16 @@
 	(iter (* counter product)
 	      (+ counter 1)
 	      max-count)))
-  (dump_env)
   (iter 1 1 n))
 
-(dump_env)
+iter
 
-factorial
+factorial 
 
 (factorial 4)
-(factorial 5)
+;(factorial 5)
 
-(dump_env)
+;(dump_env)
 
 (quit)
 

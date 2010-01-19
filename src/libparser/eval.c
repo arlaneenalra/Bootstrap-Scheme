@@ -101,11 +101,10 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 	result=(*(proc->value.primitive.fn))(interp, evaled_args);
 	
     } else {
+	TRACE("Co");
+
 	/* always evaluate arguments of compound procecdures */
 	evaled_args=eval_list(interp, cdr(obj));
-
-	printf("\nclosure:");
-	output(interp, proc->value.closure.env);
 
 	push_environment(interp, proc->value.closure.env); /* enter the procedure */
 
@@ -115,15 +114,16 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 	
 	/* loop until we have the last call */
 	while(!is_empty_list(interp, cdr(body))) {
+	    TRACE("Cb");
 	    eval(interp, car(body));
 	    body=cdr(body);
 	}
-	
-	body=car(body);
 
+	body=car(body);
+	
 	/* if we don't have a tuple here, we cannot have
 	   a tail call */
-	if(is_tuple(interp, body)) {
+	if(is_tuple(interp, body) && !is_empty_list(interp, body)) {
 	    set_tail(interp);
 	    result=body;	
 	} else {
@@ -147,6 +147,9 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     }
 
     while(!interp->error) {
+	printf("\neval:");
+	output(interp, obj);
+	printf("\n");
 
 	TRACE("E");
     
@@ -175,13 +178,20 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    
 	    /* Evaluate our object to see what we have */
 	    proc=eval(interp, car(obj));
+	    
+	    printf("\nproc:");
+	    output(interp, proc);
+	    printf("\n");
 
 	    if(is_primitive(interp, proc)) {
-		return eval_tagged_list(interp, proc, obj);
+		printf("\nprim:");
+		output(interp, proc);
+		printf("\n");
+
+		obj=eval_tagged_list(interp, proc, obj);
+	    } else {	    
+		obj=eval_tagged_list(interp, proc, obj);
 	    }
-	    
-	    obj=eval_tagged_list(interp, proc, obj);
-	
 	} else {
 	    /* we don't know how to evaluate this object */
 	    TRACE("?");
