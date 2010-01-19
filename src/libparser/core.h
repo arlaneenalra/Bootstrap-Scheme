@@ -113,7 +113,6 @@ typedef struct gc {
 typedef struct interp_core {
     bool error; /* An error has occured */
     bool running; /* The interpreter is running */
-    bool tail; /* Used in evaluating tail calls */
     
     /* Instances of #t and #f */
     bool_global_type boolean;
@@ -152,9 +151,6 @@ typedef struct interp_core {
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
 int list_length(interp_core_type * interp, object_type *args); /* Find the length of a passed in list */
-void set_tail(interp_core_type *interp);
-void clear_tail(interp_core_type *interp);
-bool is_tail(interp_core_type *interp);
 
 
 interp_core_type *create_interp();

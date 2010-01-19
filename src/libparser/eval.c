@@ -2,22 +2,6 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
-
-/* The returned object is a tail call and not a terminal one */
-void set_tail(interp_core_type *interp) {
-    interp->tail=1;
-}
-
-/* returned object is a terminal one */
-void clear_tail(interp_core_type *interp) {
-    interp->tail=0;
-}
-
-/* Are we in a tail call chain? */
-bool is_tail(interp_core_type *interp) {
-    return interp->tail;
-}
-
 /* Evaluate a symbol */
 object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
     object_type *binding=0;

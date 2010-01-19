@@ -414,17 +414,6 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
 	}
     }
 
-    /* properly handle tail calling code */
-    /* if(is_tail(interp)) { */
-    /* 	if(is_tuple(interp, result)) { */
-    /* 	    set_tail(interp); */
-    /* 	} else { */
-    /* 	    clear_tail(interp); */
-    /* 	    result=eval(interp, result); */
-    /* 	    pop_environment(interp); */
-    /* 	} */
-    /* } */
-    
     return result;
 }
 
@@ -771,7 +760,6 @@ NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\ntail: %i", interp->tail);
     printf("\nenv: %p=", interp->cur_env);
     output(interp, interp->cur_env);
     printf("\n");
