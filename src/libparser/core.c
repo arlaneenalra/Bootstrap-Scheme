@@ -269,7 +269,6 @@ void push_environment(interp_core_type *interp, object_type *env) {
     object_type *old_env=0;
 
     TRACE("Peu");
-    printf("\nPeu\n");
     
     /* replace it with the passed in stack */
     interp->cur_env=cons(interp, interp->empty_list, env);

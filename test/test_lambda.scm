@@ -1,29 +1,27 @@
-(define simple
-  (lambda (n) (dump_env) (+ 1 1 n)))
+;; (define simple
+;;   (lambda (n) (dump_env) (+ 1 1 n)))
 
-(dump_env)
+;; (simple 1)
 
-(simple 1)
-
-(dump_env)
-
-(simple 1)
-
-(dump_env)
-
-(quit)
+;; (dump_env)
 
 (define count
   (lambda (inc)
     (define n 0)
     (lambda ()
+      (dump_env)
       (set! n (+ inc n))
       n)))
 
-(dump_env)
-
 (define step
   (count 3))
+
+(define (jump n)
+  (dump_env)
+  (step)
+  (if (= (- n 1) 0)
+      (step)
+      (jump (- n 1))))
 
 (dump_env)     
 
@@ -36,8 +34,6 @@
 
 (dump_env)
 
-;(count 3)
-
-;(count 5)
+(jump 10)
 
 (quit)

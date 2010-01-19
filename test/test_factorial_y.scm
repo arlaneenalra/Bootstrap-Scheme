@@ -12,14 +12,14 @@
 	     1
 	     (* n (fact (- n 1))))))))
 
+(dump_env)
 
 (factorialy 4)
 
+(dump_env)
 
 (factorialy 5)
 
-y
-n
+(dump_env)
 
-
-;(quit)
+(quit)
