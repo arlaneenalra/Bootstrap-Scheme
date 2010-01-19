@@ -44,9 +44,10 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
     object_type *next_val=0;
     object_type *evaled=0;
     
+    evaled_args=interp->empty_list;
     next=args;
     
-    while(next!=0) {
+    while(!is_empty_list(interp, next)) {
 	evaled=eval(interp, car(next));
 	
 	if(interp->error) {
@@ -54,12 +55,12 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 	}
 	
 	/* first value has to be treated differently */
-	if(evaled_args==0) {
-	    next_val=evaled_args=cons(interp, evaled, 0);
+	if(is_empty_list(interp, evaled_args)) {
+	    next_val=evaled_args=cons(interp, evaled, interp->empty_list);
 	} else {
 	    /* build a list of the evaled arguments keeping 
 	       the same order */
-	    cdr(next_val)=cons(interp, evaled, 0);
+	    cdr(next_val)=cons(interp, evaled, interp->empty_list);
 	    next_val=cdr(next_val);
 	}
 	
@@ -77,18 +78,6 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
     object_type *body=0;
     object_type *result=0;
 
-    printf("\nobj:");
-    output(interp, obj);
-    printf("\nproc:");
-    output(interp, proc);
-    printf("\nargs:");
-    output(interp, cdr(obj));
-    /*printf("\nenv %i:", interp->tail);
-      output(interp, interp->cur_env);*/
-    /*printf("\nenv_stack:");
-    output(interp, interp->env_stack);*/
-    printf("\n");
-    
     /* Make sure that the procedure is callable */
     if(is_primitive(interp, proc)) {
 	TRACE("Pi");

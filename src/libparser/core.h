@@ -151,7 +151,7 @@ typedef struct interp_core {
 
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
-int list_length(object_type *args); /* Find the length of a passed in list */
+int list_length(interp_core_type * interp, object_type *args); /* Find the length of a passed in list */
 void set_tail(interp_core_type *interp);
 void clear_tail(interp_core_type *interp);
 bool is_tail(interp_core_type *interp);

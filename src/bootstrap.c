@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
 	obj=parse(interp, stdin);
 	
-	//obj=eval(interp, obj);
+	obj=eval(interp, obj);
 	
 	// if there was no error, output the result
 	if(!has_error(interp)) {

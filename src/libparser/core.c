@@ -427,10 +427,10 @@ void cleanup_interp(interp_core_type *interp) {
 }
 
 /* Find the length of a passed in list */
-int list_length(object_type *args) {
+int list_length(interp_core_type* interp, object_type *args) {
     int count=0;
     
-    while(args) {
+    while(!is_empty_list(interp, args)) {
 	count++;
 	args=cdr(args);
     }

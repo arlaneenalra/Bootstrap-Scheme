@@ -29,7 +29,7 @@ object_type *quote(interp_core_type *interp, object_type *obj) {
     /* and now (quote ( ... )) */
 
     ret_val=cons(interp, interp->quote,
-		 cons(interp, obj, 0));
+		 cons(interp, obj, interp->empty_list));
     
     return ret_val;
 }
@@ -98,7 +98,7 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
 
     object_type *binding=0;
 
-    while(sym_list!=0) {
+    while(!is_empty_list(interp, sym_list)) {
 
 	/* create a new binding as we didn't find one */
 	binding=cons(interp, car(sym_list), car(value_list));
@@ -232,7 +232,7 @@ object_type *prim_car(interp_core_type *interp, object_type *args) {
 object_type *prim_set_car(interp_core_type *interp, object_type *args) {
 
     /* make sure we have values to work with */
-    if(list_length(args)!=2 && car(args)->type != TUPLE) {
+    if(list_length(interp, args)!=2 && car(args)->type != TUPLE) {
 	interp->error=1;
 	return false;
     }
@@ -255,7 +255,7 @@ object_type *prim_cdr(interp_core_type *interp, object_type *args) {
 object_type *prim_set_cdr(interp_core_type *interp, object_type *args) {
 
     /* make sure we have values to work with */
-    if(list_length(args)!=2 && car(args)->type != TUPLE) {
+    if(list_length(interp, args)!=2 && car(args)->type != TUPLE) {
 	interp->error=1;
 	return false;
     }
@@ -270,7 +270,7 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
 
     /* make sure we have the correct arguments */
-    if(list_length(args)!=2) {
+    if(list_length(interp, args)!=2) {
 	interp->error=1;
 	return false;
     }
@@ -307,7 +307,7 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
 object_type *prim_define(interp_core_type *interp, object_type *args) {
 
     /* make sure we have the correct arguments */
-    if(list_length(args)<2) {
+    if(list_length(interp, args)<2) {
 	interp->error=1;
 	return false;
     }
@@ -340,7 +340,7 @@ object_type *prim_set(interp_core_type *interp, object_type *args) {
     object_type *binding=0;
 
     /* make sure we have the correct arguments */
-    if(list_length(args)!=2) {
+    if(list_length(interp, args)!=2) {
 	return false;
     }
 
@@ -371,7 +371,7 @@ object_type *prim_quit(interp_core_type *interp, object_type *args) {
 /* quote */
 object_type *prim_quote(interp_core_type *interp, object_type *args) {
     /* quote just says, don't evaluate my arguments */
-    if(list_length(args)<1) {
+    if(list_length(interp, args)<1) {
 	interp->error=1;
 	return false;
     }
@@ -387,7 +387,7 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
 
     /* make sure we have a predicate and at least
        a then clause */
-    arg_count=list_length(args);
+    arg_count=list_length(interp, args);
     if(arg_count<2 || arg_count>3) {
 	interp->error=1;
 	return false;
@@ -426,7 +426,7 @@ object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
     char *name=0;
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -447,7 +447,7 @@ object_type *prim_string_to_sym(interp_core_type *interp, object_type *args) {
     char *name=0;
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -467,7 +467,7 @@ object_type *prim_char_to_int(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -490,7 +490,7 @@ object_type *prim_int_to_char(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -513,7 +513,7 @@ object_type *prim_num_to_string(interp_core_type *interp, object_type *args) {
     char buf[2048];
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -551,7 +551,7 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
     char *walk=0;
     
     /* make sure we have enough arguments */
-    if(list_length(args)!=1) {
+    if(list_length(interp, args)!=1) {
 	interp->error=1;
 	return false;
     }
@@ -606,7 +606,7 @@ object_type *prim_mod(interp_core_type *interp, object_type *args) {
     object_type *result=0;
 
     /* make sure we have the correct arguments */
-    if(list_length(args)!=2) {
+    if(list_length(interp, args)!=2) {
 	interp->error=1;
 	return false;
     }
@@ -634,7 +634,7 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
     object_type *result=0;
 
     /* make sure we have the correct arguments */
-    if(list_length(args)!=2) {
+    if(list_length(interp, args)!=2) {
 	interp->error=1;
 	return false;
     }
@@ -665,7 +665,7 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 									\
 									\
 	/* No argument means we return 0 */				\
-	if(args==0) {							\
+	if(is_empty_list(interp, args)) {				\
 	    result=alloc_object(interp, FIXNUM);			\
 	    result->value.int_val=0;					\
 	    return result;						\
@@ -676,7 +676,7 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 	args=cdr(args);							\
 									\
 	/* walk argument list and evaluate each one */			\
-	while(args!=0) {						\
+	while(!is_empty_list(interp, args)) {				\
 	    operand=car(args);						\
 									\
 	    /* Make sure that everything is the same kind of number */	\
@@ -709,13 +709,13 @@ OPERATION(/=, prim_div)
     object_type *name(interp_core_type *interp, object_type *args) {	\
 									\
 	/* accept one argument and only one argument */			\
-	if(list_length(args)!=1) {					\
+	if(list_length(interp, args)!=1) {				\
 	    interp->error=1;						\
 	    return 0;							\
 	}								\
 									\
 	return test ? true : false;					\
-    }									\
+    }			 						\
 
 
 TEST(car(args)==0, prim_is_null)
@@ -731,14 +731,16 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
     object_type *name(interp_core_type *interp, object_type *args) {	\
 	object_type *first=0;						\
 	object_type *next=0;						\
-	if(args==0) {							\
-	    return true;						\
+	/* Make sure we have at least 2 arguments */			\
+	if(list_length(interp, args)<2) {				\
+	    interp->error=1;						\
+	    return false;						\
 	}								\
 	first=car(args);						\
 									\
 	args=cdr(args);							\
 									\
-	while(args!=0) {						\
+	while(!is_empty_list(interp, args)) {				\
 	    next=car(args);						\
 	    normalize_numbers(interp, &first, &next);			\
 									\
@@ -761,7 +763,7 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 	/* default to true */						\
 	return true;							\
     }									\
-
+ 
 NUMERIC_TEST(==, prim_equal)
 NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
