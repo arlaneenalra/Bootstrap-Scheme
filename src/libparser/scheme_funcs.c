@@ -388,6 +388,44 @@ object_type *prim_quote(interp_core_type *interp, object_type *args) {
     return car(args);
 }
 
+/* An cond then constrcut */
+object_type *prim_cond(interp_core_type *interp, object_type *args) {
+    object_type *result=false;
+    object_type *test=0;
+
+    /* We need to have some arguments */
+    if(is_empty_list(interp, args)) {
+	return false;
+    }
+
+    while(!is_empty_list(interp, args)) {
+	/* arguments should be in the form of a 
+	   list of lists */
+
+	if(!is_tuple(interp, car(args))) {
+	    interp->error=1;
+	    return false;
+	}
+
+    	test=caar(args);
+	
+	/* evaluate the test expression */
+	result=eval(interp, test);
+	
+	/* check for an interpreter error */
+	if(interp->error) {
+	    return false;
+	}
+
+	if(result!=false) {
+	    return cadar(args);
+	}	
+	args=cdr(args);
+    }
+
+    return false;
+}
+
 /* An if then constrcut */
 object_type *prim_if(interp_core_type *interp, object_type *args) {
     object_type *predicate=0;
@@ -822,6 +860,7 @@ binding_type primitive_list[]={
     {"quit", &prim_quit, 0, 0},
     {"quote", &prim_quote, 0, 1},
     {"if", &prim_if, 0, 0},
+    {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 0},
 
