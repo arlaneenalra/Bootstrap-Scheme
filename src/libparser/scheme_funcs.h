@@ -45,6 +45,7 @@ typedef struct binding {
     char *symbol;
     fn_type primitive;
     bool eval_first;
+    bool eval_end;
 } binding_type;
 
 

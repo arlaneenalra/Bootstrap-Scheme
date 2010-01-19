@@ -60,7 +60,8 @@ typedef struct object *(*fn_type)
 
 typedef struct primitive {
     fn_type fn;
-    bool eval_first;
+    bool eval_first; /* evaluate arguements ? */
+    bool eval_end; /* evaluate result? */
 } primitive_type;
 
 typedef struct closure {

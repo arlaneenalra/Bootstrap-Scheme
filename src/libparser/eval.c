@@ -147,9 +147,6 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     }
 
     while(!interp->error) {
-	printf("\neval:");
-	output(interp, obj);
-	printf("\n");
 
 	TRACE("E");
     
@@ -165,11 +162,6 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    return eval_symbol(interp, obj);
 	}
 
-	if(is_closure(interp, obj)) {
-	    TRACE("c");
-	    return obj;
-	}
-    
 	/* This should give us a means of executing 
 	   primitives */
 	if(is_tuple(interp, obj)) {
@@ -179,16 +171,13 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    /* Evaluate our object to see what we have */
 	    proc=eval(interp, car(obj));
 	    
-	    printf("\nproc:");
-	    output(interp, proc);
-	    printf("\n");
-
 	    if(is_primitive(interp, proc)) {
-		printf("\nprim:");
-		output(interp, proc);
-		printf("\n");
-
+	
 		obj=eval_tagged_list(interp, proc, obj);
+		
+		if(proc->value.primitive.eval_end) {
+		    return obj;
+		}
 	    } else {	    
 		obj=eval_tagged_list(interp, proc, obj);
 	    }
