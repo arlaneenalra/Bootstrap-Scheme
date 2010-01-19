@@ -766,6 +766,32 @@ object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
     return true;
 }
 
+object_type *prim_gc_stats(interp_core_type *interp, object_type *args) {
+    object_type *next=0;
+    uint64_t depth_free=0;
+    uint64_t depth_active=0;
+
+    next=interp->gc.free_list;
+
+    while(next!=0) {
+	depth_free++;
+	next=next->next;
+    }
+    
+    next=interp->gc.active_list;
+
+    while(next!=0) {
+	depth_active++;
+	next=next->next;
+    }
+
+
+    printf("\nGC: free:%" PRIi64 " active:%" PRIi64 " total:%" PRIi64 "\n",
+	   depth_free, depth_active, depth_free+depth_active);
+    
+    return true;
+}
+
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
@@ -777,7 +803,7 @@ binding_type primitive_list[]={
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 0},
 
-    {"cons", &prim_cons, 1, 0},
+    {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 0},
     {"cdr", &prim_cdr, 1, 0},
     {"set-car!", &prim_set_car, 1, 0},
@@ -811,6 +837,7 @@ binding_type primitive_list[]={
     {"string->symbol", &prim_string_to_sym, 1, 0},
 
     {"dump_env", &prim_dump_env, 1, 0},
+    {"gc_stats", &prim_gc_stats, 1, 0},
 
     {0,0} /* Terminate the list */
 };

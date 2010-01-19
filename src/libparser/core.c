@@ -251,9 +251,6 @@ void pop_state(interp_core_type *interp) {
 	set(interp, CDR);
 	pop_state(interp);
     }
-
-    mark_free(interp, state);
-    
 }
 
 /* Make sure that there are no loose state's sitting on 
