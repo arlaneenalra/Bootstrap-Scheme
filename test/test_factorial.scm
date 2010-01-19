@@ -8,14 +8,10 @@
 	      max-count)))
   (iter 1 1 n))
 
-iter
-
-factorial 
-
 (factorial 4)
 ;(factorial 5)
 
-;(dump_env)
+(dump_env)
 
 (quit)
 

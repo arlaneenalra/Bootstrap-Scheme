@@ -1,12 +1,17 @@
 (define simple
-  (lambda () (+ 1 1 )))
-
-(simple)
+  (lambda (n) (dump_env) (+ 1 1 n)))
 
 (dump_env)
 
-(simple)
+(simple 1)
+
 (dump_env)
+
+(simple 1)
+
+(dump_env)
+
+(quit)
 
 (define count
   (lambda (inc)

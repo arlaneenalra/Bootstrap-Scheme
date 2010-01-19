@@ -269,30 +269,11 @@ void push_environment(interp_core_type *interp, object_type *env) {
     object_type *old_env=0;
 
     TRACE("Peu");
-    
-    /* save off the current environment */
-    if(!is_tail(interp)) {
-	interp->env_stack=cons(interp, interp->cur_env, interp->env_stack);
-    } else {
-	clear_tail(interp);
-    }
+    printf("\nPeu\n");
     
     /* replace it with the passed in stack */
     interp->cur_env=cons(interp, interp->empty_list, env);
 }
-
-/* Pop off the current environment */
-void pop_environment(interp_core_type *interp) {
-
-    TRACE("Peo");
-    
-    /* Restore and Pop old environment */
-    interp->cur_env=car(interp->env_stack);
-    interp->env_stack=cdr(interp->env_stack);
-
-    //interp->cur_env=cdr(interp->cur_env);
-}
-
 
 void end_of_file(interp_core_type *interp) {
     interp->running=0;

@@ -70,83 +70,64 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
     return evaled_args;
 }
 
+/* evaluate primitive functions */
+object_type *eval_prim(interp_core_type *interp, object_type *proc, 
+		       object_type *obj) {
+    object_type *evaled_args=0;
+
+    TRACE("Pi");
+
+    /* do we evaluate the arguments before passing them? */
+    if(proc->value.primitive.eval_first) {
+	evaled_args=eval_list(interp, cdr(obj));
+
+	/* propagate errors */
+	if(interp->error) {
+	    return 0;
+	}
+    } else {
+	evaled_args=cdr(obj);
+    }
+
+    TRACE("Cpi");
+	
+    /* Call the primitive and return, make sure to skip the
+       symbol ref at the start of the list */
+    return (*(proc->value.primitive.fn))(interp, evaled_args);
+}
 
 /* evaluate a tagged list */
 object_type *eval_tagged_list(interp_core_type *interp, object_type *proc, 
 			      object_type *obj) {
-    object_type *evaled_args=0;
+
     object_type *body=0;
     object_type *result=0;
 
-    /* Make sure that the procedure is callable */
-    if(is_primitive(interp, proc)) {
-	TRACE("Pi");
+    TRACE("Co");
 
-	/* do we evaluate the arguments before passing them? */
-	if(proc->value.primitive.eval_first) {
-	    evaled_args=eval_list(interp, cdr(obj));
-
-	    /* propagate errors */
-	    if(interp->error) {
-		return 0;
-	    }
-	} else {
-	    evaled_args=cdr(obj);
-	}
-
-	TRACE("Cpi");
-
-	/* Call the primitive and return, make sure to skip the
-	   symbol ref at the start of the list */
-	result=(*(proc->value.primitive.fn))(interp, evaled_args);
+    body=proc->value.closure.body;
 	
-	/* if we didn't have a tail call, add an environment for 
-	   eval to pop */
-	if(!is_tail(interp)) {
-	    push_environment(interp, proc->value.closure.env);
-	}
-	
-    } else {
-	TRACE("Co");
-
-	/* always evaluate arguments of compound procecdures */
-	evaled_args=eval_list(interp, cdr(obj));
-
-	push_environment(interp, proc->value.closure.env); /* enter the procedure */
-
-	bind_argument_list(interp, proc->value.closure.param, evaled_args);
-
-	body=proc->value.closure.body;
-	
-	/* loop until we have the last call */
-	while(!is_empty_list(interp, cdr(body))) {
-	    TRACE("Cb");
-	    eval(interp, car(body));
-	    body=cdr(body);
-	}
-
-	body=car(body);
-	
-	/* if we don't have a tuple here, we cannot have
-	   a tail call */
-	if(is_tuple(interp, body) && !is_empty_list(interp, body)) {
-	    set_tail(interp);
-	    result=body;	
-	} else {
-	    clear_tail(interp);
-	    result=eval(interp, body);
-	    /*pop_environment(interp);*/
-	}	
+    /* loop until we have the last call */
+    while(!is_empty_list(interp, cdr(body))) {
+	TRACE("Cb");
+	eval(interp, car(body));
+	body=cdr(body);
     }
 
-    TRACE("Ret");
-    return result;
+    body=car(body);
+	
+    return body;
 }
 
 /* Main entry point to evaluator */
 object_type *eval(interp_core_type *interp, object_type *obj) {
     object_type *proc=0;
+    object_type *evaled_args=0;
+    object_type *cur_env=0;
+
     bool loop=1;
+
+    cur_env=interp->cur_env;
     
     /* make sure that the interpreter is alive */
     if(has_error(interp)) {
@@ -154,7 +135,6 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     }
 
     while(!has_error(interp) && loop) {
-
 	TRACE("E");
     
 	/* Check for self evaluating */
@@ -163,9 +143,6 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    TRACE("s");
 	    loop=0;
 	    
-	    /* can't tail call an self evaled symbol */
-	    clear_tail(interp);
-
 	} else if(is_symbol(interp, obj)) { 	/* Check for a symbol */
 
 	    TRACE("v");
@@ -181,19 +158,32 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    proc=eval(interp, car(obj));
 	    
 	    if(is_primitive(interp, proc)) {
-	
-		obj=eval_tagged_list(interp, proc, obj);
+		/* We have a primitive */
+		obj=eval_prim(interp, proc, obj);
 		
+		/* Do we need to evaluate the result? */
 		if(proc->value.primitive.eval_end) {
 		    loop=0;
 		}
-	    } else {	    
-		obj=eval_tagged_list(interp, proc, obj);
-	    }
 
-	    if(!is_tail(interp)) {
-		pop_environment(interp);
+	    } else {
+		/* always evaluate arguments of compound procecdures */
+		evaled_args=eval_list(interp, cdr(obj));
+
+		push_environment(interp, proc->value.closure.env);
+
+		bind_argument_list(interp, proc->value.closure.param, evaled_args);
+
+		obj=eval_tagged_list(interp, proc, obj);
+
+		/* if we don't have a tuple here, we cannot have
+		   a tail call */
+		if(!is_tuple(interp, obj) || is_empty_list(interp, obj)) {
+		    obj=eval(interp, obj);
+		    loop=0;
+		}
 	    }
+	    
 	} else {
 	    /* we don't know how to evaluate this object */
 	    TRACE("?");
@@ -204,6 +194,8 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    return false;
 	}
     }
+
+    interp->cur_env=cur_env;
 
     return obj;
 }

@@ -397,15 +397,15 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     }
 
     /* properly handle tail calling code */
-    if(is_tail(interp)) {
-	if(is_tuple(interp, result)) {
-	    set_tail(interp);
-	} else {
-	    clear_tail(interp);
-	    result=eval(interp, result);
-	    pop_environment(interp);
-	}
-    }
+    /* if(is_tail(interp)) { */
+    /* 	if(is_tuple(interp, result)) { */
+    /* 	    set_tail(interp); */
+    /* 	} else { */
+    /* 	    clear_tail(interp); */
+    /* 	    result=eval(interp, result); */
+    /* 	    pop_environment(interp); */
+    /* 	} */
+    /* } */
     
     return result;
 }
