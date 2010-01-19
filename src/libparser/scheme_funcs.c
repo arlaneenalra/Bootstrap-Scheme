@@ -520,12 +520,6 @@ object_type *prim_num_to_string(interp_core_type *interp, object_type *args) {
     
     obj=car(args);
 
-    /* make sure that there is an argument */
-    if(obj==0) {
-	interp->error=1;
-	return false;
-    }
-    
     switch(obj->type) {
     case FIXNUM:
 	sprintf(buf, "%" PRIi64, obj->value.int_val);
