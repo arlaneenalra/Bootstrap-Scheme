@@ -140,8 +140,14 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	    
 	    /* Evaluate our object to see what we have */
 	    proc=eval(interp, car(obj));
-	    
-	    if(is_primitive(interp, proc)) {
+
+	    /* make sure that we actually have a proc to work with */
+	    if(has_error(interp) || proc==0) {
+		interp->error=1;
+		loop=0;
+		obj=false;
+
+	    } else if(is_primitive(interp, proc)) {
 		/* We have a primitive */
 		obj=eval_prim(interp, proc, obj);
 		

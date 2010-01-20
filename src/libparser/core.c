@@ -363,7 +363,8 @@ void create_base_environment(interp_core_type *interp) {
     bind_symbol_list(interp, primitive_list);
 
     /* for cond */
-    bind_symbol(interp, create_symbol(interp, "else"),
+    bind_symbol(interp, 
+		create_symbol(interp, "else"),
 		true);
 
 }
