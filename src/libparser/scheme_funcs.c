@@ -773,6 +773,7 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
     object_type *name(interp_core_type *interp, object_type *args) {	\
 	object_type *first=0;						\
 	object_type *next=0;						\
+									\
 	/* Make sure we have at least 2 arguments */			\
 	if(list_length(interp, args)<2) {				\
 	    interp->error=1;						\
@@ -810,6 +811,58 @@ NUMERIC_TEST(==, prim_equal)
 NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
 
+
+/* eq */
+object_type *prim_eq(interp_core_type *interp, object_type *args) {
+    object_type *obj1=0;
+    object_type *obj2=0;
+    
+    /* Make sure we have at least 2 arguments */			
+    if(list_length(interp, args)!=2) {				
+	interp->error=1;						
+	return false;						
+    }
+
+    obj1=car(args);
+    obj2=cadr(args);
+
+    /* avoid segfaults */
+    if(obj1==0 || obj2==0) {
+	interp->error=1;
+	return false;
+    }
+
+    /* objects of different types cannot be equal */
+    if(obj1->type != obj2->type) {
+	return false;
+    }
+
+    /* internal comparisons */
+    switch(obj1->type) {
+    case FIXNUM:
+    case FLOATNUM:
+	return prim_equal(interp, args);
+	break;
+
+    case CHAR:
+	return obj1->value.char_val==obj2->value.char_val ?
+	    true : false;
+	break;
+
+    case STRING:
+	return strcmp(obj1->value.string_val, obj2->value.string_val)==0 ?
+	    true : false;
+	break;
+
+    default:
+	return obj1==obj2 ?
+	    true : false;
+	break;
+    }
+
+}
+
+/* output the contents of the current environment */
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
     printf("\nenv: %p=", interp->cur_env);
     output(interp, interp->cur_env);
@@ -854,6 +907,7 @@ binding_type primitive_list[]={
     {"string?", &prim_is_string, 1, 1},
     {"pair?", &prim_is_tuple, 1, 1},
     {"procedure?", &prim_is_prim, 1, 1},
+    {"eq?", &prim_eq, 1, 1},
     
     {"char->integer", &prim_char_to_int, 1, 1},
     {"integer->char", &prim_int_to_char, 1, 1},
