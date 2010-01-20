@@ -13,10 +13,4 @@
 
 (massalloc 10)
 
-(gc_stats)
-
-(gc_stats 1)
-
-(gc_stats)
-
 (quit)

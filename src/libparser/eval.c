@@ -40,6 +40,7 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 	
 	/* first value has to be treated differently */
 	if(is_empty_list(interp, evaled_args)) {
+	    /* make sure we have a record of the first value */
 	    next_val=evaled_args=cons(interp, evaled, interp->empty_list);
 	} else {
 	    /* build a list of the evaled arguments keeping 

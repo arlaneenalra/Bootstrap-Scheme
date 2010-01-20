@@ -163,6 +163,12 @@ bool has_error(interp_core_type *interp) {
 /* Is this object self evaluating */
 bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     object_type_enum type=0;
+
+    /* check for null */
+    if(obj==0) {
+	return 0;
+    }
+
     type=obj->type;
     
     return type==FIXNUM || type==FLOATNUM 
@@ -311,6 +317,12 @@ object_type *prim_begin(interp_core_type *interp, object_type *args) {
     /* return the last argument */
     return car(args);
 }
+
+/* list */
+object_type *prim_list(interp_core_type *interp, object_type *args) {
+    return args;
+}
+
 
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
@@ -807,49 +819,50 @@ object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
-    {"define", &prim_define, 0, 0},
-    {"set!", &prim_set, 0, 0},
-    {"quit", &prim_quit, 0, 0},
+    {"define", &prim_define, 0, 1},
+    {"set!", &prim_set, 0, 1},
+    {"quit", &prim_quit, 0, 1},
     {"quote", &prim_quote, 0, 1},
     {"if", &prim_if, 0, 0},
     {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
-    {"begin", &prim_begin, 0, 0},
+    {"begin", &prim_begin, 0, 1},
 
     {"cons", &prim_cons, 1, 1},
-    {"car", &prim_car, 1, 0},
-    {"cdr", &prim_cdr, 1, 0},
-    {"set-car!", &prim_set_car, 1, 0},
-    {"set-cdr!", &prim_set_cdr, 1, 0},
+    {"car", &prim_car, 1, 1},
+    {"cdr", &prim_cdr, 1, 1},
+    {"set-car!", &prim_set_car, 1, 1},
+    {"set-cdr!", &prim_set_cdr, 1, 1},
+    {"list", &prim_list, 1, 1},
 
-    {"+", &prim_plus, 1, 0},
-    {"-", &prim_minus, 1, 0},
-    {"*", &prim_multi, 1, 0},
-    {"/", &prim_div, 1, 0},
-    {"quotient", &prim_div_int, 1, 0},
-    {"remainder", &prim_mod, 1, 0},
+    {"+", &prim_plus, 1, 1},
+    {"-", &prim_minus, 1, 1},
+    {"*", &prim_multi, 1, 1},
+    {"/", &prim_div, 1, 1},
+    {"quotient", &prim_div_int, 1, 1},
+    {"remainder", &prim_mod, 1, 1},
 
-    {"=", &prim_equal, 1, 0},
-    {"<", &prim_less, 1, 0},
-    {">", &prim_greater, 1, 0},
+    {"=", &prim_equal, 1, 1},
+    {"<", &prim_less, 1, 1},
+    {">", &prim_greater, 1, 1},
 
-    {"null?", &prim_is_null, 1, 0},
-    {"boolean?", &prim_is_boolean, 1, 0},
-    {"symbol?", &prim_is_symbol, 1, 0},
-    {"integer?", &prim_is_integer, 1, 0},
-    {"char?", &prim_is_char, 1, 0},
-    {"string?", &prim_is_string, 1, 0},
-    {"pair?", &prim_is_tuple, 1, 0},
-    {"procedure?", &prim_is_prim, 1, 0},
+    {"null?", &prim_is_null, 1, 1},
+    {"boolean?", &prim_is_boolean, 1, 1},
+    {"symbol?", &prim_is_symbol, 1, 1},
+    {"integer?", &prim_is_integer, 1, 1},
+    {"char?", &prim_is_char, 1, 1},
+    {"string?", &prim_is_string, 1, 1},
+    {"pair?", &prim_is_tuple, 1, 1},
+    {"procedure?", &prim_is_prim, 1, 1},
     
-    {"char->integer", &prim_char_to_int, 1, 0},
-    {"integer->char", &prim_int_to_char, 1, 0},
-    {"number->string", &prim_num_to_string, 1, 0},
-    {"string->number", &prim_string_to_num, 1, 0},
-    {"symbol->string", &prim_sym_to_string, 1, 0},
-    {"string->symbol", &prim_string_to_sym, 1, 0},
+    {"char->integer", &prim_char_to_int, 1, 1},
+    {"integer->char", &prim_int_to_char, 1, 1},
+    {"number->string", &prim_num_to_string, 1, 1},
+    {"string->number", &prim_string_to_num, 1, 1},
+    {"symbol->string", &prim_sym_to_string, 1, 1},
+    {"string->symbol", &prim_string_to_sym, 1, 1},
 
-    {"dump_env", &prim_dump_env, 1, 0},
+    {"dump_env", &prim_dump_env, 1, 1},
 
     {0,0} /* Terminate the list */
 };
