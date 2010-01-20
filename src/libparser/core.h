@@ -110,14 +110,6 @@ typedef struct symbol_table {
 } symbol_table_type;
 
 
-/* Configuartion for the garbage collector */
-typedef struct gc {
-    object_type *active_list;
-    object_type *free_list;
-    gc_mark_type cur_mark;
-} gc_type;
-
-
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
@@ -145,9 +137,6 @@ typedef struct interp_core {
     /* Stores variable bindings */
     object_type *cur_env;
     
-    /* Where the garbage collector keeps it's data */
-    gc_type gc; 
-
     /* List of all symbols in the system */
     symbol_table_type symbols;
 
@@ -156,6 +145,8 @@ typedef struct interp_core {
 } interp_core_type;
 
 
+/* include the bohem gc and our gc stuff */
+#include <gc.h> 
 #include "gc.h"
 
 /* Function definitions */

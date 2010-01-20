@@ -129,7 +129,7 @@ object_type *create_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
     /* create a new buffer for the string value */
-    char *c=malloc(strlen(str)+1);
+    char *c=GC_malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, STRING);
@@ -152,7 +152,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     }
 
     /* create a new buffer for the string value */
-    char *c=malloc(strlen(str)+1);
+    char *c=GC_malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);
@@ -318,7 +318,7 @@ void create_quote(interp_core_type * interp) {
     object_type *obj=0;
 
     obj=create_symbol(interp, "quote");
-    mark_perm(interp, obj);
+
     interp->quote=obj;
 }
 
@@ -330,13 +330,13 @@ void create_booleans(interp_core_type *interp) {
        memvers of interp->boolean */
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=1;
-    mark_perm(interp, obj);
+
     true=obj;
 
     
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=0;
-    mark_perm(interp, obj);
+
     false=obj;
 }
 
@@ -345,7 +345,7 @@ void create_empty_list(interp_core_type *interp) {
     object_type *obj=0;
 
     obj=alloc_object(interp,TUPLE);
-    mark_perm(interp, obj);
+
     interp->empty_list=obj;
 }
 
@@ -372,14 +372,13 @@ void create_base_environment(interp_core_type *interp) {
 /* Create an instance of the interpreter */
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
-    
-    interp=malloc(sizeof(interp_core_type));
+
+    interp=GC_malloc(sizeof(interp_core_type));
     
     /* Setup the interpreter */
     if(interp) {
 	bzero(interp, sizeof(interp_core_type));
 
-	interp->gc.cur_mark=MARK_RED;
 
 	/* create some special values */
 	create_booleans(interp);
@@ -407,10 +406,6 @@ interp_core_type *create_interp() {
 /* Clean up allocations in the interpreter. */
 void cleanup_interp(interp_core_type *interp) {
     yylex_destroy(interp->scanner);
-
-    gc_all(interp);
-
-    free(interp);
 }
 
 /* Find the length of a passed in list */
