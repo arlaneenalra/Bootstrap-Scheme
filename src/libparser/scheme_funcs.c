@@ -299,6 +299,67 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* let */
+object_type *prim_let(interp_core_type *interp, object_type *args) {
+    object_type *next=0;
+    object_type *body=0;
+    object_type *arg_list=0;
+    object_type *sym_list=0;
+
+    /* make sure that we have at least 2 arguments */
+    if(list_length(interp, args)<2) {
+	interp->error=1;
+	return false;
+    }
+
+    /* Split first argument into symbols and 
+       values */
+    arg_list=interp->empty_list;
+    sym_list=interp->empty_list;
+    
+    /* let takes a list of pairs as it's first argument */
+    next=car(args);
+    
+    /* make sure we have a tuple */
+    if(!is_tuple(interp, next)) {
+	interp->error=0;
+	return false;
+    }
+
+    /* split pairs into parallel lists */
+    while(!is_empty_list(interp, next)) {
+
+	/* avoid segfaults */
+	if(!is_tuple(interp, car(next)) || caar(next)==0 ||
+	   !is_tuple(interp, cdar(next)) || !cadar(next)==0) {
+	    interp->error=1;
+	    return false;
+	}
+
+	sym_list=cons(interp, caar(next), sym_list);
+	arg_list=cons(interp, cadar(next), arg_list);
+
+	next=cdr(next);
+    }
+    
+
+
+    body=cdr(args);
+
+    
+    /* construct the lambda version and return it */
+    next=cons(interp, 
+	      cons(interp, create_symbol(interp, "lambda"),
+		   cons(interp, sym_list, body)),
+	      arg_list);
+
+    output(interp, next);
+    printf("\n");
+
+    return next;
+
+}
+
 /* begin */
 object_type *prim_begin(interp_core_type *interp, object_type *args) {
     
@@ -880,6 +941,7 @@ binding_type primitive_list[]={
     {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 1},
+    {"let", &prim_let, 0, 0},
 
     {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 1},
