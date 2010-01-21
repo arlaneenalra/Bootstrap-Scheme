@@ -923,6 +923,50 @@ object_type *prim_eq(interp_core_type *interp, object_type *args) {
 
 }
 
+/* and */
+object_type *prim_and(interp_core_type *interp, object_type *args) {
+    object_type *result=0;
+
+    /* evalueate each argument */
+    while(!is_empty_list(interp, args)) {
+	result=eval(interp, car(args));
+
+	/* If the result is false, return false
+	   otherwise keep evaluating */
+	if(!is_true(interp, result)) {
+	    return false;
+	}
+
+	args=cdr(args);
+    }
+    
+    /* return the last argument */
+    return true;
+
+}
+
+/* or */
+object_type *prim_or(interp_core_type *interp, object_type *args) {
+    object_type *result=0;
+
+    /* evalueate each argument */
+    while(!is_empty_list(interp, args)) {
+	result=eval(interp, car(args));
+	
+	/* If the result is false, return false
+	   otherwise keep evaluating */
+	if(is_true(interp, result)) {
+	    return true;
+	}
+
+	args=cdr(args);
+    }
+    
+    /* return the last argument */
+    return false;
+
+}
+
 /* output the contents of the current environment */
 object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
     printf("\nenv: %p=", interp->cur_env);
@@ -969,7 +1013,10 @@ binding_type primitive_list[]={
     {"string?", &prim_is_string, 1, 1},
     {"pair?", &prim_is_tuple, 1, 1},
     {"procedure?", &prim_is_prim, 1, 1},
+
     {"eq?", &prim_eq, 1, 1},
+    {"and", &prim_and, 0, 1},
+    {"or", &prim_or, 0, 1},
     
     {"char->integer", &prim_char_to_int, 1, 1},
     {"integer->char", &prim_int_to_char, 1, 1},
