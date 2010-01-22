@@ -11,6 +11,6 @@
 	numbers
 	(massalloc (- num 1)))))
 
-(massalloc 10)
+(massalloc 1000000)
 
 (quit)

@@ -9,7 +9,7 @@
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     object_type *obj=0;
 	
-    obj=GC_malloc(sizeof(object_type));
+    obj=(object_type *)GC_malloc(sizeof(object_type));
 
     /* check to make sure there was memory to allocate and then
        make sure that we have a properly typed and zeroed object */
