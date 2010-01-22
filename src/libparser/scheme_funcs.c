@@ -76,12 +76,12 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value)
     
     /* Check to see if a binding exists, 
        and replace it if it does */
-    binding=get_binding(interp, sym);
+    /*binding=get_binding(interp, sym);
     
     if(binding) {
 	cdr(binding)=value;
 	return;
-    }
+    }*/
 
     /* create a new binding as we didn't find one */
     binding=cons(interp, sym, value);
