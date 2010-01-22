@@ -21,9 +21,8 @@
 ; Was the guess good enough for 
 ; Government work?
 (define (good-enough? guess x)
-  (if (> 0.001 (diff guess x))
-      #t
-      #f))
+  (> 0.00001 (diff guess x)))
+  
 
 ; find the average of two numbers 
 ; with a floating point result
