@@ -72,24 +72,16 @@ object_type *create_primitive(interp_core_type *interp, fn_type primitive,
 }
 
 /* Bind a symbol to a given value */
-void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value) {
+void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value,
+		 object_type **env) {
     object_type *binding=0;
     
-    /* Check to see if a binding exists, 
-       and replace it if it does */
-    /*binding=get_binding(interp, sym);
-    
-    if(binding) {
-	cdr(binding)=value;
-	return;
-    }*/
-
     /* create a new binding as we didn't find one */
     binding=cons(interp, sym, value);
     
     /* add our new binding to the list of bindings */
-    car(interp->cur_env)=cons(interp, binding, 
-			  car(interp->cur_env));
+    car((*env))=cons(interp, binding, 
+		     car((*env)));
 }
 
 /* bind a parallel list of symbols and arguments */
@@ -112,7 +104,8 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
     }
 }
 
-void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
+void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
+		      object_type **env) {
     object_type *obj=0;
     int i=0;
 
@@ -122,7 +115,7 @@ void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
 	bind_symbol(interp, obj, 
 		    create_primitive(interp, binding_list[i].primitive, 
 				     binding_list[i].eval_first, 
-				     binding_list[i].eval_end));
+				     binding_list[i].eval_end), env);
     }
 }
 
@@ -405,14 +398,16 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 
     if(is_symbol(interp, car(args))) {
 	bind_symbol(interp, car(args), /* Symbol */
-		    eval(interp, cadr(args))); /* Value */
+		    eval(interp, cadr(args)),
+		    &interp->cur_env); /* Value */
     } else {
 	/* It can only be a tagged list then */
 
 	bind_symbol(interp, caar(args), /* Symbol */
 		    prim_lambda(interp, 
 				cons(interp, cdar(args), /* Arguments */
-				     cdr(args)))); /* Body */
+				     cdr(args))),
+		    &interp->cur_env); /* Body */
     }
 
     return true;

@@ -357,12 +357,13 @@ void create_base_environment(interp_core_type *interp) {
        so, this is just the empty list */
     push_environment(interp,interp->empty_list);
 
-    bind_symbol_list(interp, primitive_list);
+    bind_symbol_list(interp, primitive_list, &interp->cur_env);
 
     /* for cond */
     bind_symbol(interp, 
 		create_symbol(interp, "else"),
-		true);
+		true,
+		&interp->cur_env);
 
     push_environment(interp, interp->cur_env);
 

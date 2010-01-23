@@ -35,8 +35,10 @@ object_type *quote(interp_core_type *interp, object_type *obj);
 void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
 			object_type *value_list);
 
-void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value);
-void bind_symbol_list(interp_core_type *interp, binding_type *binding_list);
+void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value,
+		 object_type **env);
+void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
+		      object_type **env);
 object_type *get_binding(interp_core_type *interp, object_type *sym);
 
 
