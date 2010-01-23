@@ -129,7 +129,7 @@ object_type *create_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
     /* create a new buffer for the string value */
-    char *c=GC_malloc(strlen(str)+1);
+    char *c=(char *)GC_malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, STRING);
@@ -152,7 +152,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     }
 
     /* create a new buffer for the string value */
-    char *c=GC_malloc(strlen(str)+1);
+    char *c=(char *)GC_malloc(strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);
@@ -372,7 +372,7 @@ void create_base_environment(interp_core_type *interp) {
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
 
-    interp=GC_malloc(sizeof(interp_core_type));
+    interp=(interp_core_type *)GC_malloc(sizeof(interp_core_type));
     
     /* Setup the interpreter */
     if(interp) {
