@@ -379,6 +379,54 @@ object_type *prim_begin(interp_core_type *interp, object_type *args) {
     return car(args);
 }
 
+/* apply */
+object_type *prim_apply(interp_core_type *interp, object_type *args) {
+    object_type *call=0;
+    object_type *tail=0;
+    object_type *result=0;
+    
+    /* If we don't have any arguments, return an 
+       empty list */
+    if(list_length(interp, args)<1) {
+	interp->error=1;
+	return false;
+    }
+
+    tail=call=cons(interp, car(args), interp->empty_list);
+
+    args=cdr(args);
+
+    if(is_tuple(interp, car(args))) {
+	args=eval(interp, car(args));
+	
+	/* propgate errors */
+	if(interp->error) {
+	    return false;
+	}
+
+	cdr(call)=args;
+    } else {
+    
+	/* evalueate each argument */
+	while(!is_empty_list(interp, args)) {
+
+	    result=eval(interp, car(args));
+
+	    if(!is_empty_list(interp, result)) {
+		
+		tail=cdr(tail)=cons(interp, result, interp->empty_list);
+	    } else {
+		break;
+	    }
+
+	    args=cdr(args);
+	}
+    }
+
+    /* return the last argument */
+    return call;
+}
+
 /* list */
 object_type *prim_list(interp_core_type *interp, object_type *args) {
     return args;
@@ -986,6 +1034,7 @@ binding_type primitive_list[]={
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 1},
     {"let", &prim_let, 0, 0},
+    {"apply", &prim_apply, 0, 0},
 
     {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 1},
