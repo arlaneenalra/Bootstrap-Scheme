@@ -11,12 +11,10 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
     /* Check the binding */
     if(binding==0) {
 	printf("\nUnound Variable: %s@%p\n", obj->value.symbol.name, obj);
-	printf("env: %p=", interp->cur_env);
-	output(interp, interp->cur_env);
-	printf("\n");
+
 	/* Unbound variable */
 	interp->error=1;
-	return 0;
+	return false;
     }
     return cdr(binding);
 }

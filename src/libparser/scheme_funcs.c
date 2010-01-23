@@ -993,6 +993,26 @@ object_type *prim_null_environment(interp_core_type *interp, object_type *args) 
     return env;
 }
 
+/* eval */
+object_type *prim_eval(interp_core_type *interp, object_type *args) {
+    int arg_count=list_length(interp, args);
+
+    /* we have to some arguments */
+    if(arg_count==0) {
+	interp->error=1;
+	return false;
+
+    } else if(arg_count==1) {
+	/* evaluate in the current environment */
+	return car(args);
+
+    } else  {
+	/* replace the current environment 
+	   with the passed in one */
+	interp->cur_env=cadr(args);
+	return car(args);
+    }
+}
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
@@ -1046,6 +1066,7 @@ binding_type primitive_list[]={
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
+    {"eval", &prim_eval, 1, 0},
 
     {0,0} /* Terminate the list */
 };
