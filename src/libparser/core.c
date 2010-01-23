@@ -263,7 +263,6 @@ void clear_state_stack(interp_core_type *interp) {
 
 /* Add a new environment on top of the current one */
 void push_environment(interp_core_type *interp, object_type *env) {
-    object_type *old_env=0;
 
     TRACE("Peu");
     
@@ -351,8 +350,6 @@ void create_empty_list(interp_core_type *interp) {
 
 /* setup the base environment */
 void create_base_environment(interp_core_type *interp) {
-    object_type *obj=0;
-    object_type *target=0;
 
     interp->cur_env=interp->empty_list;
 
@@ -403,6 +400,7 @@ interp_core_type *create_interp() {
     }
     
     fail("Unable to create interpreter instance");
+    return 0;
 }
 
 /* Clean up allocations in the interpreter. */
