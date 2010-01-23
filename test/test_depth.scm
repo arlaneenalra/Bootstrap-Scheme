@@ -38,7 +38,7 @@
 
 (define (sqrt-depth y)
   (define (sqrt-iter guess x depth)
-    (dump_env)
+    (interaction-environment)
     (if (good-enough? guess x)
 	(list guess depth)
 	(sqrt-iter (sqrt-improve guess x) x (+ 1 depth))))
@@ -67,6 +67,6 @@
 (sqrt 2048)
 (sqrt-depth 2048)
 
-(dump_env)
+(interaction-environment)
 
 (quit)

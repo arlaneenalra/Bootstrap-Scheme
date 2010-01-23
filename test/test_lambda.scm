@@ -1,15 +1,15 @@
 ;; (define simple
-;;   (lambda (n) (dump_env) (+ 1 1 n)))
+;;   (lambda (n) (interaction-environment) (+ 1 1 n)))
 
 ;; (simple 1)
 
-;; (dump_env)
+;; (interaction-environment)
 
 (define count
   (lambda (inc)
     (define n 0)
     (lambda ()
-      (dump_env)
+      (interaction-environment)
       (set! n (+ inc n))
       n)))
 
@@ -17,22 +17,22 @@
   (count 3))
 
 (define (jump n)
-  (dump_env)
+  (interaction-environment)
   (step)
   (if (= (- n 1) 0)
       (step)
       (jump (- n 1))))
 
-(dump_env)     
+(interaction-environment)     
 
 (step)
 
-(dump_env)
+(interaction-environment)
 
 (step)
 (step)
 
-(dump_env)
+(interaction-environment)
 
 (jump 10)
 

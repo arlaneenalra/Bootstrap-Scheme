@@ -975,12 +975,9 @@ object_type *prim_or(interp_core_type *interp, object_type *args) {
 
 }
 
-/* output the contents of the current environment */
-object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\nenv: %p=", interp->cur_env);
-    output(interp, interp->cur_env);
-    printf("\n");
-    return true;
+/* return the current environment */
+object_type *prim_interaction_environment(interp_core_type *interp, object_type *args) {
+    return interp->cur_env;
 }
 
 /* Setup scheme primitive function bindings */
@@ -1033,7 +1030,7 @@ binding_type primitive_list[]={
     {"symbol->string", &prim_sym_to_string, 1, 1},
     {"string->symbol", &prim_string_to_sym, 1, 1},
 
-    {"dump_env", &prim_dump_env, 1, 1},
+    {"interaction-environment", &prim_interaction_environment, 1, 1},
 
     {0,0} /* Terminate the list */
 };

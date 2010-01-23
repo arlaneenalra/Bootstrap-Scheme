@@ -12,14 +12,14 @@
 	     1
 	     (* n (fact (- n 1))))))))
 
-(dump_env)
+(interaction-environment)
 
 (factorialy 4)
 
-(dump_env)
+(interaction-environment)
 
 (factorialy 5)
 
-(dump_env)
+(interaction-environment)
 
 (quit)

@@ -66,6 +66,6 @@
 (sqrt 2048)
 (sqrt-depth 2048)
 
-(dump_env)
+(interaction-environment)
 
 (quit)
