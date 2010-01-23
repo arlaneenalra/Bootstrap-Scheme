@@ -975,6 +975,25 @@ object_type *prim_interaction_environment(interp_core_type *interp, object_type 
     return interp->cur_env;
 }
 
+/* populate a new base environment */
+object_type *prim_null_environment(interp_core_type *interp, object_type *args) {
+    object_type *env=0;
+    
+    env=cons(interp, interp->empty_list, interp->empty_list);
+
+    /* bind default primitive symbols */
+    bind_symbol_list(interp, primitive_list, &env);
+
+    /* for cond */
+    bind_symbol(interp, 
+		create_symbol(interp, "else"),
+		true,
+		&env);
+
+    return env;
+}
+
+
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0, 1},
@@ -1026,6 +1045,7 @@ binding_type primitive_list[]={
     {"string->symbol", &prim_string_to_sym, 1, 1},
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
+    {"null-environment", &prim_null_environment, 1, 1},
 
     {0,0} /* Terminate the list */
 };

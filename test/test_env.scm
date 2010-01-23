@@ -1,9 +1,9 @@
-(define (id x) x)
+(interaction-environment)
 
-(id 1)
+(define env (null-environment))
 
-(define (id2 y) (id y))
+(interaction-environment)
 
-(id2 2)
+env
 
 (quit)
