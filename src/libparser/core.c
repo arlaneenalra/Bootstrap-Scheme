@@ -5,6 +5,8 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
+#include "parser_internal.h"
+
 
 void create_booleans(interp_core_type *interp);
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "core.h"
 #include "util.h"
+#include "parser_internal.h"
 
 void yyerror(interp_core_type *interp, void *scanner, char *s);
 

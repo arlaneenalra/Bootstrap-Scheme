@@ -4,6 +4,7 @@
 #include "core.h"
 #include "util.h"
 #include "scheme_funcs.h"
+#include "parser_internal.h"
 
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {

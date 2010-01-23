@@ -3,8 +3,9 @@
 #include <ctype.h>
 
 #include "core.h"
-#include "scheme_funcs.h"
 #include "util.h"
+#include "scheme_funcs.h"
+#include "parser_internal.h"
 
 /* Create a new tuple object with a
    given car and cdr */
