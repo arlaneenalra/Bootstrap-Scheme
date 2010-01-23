@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "core.h"
 #include "scheme_funcs.h"
@@ -531,7 +533,6 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
 /* Symbol to String */
 object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
-    char *name=0;
     
     /* make sure we have enough arguments */
     if(list_length(interp, args)!=1) {
@@ -552,7 +553,6 @@ object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
 /* String to Symbol */
 object_type *prim_string_to_sym(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
-    char *name=0;
     
     /* make sure we have enough arguments */
     if(list_length(interp, args)!=1) {
@@ -694,6 +694,10 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
     case FLOATNUM:
 	obj->value.float_val=strtold(str, 0);
 	break;
+
+    default:
+	interp->error=1;
+	return false;
     }
     
 
@@ -763,9 +767,6 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 	object_type *result=0;						\
 	object_type *operand=0;						\
 									\
-	int arg_count=0;						\
-									\
-									\
 	/* No argument means we return 0 */				\
 	if(is_empty_list(interp, args)) {				\
 	    result=alloc_object(interp, FIXNUM);			\
@@ -792,6 +793,10 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 		break;							\
 	    case FLOATNUM:						\
 		result->value.float_val oper operand->value.float_val;	\
+		break;							\
+            default:							\
+		interp->error=1;					\
+		return false;						\
 		break;							\
 	    }								\
 									\
@@ -857,6 +862,10 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 		if(!(first->value.float_val test next->value.float_val)) { \
 		    return false;					\
 		}							\
+		break;							\
+            default:							\
+		interp->error=1;					\
+		return false;						\
 		break;							\
 	    }								\
 	    first=next;							\

@@ -86,7 +86,6 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 			      object_type *obj) {
 
     object_type *body=0;
-    object_type *result=0;
 
     TRACE("Co");
 

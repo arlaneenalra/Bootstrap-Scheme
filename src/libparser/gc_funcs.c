@@ -31,13 +31,14 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     }
     
     fail("Unable to new object");
+    
+    return 0;
 }
 
 /* Make a copy of an object */
 object_type *clone(interp_core_type *interp, object_type *obj) {
     object_type *new_obj;
     object_type *next=0;
-    char *str=0;
 
     /* don't try to clone a null */
     if(obj==0) {
@@ -59,5 +60,7 @@ object_type *clone(interp_core_type *interp, object_type *obj) {
     memcpy(new_obj, obj, sizeof(object_type));
     
     new_obj->next=next;
+
+    return new_obj;
 }
 

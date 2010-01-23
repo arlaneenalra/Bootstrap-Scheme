@@ -25,6 +25,8 @@
 
 object_type *cons(interp_core_type *interp, object_type *car,object_type *cdr);
 object_type *quote(interp_core_type *interp, object_type *obj);
+void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
+			object_type *value_list);
 
 void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value);
 object_type *get_binding(interp_core_type *interp, object_type *sym);
