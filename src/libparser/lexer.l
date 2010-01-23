@@ -1,5 +1,6 @@
 %option noyywrap reentrant bison-bridge
 %option yylineno
+%option   outfile="lex.yy.c" header-file="lex.yy.h"
 
 %{
 #include "scheme.h"

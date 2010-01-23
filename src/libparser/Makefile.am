@@ -12,4 +12,4 @@ MOSTLYCLEANFILES=scheme.h scheme.output
 
 include ../../Makefile.extra
 
-#EXTRA_DIST=core.h
+EXTRA_DIST=core.h util.h scheme_funcs.h gc_funcs.h
