@@ -367,6 +367,8 @@ void create_base_environment(interp_core_type *interp) {
 		create_symbol(interp, "else"),
 		true);
 
+    push_environment(interp, interp->cur_env);
+
 }
 
 /* Create an instance of the interpreter */

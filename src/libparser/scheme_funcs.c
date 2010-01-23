@@ -3,7 +3,6 @@
 #include "core.h"
 #include "scheme_funcs.h"
 #include "util.h"
-#include "gc.h"
 
 /* Create a new tuple object with a
    given car and cdr */

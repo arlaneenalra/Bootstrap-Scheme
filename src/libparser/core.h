@@ -5,17 +5,11 @@
 
 #include <inttypes.h>
 
-#include "scheme.h"
-
 /* Add in some debuggin messages */
 #ifdef DEBUG
-
 #define TRACE(x)  (void)fprintf(stderr, "%s",x);
-
 #else
-
 #define TRACE(x)
-
 #endif
 
 
@@ -147,7 +141,7 @@ typedef struct interp_core {
 
 /* include the bohem gc and our gc stuff */
 #include <gc.h> 
-#include "gc.h"
+#include "gc_funcs.h"
 
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
