@@ -11,7 +11,7 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
-	printf("\nUnound Variable: %s@%p\n", obj->value.symbol.name, obj);
+	printf("\nUnound Variable: %s@%p\n", obj->value.string_val, obj);
 
 	/* Unbound variable */
 	interp->error=1;

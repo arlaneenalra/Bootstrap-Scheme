@@ -39,11 +39,6 @@ typedef	struct tuple {
     struct object *cdr;
 } tuple_type;
 
-typedef	struct symbol {
-    char *name;
-    struct object *binding;
-} symbol_type;
-
 typedef struct object *(*fn_type)
     (struct interp_core *interp, struct object *);
 
@@ -70,7 +65,6 @@ typedef struct object {
 	char *string_val;
 	bool bool_val;
 	tuple_type tuple;
-	symbol_type symbol;
 	primitive_type primitive;
 	closure_type closure;
     } value;

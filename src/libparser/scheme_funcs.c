@@ -541,7 +541,7 @@ object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
 	return false;	
     }
 
-    obj=create_string(interp, car(args)->value.symbol.name);
+    obj=create_string(interp, car(args)->value.string_val);
     
     return obj;
 }

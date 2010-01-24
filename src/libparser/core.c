@@ -115,7 +115,7 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
         sym=car(top);
 
 	/* Is this the right symbol? */
-	if(strcmp(sym->value.symbol.name, str)==0) {
+	if(strcmp(sym->value.string_val, str)==0) {
 	    return sym;
 	}
 	
@@ -158,7 +158,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);
-    obj->value.symbol.name=c;
+    obj->value.string_val=c;
 	
     /* add our new symbol to the symbol list */
     list=cons(interp, obj, interp->symbols.list);
