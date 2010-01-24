@@ -155,7 +155,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    loop=0;
 		}
 
-	    } else {
+	    } else if(is_closure(interp, proc)) {
 		/* always evaluate arguments of compound procecdures */
 		evaled_args=eval_list(interp, cdr(obj));
 
@@ -171,7 +171,11 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    obj=eval(interp, obj);
 		    loop=0;
 		}
+	    } else {
+		interp->error=1;
+		return false;
 	    }
+
 	    
 	} else {
 	    /* we don't know how to evaluate this object */
