@@ -5,19 +5,6 @@
 
 #include <inttypes.h>
 
-#include "scheme.h"
-
-/* Add in some debuggin messages */
-#ifdef DEBUG
-
-#define TRACE(x)  (void)fprintf(stderr, "%s",x);
-
-#else
-
-#define TRACE(x)
-
-#endif
-
 
 typedef int8_t bool;
 struct interp_core;
@@ -37,12 +24,6 @@ typedef enum {
     CHAIN /* internal type */
 } object_type_enum;
 
-/* Used to tell add object that we are setting a car or cdr */
-typedef enum {
-    CAR,
-    CDR
-} setting_type_enum;
-
 /* used by the gc */
 typedef enum {
     MARK_RED, /* Everything else */
@@ -57,11 +38,6 @@ typedef	struct tuple {
     struct object *car;
     struct object *cdr;
 } tuple_type;
-
-typedef	struct symbol {
-    char *name;
-    struct object *binding;
-} symbol_type;
 
 typedef struct object *(*fn_type)
     (struct interp_core *interp, struct object *);
@@ -89,7 +65,6 @@ typedef struct object {
 	char *string_val;
 	bool bool_val;
 	tuple_type tuple;
-	symbol_type symbol;
 	primitive_type primitive;
 	closure_type closure;
     } value;
@@ -145,43 +120,19 @@ typedef struct interp_core {
 } interp_core_type;
 
 
-/* include the bohem gc and our gc stuff */
-#include <gc.h> 
-#include "gc.h"
-
-/* Function definitions */
-void set(interp_core_type *interp, setting_type_enum setting);
-int list_length(interp_core_type * interp, object_type *args); /* Find the length of a passed in list */
-
-
 interp_core_type *create_interp();
 void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *parse_string(interp_core_type *interp, char *in);
+
 object_type *eval(interp_core_type *interp, object_type *obj);
-object_type *eval_list(interp_core_type *interp, object_type *obj);
 void output(interp_core_type *interp, object_type *obj);
 
 bool has_error(interp_core_type *interp);
 
-void add_object(interp_core_type *interp, object_type *obj);
-void add_char(interp_core_type *interp, char *str);
-void add_number(interp_core_type *interp, char *str);
-void add_float(interp_core_type *interp, char *str);
-void add_string(interp_core_type *interp, char *str);
-void add_quote(interp_core_type *interp);
-
-object_type *create_string(interp_core_type *interp, char *str);
-
-void chain_state(interp_core_type *interp);
-void push_state(interp_core_type *interp);
-void pop_state(interp_core_type *interp);
-
-void push_environment(interp_core_type *interp, object_type *env);
 
 void end_of_file(interp_core_type *interp);
 
-object_type *create_symbol(interp_core_type *interp, char *str);
 
 #endif

@@ -5,6 +5,8 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
+#include "parser_internal.h"
+
 
 void create_booleans(interp_core_type *interp);
 
@@ -113,7 +115,7 @@ object_type *get_symbol(interp_core_type *interp, char *str) {
         sym=car(top);
 
 	/* Is this the right symbol? */
-	if(strcmp(sym->value.symbol.name, str)==0) {
+	if(strcmp(sym->value.string_val, str)==0) {
 	    return sym;
 	}
 	
@@ -156,7 +158,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);
-    obj->value.symbol.name=c;
+    obj->value.string_val=c;
 	
     /* add our new symbol to the symbol list */
     list=cons(interp, obj, interp->symbols.list);
@@ -263,7 +265,6 @@ void clear_state_stack(interp_core_type *interp) {
 
 /* Add a new environment on top of the current one */
 void push_environment(interp_core_type *interp, object_type *env) {
-    object_type *old_env=0;
 
     TRACE("Peu");
     
@@ -351,8 +352,6 @@ void create_empty_list(interp_core_type *interp) {
 
 /* setup the base environment */
 void create_base_environment(interp_core_type *interp) {
-    object_type *obj=0;
-    object_type *target=0;
 
     interp->cur_env=interp->empty_list;
 
@@ -360,12 +359,13 @@ void create_base_environment(interp_core_type *interp) {
        so, this is just the empty list */
     push_environment(interp,interp->empty_list);
 
-    bind_symbol_list(interp, primitive_list);
+    bind_symbol_list(interp, primitive_list, &interp->cur_env);
 
     /* for cond */
     bind_symbol(interp, 
 		create_symbol(interp, "else"),
-		true);
+		true,
+		&interp->cur_env);
 
 }
 
@@ -401,6 +401,7 @@ interp_core_type *create_interp() {
     }
     
     fail("Unable to create interpreter instance");
+    return 0;
 }
 
 /* Clean up allocations in the interpreter. */

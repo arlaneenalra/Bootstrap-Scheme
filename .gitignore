@@ -25,3 +25,4 @@ src/libparser/scheme.h
 src/libparser/scheme.c
 ylwrap
 TAGS
+*.gz

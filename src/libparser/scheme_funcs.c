@@ -1,9 +1,11 @@
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #include "core.h"
-#include "scheme_funcs.h"
 #include "util.h"
-#include "gc.h"
+#include "scheme_funcs.h"
+#include "parser_internal.h"
 
 /* Create a new tuple object with a
    given car and cdr */
@@ -71,24 +73,16 @@ object_type *create_primitive(interp_core_type *interp, fn_type primitive,
 }
 
 /* Bind a symbol to a given value */
-void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value) {
+void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value,
+		 object_type **env) {
     object_type *binding=0;
     
-    /* Check to see if a binding exists, 
-       and replace it if it does */
-    /*binding=get_binding(interp, sym);
-    
-    if(binding) {
-	cdr(binding)=value;
-	return;
-    }*/
-
     /* create a new binding as we didn't find one */
     binding=cons(interp, sym, value);
     
     /* add our new binding to the list of bindings */
-    car(interp->cur_env)=cons(interp, binding, 
-			  car(interp->cur_env));
+    car((*env))=cons(interp, binding, 
+		     car((*env)));
 }
 
 /* bind a parallel list of symbols and arguments */
@@ -111,7 +105,8 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
     }
 }
 
-void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
+void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
+		      object_type **env) {
     object_type *obj=0;
     int i=0;
 
@@ -121,7 +116,7 @@ void bind_symbol_list(interp_core_type *interp, binding_type *binding_list) {
 	bind_symbol(interp, obj, 
 		    create_primitive(interp, binding_list[i].primitive, 
 				     binding_list[i].eval_first, 
-				     binding_list[i].eval_end));
+				     binding_list[i].eval_end), env);
     }
 }
 
@@ -452,14 +447,16 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 
     if(is_symbol(interp, car(args))) {
 	bind_symbol(interp, car(args), /* Symbol */
-		    eval(interp, cadr(args))); /* Value */
+		    eval(interp, cadr(args)),
+		    &interp->cur_env); /* Value */
     } else {
 	/* It can only be a tagged list then */
 
 	bind_symbol(interp, caar(args), /* Symbol */
 		    prim_lambda(interp, 
 				cons(interp, cdar(args), /* Arguments */
-				     cdr(args)))); /* Body */
+				     cdr(args))),
+		    &interp->cur_env); /* Body */
     }
 
     return true;
@@ -580,7 +577,6 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
 /* Symbol to String */
 object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
-    char *name=0;
     
     /* make sure we have enough arguments */
     if(list_length(interp, args)!=1) {
@@ -593,7 +589,7 @@ object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
 	return false;	
     }
 
-    obj=create_string(interp, car(args)->value.symbol.name);
+    obj=create_string(interp, car(args)->value.string_val);
     
     return obj;
 }
@@ -601,7 +597,6 @@ object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
 /* String to Symbol */
 object_type *prim_string_to_sym(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
-    char *name=0;
     
     /* make sure we have enough arguments */
     if(list_length(interp, args)!=1) {
@@ -743,6 +738,10 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
     case FLOATNUM:
 	obj->value.float_val=strtold(str, 0);
 	break;
+
+    default:
+	interp->error=1;
+	return false;
     }
     
 
@@ -812,9 +811,6 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 	object_type *result=0;						\
 	object_type *operand=0;						\
 									\
-	int arg_count=0;						\
-									\
-									\
 	/* No argument means we return 0 */				\
 	if(is_empty_list(interp, args)) {				\
 	    result=alloc_object(interp, FIXNUM);			\
@@ -841,6 +837,10 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 		break;							\
 	    case FLOATNUM:						\
 		result->value.float_val oper operand->value.float_val;	\
+		break;							\
+            default:							\
+		interp->error=1;					\
+		return false;						\
 		break;							\
 	    }								\
 									\
@@ -906,6 +906,10 @@ TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 		if(!(first->value.float_val test next->value.float_val)) { \
 		    return false;					\
 		}							\
+		break;							\
+            default:							\
+		interp->error=1;					\
+		return false;						\
 		break;							\
 	    }								\
 	    first=next;							\
@@ -1015,12 +1019,48 @@ object_type *prim_or(interp_core_type *interp, object_type *args) {
 
 }
 
-/* output the contents of the current environment */
-object_type *prim_dump_env(interp_core_type *interp, object_type *args) {
-    printf("\nenv: %p=", interp->cur_env);
-    output(interp, interp->cur_env);
-    printf("\n");
-    return true;
+/* return the current environment */
+object_type *prim_interaction_environment(interp_core_type *interp, object_type *args) {
+    return interp->cur_env;
+}
+
+/* populate a new base environment */
+object_type *prim_null_environment(interp_core_type *interp, object_type *args) {
+    object_type *env=0;
+    
+    env=cons(interp, interp->empty_list, interp->empty_list);
+
+    /* bind default primitive symbols */
+    bind_symbol_list(interp, primitive_list, &env);
+
+    /* for cond */
+    bind_symbol(interp, 
+		create_symbol(interp, "else"),
+		true,
+		&env);
+
+    return env;
+}
+
+/* eval */
+object_type *prim_eval(interp_core_type *interp, object_type *args) {
+    int arg_count=list_length(interp, args);
+
+    /* we have to some arguments */
+    if(arg_count==0) {
+	interp->error=1;
+	return false;
+
+    } else if(arg_count==1) {
+	/* evaluate in the current environment */
+	return car(args);
+
+    } else  {
+	/* replace the current environment 
+	   with the passed in one */
+	interp->cur_env=cadr(args);
+	return car(args);
+    }
 }
 
 /* Setup scheme primitive function bindings */
@@ -1074,7 +1114,9 @@ binding_type primitive_list[]={
     {"symbol->string", &prim_sym_to_string, 1, 1},
     {"string->symbol", &prim_string_to_sym, 1, 1},
 
-    {"dump_env", &prim_dump_env, 1, 1},
+    {"interaction-environment", &prim_interaction_environment, 1, 1},
+    {"null-environment", &prim_null_environment, 1, 1},
+    {"eval", &prim_eval, 1, 0},
 
     {0,0} /* Terminate the list */
 };

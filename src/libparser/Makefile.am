@@ -1,7 +1,7 @@
 
 
 noinst_LIBRARIES=libparser.a
-libparser_a_SOURCES=lexer.l scheme.y core.c util.c gc.c \
+libparser_a_SOURCES=lexer.l scheme.y core.c util.c gc_funcs.c \
 	            scheme_funcs.c eval.c output.c
 
 BUILT_SOURCES=lexer.c scheme.c
@@ -12,4 +12,4 @@ MOSTLYCLEANFILES=scheme.h scheme.output
 
 include ../../Makefile.extra
 
-#EXTRA_DIST=core.h
+EXTRA_DIST=core.h util.h scheme_funcs.h gc_funcs.h

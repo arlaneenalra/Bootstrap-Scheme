@@ -1,6 +1,7 @@
 #include "core.h"
 #include "util.h"
 #include "scheme_funcs.h"
+#include "parser_internal.h"
 
 /* Evaluate a symbol */
 object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
@@ -10,13 +11,11 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
-	printf("\nUnound Variable: %s@%p\n", obj->value.symbol.name, obj);
-	printf("env: %p=", interp->cur_env);
-	output(interp, interp->cur_env);
-	printf("\n");
+	printf("\nUnound Variable: %s@%p\n", obj->value.string_val, obj);
+
 	/* Unbound variable */
 	interp->error=1;
-	return 0;
+	return false;
     }
     return cdr(binding);
 }
@@ -86,7 +85,6 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
 			      object_type *obj) {
 
     object_type *body=0;
-    object_type *result=0;
 
     TRACE("Co");
 
@@ -157,7 +155,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    loop=0;
 		}
 
-	    } else {
+	    } else if(is_closure(interp, proc)) {
 		/* always evaluate arguments of compound procecdures */
 		evaled_args=eval_list(interp, cdr(obj));
 
@@ -173,7 +171,11 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    obj=eval(interp, obj);
 		    loop=0;
 		}
+	    } else {
+		interp->error=1;
+		return false;
 	    }
+
 	    
 	} else {
 	    /* we don't know how to evaluate this object */

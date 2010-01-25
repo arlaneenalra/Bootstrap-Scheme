@@ -1,9 +1,23 @@
-(define (id x) x)
+(interaction-environment)
 
-(id 1)
+(define env (null-environment))
 
-(define (id2 y) (id y))
+(interaction-environment)
 
-(id2 2)
+
+(eval '(define x 2))
+
+(eval '(define z 1) env)
+
+(eval 'z env)
+(eval 'x env)
+
+z
+
+x
+
+(interaction-environment)
+
+env
 
 (quit)

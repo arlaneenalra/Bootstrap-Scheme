@@ -1,6 +1,6 @@
 (define (factorial n)
   (define (iter product counter max-count)
-    (dump_env)
+    (interaction-environment)
     (if (> counter max-count)
 	product
 	(iter (* counter product)
@@ -11,7 +11,7 @@
 (factorial 4)
 ;(factorial 5)
 
-(dump_env)
+(interaction-environment)
 
 (quit)
 

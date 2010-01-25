@@ -23,10 +23,22 @@
 #define false interp->boolean.false
 #define true interp->boolean.true
 
+typedef struct binding {
+    char *symbol;
+    fn_type primitive;
+    bool eval_first;
+    bool eval_end;
+} binding_type;
+
 object_type *cons(interp_core_type *interp, object_type *car,object_type *cdr);
 object_type *quote(interp_core_type *interp, object_type *obj);
+void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
+			object_type *value_list);
 
-void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value);
+void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value,
+		 object_type **env);
+void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
+		      object_type **env);
 object_type *get_binding(interp_core_type *interp, object_type *sym);
 
 
@@ -39,16 +51,6 @@ bool is_true(interp_core_type *interp, object_type *obj);
 bool is_tuple(interp_core_type *interp, object_type *obj);
 bool is_closure(interp_core_type *interp, object_type *obj);
 bool is_empty_list(interp_core_type *interp,object_type *obj);
-
-
-/* Primitives */
-
-typedef struct binding {
-    char *symbol;
-    fn_type primitive;
-    bool eval_first;
-    bool eval_end;
-} binding_type;
 
 
 /* List of primitives to bind */

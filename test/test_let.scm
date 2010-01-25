@@ -5,5 +5,5 @@
 
 (let (x 1) (+ x 1))
 
-(dump_env)
+(interaction-environment)
 (quit)
