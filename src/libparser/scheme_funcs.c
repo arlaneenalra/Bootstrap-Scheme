@@ -356,6 +356,7 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 
 }
 
+
 /* begin */
 object_type *prim_begin(interp_core_type *interp, object_type *args) {
     
@@ -1319,6 +1320,24 @@ object_type *prim_close(interp_core_type *interp, object_type *args) {
     return true;
 }
 
+/* error */
+object_type *prim_error(interp_core_type *interp, object_type *args) {
+    
+    /* If we don't have any arguments, return an 
+       empty list */
+    if(is_empty_list(interp, args)) {
+	return quote(interp, interp->empty_list);
+    }
+    
+    /* evalueate each argument */
+    while(!is_empty_list(interp, args)) {
+	output_stream(interp, car(args), stderr);
+	fprintf(stderr, " ");
+	args=cdr(args);
+    }
+
+    return prim_quit(interp, interp->empty_list);
+}
 
 
 /* Setup scheme primitive function bindings */
@@ -1332,6 +1351,8 @@ binding_type primitive_list[]={
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 0},
     {"let", &prim_let, 0, 0},
+
+    {"error",&prim_error, 1, 1},
 
     {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 1},
