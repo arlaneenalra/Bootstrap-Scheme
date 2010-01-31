@@ -192,7 +192,7 @@ bool is_tagged_list(interp_core_type *interp, object_type *obj) {
 
 /* Is this object a tuple? */
 bool is_tuple(interp_core_type *interp, object_type *obj) {
-    return obj!=0 && obj->type==TUPLE;
+    return obj!=0 && obj->type==TUPLE && obj!=interp->empty_list;
 }
 
 /* Is this is a primitive? */
@@ -829,7 +829,7 @@ TEST(car(args)!=0 && car(args)->type==SYM, prim_is_symbol)
 TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
 TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
-TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
+TEST(is_tuple(interp, car(args)), prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_is_eof_object)
 
