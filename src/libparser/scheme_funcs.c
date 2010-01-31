@@ -1074,6 +1074,57 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
     
 }
 
+/* read-char */
+object_type *prim_read_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char c=0;
+
+    FILE *fin=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val;
+    }
+    
+    
+    c=fgetc(fin);
+
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c;
+
+    return obj;
+}
+
+/* peek-char */
+object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char c=0;
+
+    FILE *fin=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val;
+    }
+    
+    
+    /* undo the read */
+    c=fgetc(fin);
+    ungetc(c, fin);
+
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c;
+
+    return obj;
+}
+
+
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0, 1},
@@ -1128,5 +1179,8 @@ binding_type primitive_list[]={
     {"null-environment", &prim_null_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
     {"load", &prim_load, 1, 0},
+
+    {"read-char", &prim_read_char, 1, 1},
+    {"peek-char", &prim_peek_char, 1, 1},
     {0,0} /* Terminate the list */
 };

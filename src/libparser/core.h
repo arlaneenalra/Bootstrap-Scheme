@@ -18,6 +18,7 @@ typedef enum {
     STRING,
     TUPLE,
     SYM,
+    PORT,
 
     PRIM, /* primitive c functions */
     CLOSURE, /* a closure */
@@ -67,6 +68,7 @@ typedef struct object {
 	tuple_type tuple;
 	primitive_type primitive;
 	closure_type closure;
+	FILE *port_val;
     } value;
 
     gc_mark_type mark;

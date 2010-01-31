@@ -111,6 +111,9 @@ void output(interp_core_type *interp, object_type *obj) {
     case PRIM:
 	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);
 	break;
+    case PORT:
+	printf("#<port :@%p>", obj->value.port_val);
+	break;
     case CLOSURE:
 
 	/* avoid infinite recursion */
