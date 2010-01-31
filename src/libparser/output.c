@@ -112,7 +112,8 @@ void output(interp_core_type *interp, object_type *obj) {
 	printf("#<primitive procedure:@%p>", obj->value.primitive.fn);
 	break;
     case PORT:
-	printf("#<port :@%p>", obj->value.port_val);
+	printf("#<port:@%p in:%i out:%i>", obj->value.port_val.port,
+	       obj->value.port_val.input, obj->value.port_val.output);
 	break;
     case CLOSURE:
 

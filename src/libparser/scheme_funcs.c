@@ -1086,7 +1086,7 @@ object_type *prim_read_char(interp_core_type *interp, object_type *args) {
     if(len==0) {
 	fin=stdin;
     } else {
-	fin=car(args)->value.port_val;
+	fin=car(args)->value.port_val.port;
     }
     
     
@@ -1110,7 +1110,7 @@ object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
     if(len==0) {
 	fin=stdin;
     } else {
-	fin=car(args)->value.port_val;
+	fin=car(args)->value.port_val.port;
     }
     
     
@@ -1123,6 +1123,67 @@ object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
 
     return obj;
 }
+
+/* open-input-file */
+object_type *prim_open_input_file(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *filename=0;
+    FILE *fin=0;
+    
+    /* make sure we have a file name */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+
+    /* TODO: add type checking */
+    filename=car(args)->value.string_val;
+
+    fin=fopen(filename, "r");
+    
+    /* make sure that we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=fin;
+    obj->value.port_val.input=1;
+    
+    return obj;
+}
+
+
+/* close-input-file close-output-file */
+object_type *prim_close(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    obj=car(args);
+
+    /* don't want to close something that is
+       not a port */
+    if(obj->type != PORT) {
+	interp->error=1;
+	return false;
+    }
+
+    /* attempt to close the port, checking for errors */
+    if(fclose(obj->value.port_val.port)==EOF) {
+	/* Something went wrong here */
+	interp->error=1;
+	return false;
+    }
+
+    
+    return true;
+}
+
 
 
 /* Setup scheme primitive function bindings */
@@ -1182,5 +1243,11 @@ binding_type primitive_list[]={
 
     {"read-char", &prim_read_char, 1, 1},
     {"peek-char", &prim_peek_char, 1, 1},
+
+    {"open-input-file", &prim_open_input_file, 1, 1},
+
+    {"close-input-file", &prim_close, 1, 1},
+    {"close-output-file", &prim_close, 1, 1},
+    
     {0,0} /* Terminate the list */
 };

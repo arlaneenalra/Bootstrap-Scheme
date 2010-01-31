@@ -49,6 +49,12 @@ typedef struct primitive {
     bool eval_end; /* evaluate result? */
 } primitive_type;
 
+typedef struct port {
+    FILE *port;
+    bool input;
+    bool output;
+} port_type;
+
 typedef struct closure {
     struct object *param;
     struct object *body;
@@ -68,7 +74,7 @@ typedef struct object {
 	tuple_type tuple;
 	primitive_type primitive;
 	closure_type closure;
-	FILE *port_val;
+	port_type port_val;
     } value;
 
     gc_mark_type mark;
