@@ -1036,6 +1036,14 @@ object_type *prim_null_environment(interp_core_type *interp, object_type *args) 
     
     env=cons(interp, interp->empty_list, interp->empty_list);
 
+    return env;
+}
+/* populate a new base environment */
+object_type *prim_environment(interp_core_type *interp, object_type *args) {
+    object_type *env=0;
+    
+    env=cons(interp, interp->empty_list, interp->empty_list);
+
     /* bind default primitive symbols */
     bind_symbol_list(interp, primitive_list, &env);
 
@@ -1443,6 +1451,7 @@ binding_type primitive_list[]={
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
+    {"environment", &prim_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
 
     {"load", &prim_load, 1, 0},
