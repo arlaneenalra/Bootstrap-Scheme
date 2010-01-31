@@ -1078,6 +1078,36 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
     
 }
 
+/* read */
+object_type *prim_read(interp_core_type *interp, object_type *args) {
+    FILE *fin=0;
+    
+    object_type *parsed=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val.port;
+    }
+    
+    push_parse_state(interp, fin);
+
+    parsed=parse_chain(interp);
+
+    if(!interp->running) {
+	parsed=eof_object;
+    }
+
+    pop_parse_state(interp);
+
+    interp->running=1;
+
+    return parsed;
+    
+}
+
 /* read-char */
 object_type *prim_read_char(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -1255,6 +1285,7 @@ binding_type primitive_list[]={
     {"null-environment", &prim_null_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
     {"load", &prim_load, 1, 0},
+    {"read", &prim_read, 1, 1},
 
     {"read-char", &prim_read_char, 1, 1},
     {"peek-char", &prim_peek_char, 1, 1},
