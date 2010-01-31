@@ -21,6 +21,7 @@ log.txt
 src/bootstrap
 src/libparser/lexer.c
 src/libparser/scheme.output
+src/libparser/lexer.h
 src/libparser/scheme.h
 src/libparser/scheme.c
 ylwrap

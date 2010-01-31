@@ -7,6 +7,9 @@
 
 #include "parser_internal.h"
 
+#include "scheme.h"
+#include "lexer.h"
+
 
 void create_booleans(interp_core_type *interp);
 
@@ -312,6 +315,28 @@ object_type *parse_string(interp_core_type *interp, char *in) {
     TRACE("\n")
     
     return interp->added;
+}
+
+/* Parse used by load */
+object_type *parse_chain(interp_core_type *interp) {
+    reset(interp);
+    
+
+    if(yyparse(interp, interp->scanner)) {
+	return 0;
+    }
+
+    return interp->added;
+}
+
+void push_parse_state(interp_core_type *interp, FILE *fin) {
+    yypush_buffer_state(
+			yy_create_buffer(fin, YY_BUF_SIZE, interp->scanner),
+			interp->scanner);
+}
+
+void pop_parse_state(interp_core_type *interp) {
+    yypop_buffer_state(interp->scanner);
 }
 
 /* Create an instance of the Quote symbol */

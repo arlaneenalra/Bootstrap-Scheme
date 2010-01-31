@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -1015,6 +1016,64 @@ object_type *prim_eval(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* load primitive */
+object_type *prim_load(interp_core_type *interp, object_type *args) {
+    FILE *fin=0;
+    char *filename=0;
+    
+    object_type *parse_result=interp->empty_list;
+    object_type *current=0;
+    object_type *parsed=0;
+    
+    /* make sure that we have one argument */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    filename=car(args)->value.string_val;
+    
+    /* open the file */
+    fin=fopen(filename, "r");
+
+    /* make sure we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+    
+    push_parse_state(interp, fin);
+
+    /* create our implicit begin form */
+    current=parse_result=cons(interp,
+		      create_symbol(interp, "begin"),interp->empty_list);
+
+    /* parse all objects in the file 
+       until eof or error */
+    while(interp->running==1 && interp->error==0) {
+
+	parsed=parse_chain(interp);
+
+	if(interp->running) {
+	    /* parse the file and attach it to our begin form */
+	    cdr(current)=cons(interp,
+			      parsed, interp->empty_list);
+
+	    current=cdr(current);
+	}
+
+    }
+
+    pop_parse_state(interp);
+
+    interp->running=1;
+
+    fclose(fin);
+
+    return parse_result;
+    
+}
+
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0, 1},
@@ -1024,7 +1083,7 @@ binding_type primitive_list[]={
     {"if", &prim_if, 0, 0},
     {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
-    {"begin", &prim_begin, 0, 1},
+    {"begin", &prim_begin, 0, 0},
     {"let", &prim_let, 0, 0},
 
     {"cons", &prim_cons, 1, 1},
@@ -1068,6 +1127,6 @@ binding_type primitive_list[]={
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
-
+    {"load", &prim_load, 1, 0},
     {0,0} /* Terminate the list */
 };

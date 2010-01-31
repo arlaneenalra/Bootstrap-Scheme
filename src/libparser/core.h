@@ -126,6 +126,10 @@ void cleanup_interp(interp_core_type *interp);
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *parse_string(interp_core_type *interp, char *in);
 
+void push_parse_state(interp_core_type *interp, FILE *in);
+void pop_parse_state(interp_core_type *interp);
+object_type *parse_chain(interp_core_type *interp);
+
 object_type *eval(interp_core_type *interp, object_type *obj);
 void output(interp_core_type *interp, object_type *obj);
 
