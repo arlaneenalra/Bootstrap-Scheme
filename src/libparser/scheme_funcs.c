@@ -269,7 +269,7 @@ object_type *prim_set_cdr(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    cadr(args)=cadr(args);
+    cdar(args)=cadr(args);
     return true;
 }
 
