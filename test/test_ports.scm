@@ -23,8 +23,17 @@
       #f))
 
 
-(cat in-port)
+(define (dump-all char-list)
+  (if (eq? '() char-list)
+      #t
+      (begin
+	(write-char (car char-list))
+	(dump-all (cdr char-list)))))
+
+(define loaded-file (cat in-port))
 (cat "not a port")
+
+(dump-all loaded-file)
       
 (close-input-port in-port)
 

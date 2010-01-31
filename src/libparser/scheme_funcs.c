@@ -1137,6 +1137,37 @@ object_type *prim_write(interp_core_type *interp, object_type *args) {
     return true;
 }
 
+/* write-char */
+object_type *prim_write_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    FILE *fout=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==1) {
+	/* writing to stdout */
+	fout=stdout;
+
+    } else if( len==2) {
+	/* writing to specified port */
+	fout=cadr(args)->value.port_val.port;
+
+    } else {
+	/* we have to have something to write */
+	interp->error=1;
+	return false;
+    }
+
+    /* object graph to write */
+    obj=car(args);
+    
+    /* TODO: add type checking here */
+    fputc(obj->value.char_val, fout);
+    fflush(fout);
+
+    return true;
+}
+
 /* read-char */
 object_type *prim_read_char(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -1349,6 +1380,7 @@ binding_type primitive_list[]={
     {"write", &prim_write, 1, 1},
 
     {"read-char", &prim_read_char, 1, 1},
+    {"write-char", &prim_write_char, 1, 1},
     {"peek-char", &prim_peek_char, 1, 1},
 
     {"open-input-port", &prim_open_input_file, 1, 1},
