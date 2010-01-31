@@ -430,10 +430,6 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 	}
     }
 
-    printf("\nresult:");
-    output(interp, call);
-    printf("\n");
-
     /* return the last argument */
     return call;
 }
