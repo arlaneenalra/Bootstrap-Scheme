@@ -26,6 +26,19 @@
 (cat in-port)
 (cat "not a port")
       
+(close-input-port in-port)
+
+; testing read
+
+(set! in-port (open-input-file "test/test_load.scm"))
+
+(eval (read in-port))
+(eval (read in-port))
+(eval (read in-port))
+(eval (read in-port))
+
+(eof-object? (read in-port))
+
 
 (close-input-port in-port)
 
