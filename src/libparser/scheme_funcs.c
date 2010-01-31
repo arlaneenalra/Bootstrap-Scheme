@@ -389,19 +389,22 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
     object_type *call=0;
     object_type *tail=0;
     object_type *result=0;
+    int len=0;
     
     /* If we don't have any arguments, return an 
        empty list */
-    if(list_length(interp, args)<1) {
+    len=list_length(interp, args);
+    if(len<1) {
 	interp->error=1;
 	return false;
     }
 
+    /* setup the procedure all */
     tail=call=cons(interp, car(args), interp->empty_list);
 
     args=cdr(args);
 
-    if(is_tuple(interp, car(args))) {
+    if(len==2) {
 	args=eval(interp, car(args));
 	
 	/* propgate errors */
@@ -411,15 +414,14 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 
 	cdr(call)=args;
     } else {
-    
 	/* evalueate each argument */
 	while(!is_empty_list(interp, args)) {
 
 	    result=eval(interp, car(args));
 
 	    if(!is_empty_list(interp, result)) {
-		
 		tail=cdr(tail)=cons(interp, result, interp->empty_list);
+
 	    } else {
 		break;
 	    }
@@ -427,6 +429,10 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 	    args=cdr(args);
 	}
     }
+
+    printf("\nresult:");
+    output(interp, call);
+    printf("\n");
 
     /* return the last argument */
     return call;
