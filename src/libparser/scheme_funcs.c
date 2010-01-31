@@ -92,7 +92,7 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
 
     object_type *binding=0;
 
-    while(!is_empty_list(interp, sym_list)) {
+    while(!is_empty_list(interp, sym_list) && !is_empty_list(interp, value_list)) {
 
 	/* create a new binding as we didn't find one */
 	binding=cons(interp, car(sym_list), car(value_list));
@@ -103,6 +103,13 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
 
 	sym_list=cdr(sym_list);
 	value_list=cdr(value_list);
+    }
+
+    /* make sure that we have the same number of arguments
+       as we have symbols */
+    if(!is_empty_list(interp, sym_list) &&
+       !is_empty_list(interp, value_list)) {
+	interp->error=1;
     }
 }
 
@@ -192,7 +199,7 @@ bool is_tagged_list(interp_core_type *interp, object_type *obj) {
 
 /* Is this object a tuple? */
 bool is_tuple(interp_core_type *interp, object_type *obj) {
-    return obj!=0 && obj->type==TUPLE && obj!=interp->empty_list;
+    return obj!=0 && obj->type==TUPLE;
 }
 
 /* Is this is a primitive? */
@@ -318,7 +325,7 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
     
     /* make sure we have a tuple */
     if(!is_tuple(interp, next)) {
-	interp->error=0;
+	interp->error=1;
 	return false;
     }
 
@@ -326,11 +333,12 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
     while(!is_empty_list(interp, next)) {
 
 	/* avoid segfaults */
-	if(!is_tuple(interp, car(next)) || caar(next)==0 ||
-	   !is_tuple(interp, cdar(next)) || !cadar(next)==0) {
-	    interp->error=1;
-	    return false;
-	}
+	/* if(!is_tuple(interp, car(next)) || caar(next)==0 || */
+	/*    !is_tuple(interp, cdar(next)) || !cadar(next)==0) { */
+	/*     interp->error=1; */
+
+	/*     return false; */
+	/*     } */
 
 	sym_list=cons(interp, caar(next), sym_list);
 	arg_list=cons(interp, cadar(next), arg_list);
@@ -349,8 +357,8 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 		   cons(interp, sym_list, body)),
 	      arg_list);
 
-    output(interp, next);
-    printf("\n");
+    /*    output(interp, next);
+	  printf("\n");*/
 
     return next;
 
@@ -871,13 +879,13 @@ OPERATION(/=, prim_div)
     }			 						\
 
 
-TEST(car(args)==0, prim_is_null)
+TEST(is_empty_list(interp, car(args)), prim_is_null)
 TEST(car(args)!=0 && car(args)->type==BOOL, prim_is_boolean)
 TEST(car(args)!=0 && car(args)->type==SYM, prim_is_symbol)
 TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
 TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
-TEST(is_tuple(interp, car(args)), prim_is_tuple)
+TEST(is_tuple(interp, car(args)) && car(args)!=interp->empty_list, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_is_eof_object)
 

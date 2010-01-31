@@ -159,6 +159,17 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		/* always evaluate arguments of compound procecdures */
 		evaled_args=eval_list(interp, cdr(obj));
 
+		/* check for error evaluating arguments */
+		if(has_error(interp)) {
+		    printf("\nfailed evaluating:");
+		    output(interp, obj);
+		    printf("\nwith args:");
+		    output(interp, cdr(obj));
+		    printf("\n");
+		    
+		    return false;
+		}
+
 		push_environment(interp, proc->value.closure.env);
 
 		bind_argument_list(interp, proc->value.closure.param, evaled_args);
