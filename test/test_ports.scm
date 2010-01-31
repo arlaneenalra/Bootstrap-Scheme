@@ -17,10 +17,14 @@
 	buffer
 	(cat-internal port 
 		      (cons (read-char port) buffer))))
-  (invert (cat-internal port '())))
+
+  (if (input-port? port) 
+      (invert (cat-internal port '()))
+      #f))
 
 
 (cat in-port)
+(cat "not a port")
       
 
 (close-input-port in-port)

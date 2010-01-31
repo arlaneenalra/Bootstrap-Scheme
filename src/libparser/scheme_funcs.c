@@ -830,7 +830,10 @@ TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
 TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
-TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_eof_object)
+TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_is_eof_object)
+
+TEST(car(args)!=0 && car(args)->type==PORT && car(args)->value.port_val.input, prim_is_input_port)
+TEST(car(args)!=0 && car(args)->type==PORT && car(args)->value.port_val.output, prim_is_output_port)
 
 #define NUMERIC_TEST(test, name)					\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -1262,7 +1265,9 @@ binding_type primitive_list[]={
     {"close-input-port", &prim_close, 1, 1},
     {"close-output-port", &prim_close, 1, 1},
 
-    {"eof-object?", &prim_eof_object, 1, 1},
+    {"eof-object?", &prim_is_eof_object, 1, 1},
+    {"input-port?", &prim_is_input_port, 1, 1},
+    {"output-port?", &prim_is_output_port, 1, 1},
     
     {0,0} /* Terminate the list */
 };
