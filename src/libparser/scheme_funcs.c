@@ -830,6 +830,7 @@ TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
 TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
+TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_eof_object)
 
 #define NUMERIC_TEST(test, name)					\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -1092,6 +1093,12 @@ object_type *prim_read_char(interp_core_type *interp, object_type *args) {
     
     c=fgetc(fin);
 
+    /* check for eof */
+    if(c==EOF) {
+	return eof_object;
+    }
+
+
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c;
 
@@ -1117,6 +1124,11 @@ object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
     /* undo the read */
     c=fgetc(fin);
     ungetc(c, fin);
+
+    /* check for eof */
+    if(c==EOF) {
+	return eof_object;
+    }
 
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c;
@@ -1244,10 +1256,13 @@ binding_type primitive_list[]={
     {"read-char", &prim_read_char, 1, 1},
     {"peek-char", &prim_peek_char, 1, 1},
 
+    {"open-input-port", &prim_open_input_file, 1, 1},
     {"open-input-file", &prim_open_input_file, 1, 1},
 
-    {"close-input-file", &prim_close, 1, 1},
-    {"close-output-file", &prim_close, 1, 1},
+    {"close-input-port", &prim_close, 1, 1},
+    {"close-output-port", &prim_close, 1, 1},
+
+    {"eof-object?", &prim_eof_object, 1, 1},
     
     {0,0} /* Terminate the list */
 };

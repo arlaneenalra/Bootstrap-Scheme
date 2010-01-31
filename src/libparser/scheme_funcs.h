@@ -22,6 +22,7 @@
 
 #define false interp->boolean.false
 #define true interp->boolean.true
+#define eof_object interp->eof_object
 
 typedef struct binding {
     char *symbol;

@@ -110,6 +110,8 @@ typedef struct interp_core {
 
     /* Object to be attached to the object graph */
     object_type *added;
+    
+    object_type *eof_object;
 
     /* Object we are currently working on */
     object_type *current;

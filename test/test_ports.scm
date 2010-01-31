@@ -3,12 +3,19 @@
 ; open the port
 (define in-port (open-input-file "test/test_ports.scm"))
 
-(read-char in-port)
-(peek-char in-port)
-(read-char in-port)
-(read-char in-port)
-(read-char in-port)
+; read a file in and create a list of characters in inverse order
+(define (invert port)
+  (define (invert-internal port buffer)
+    (if (eof-object? (peek-char port))
+	buffer
+	(invert-internal port 
+		      (cons (read-char port) buffer))))
+  (invert-internal port '()))
 
-(close-input-file in-port)
+
+(invert in-port)
+      
+
+(close-input-port in-port)
 
 

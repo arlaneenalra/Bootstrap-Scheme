@@ -375,6 +375,15 @@ void create_empty_list(interp_core_type *interp) {
     interp->empty_list=obj;
 }
 
+/* Create a marker for EOF */
+void create_eof_object(interp_core_type *interp) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp,CHAR);
+
+    eof_object=obj;
+}
+
 /* setup the base environment */
 void create_base_environment(interp_core_type *interp) {
 
@@ -413,6 +422,9 @@ interp_core_type *create_interp() {
 	
 	/* create the empty list */
 	create_empty_list(interp);
+
+	/* create the eof_object */
+	create_eof_object(interp);
 
 	/* setup the base environment */
 	create_base_environment(interp);
