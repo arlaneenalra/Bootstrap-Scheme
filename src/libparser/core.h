@@ -141,7 +141,9 @@ void pop_parse_state(interp_core_type *interp);
 object_type *parse_chain(interp_core_type *interp);
 
 object_type *eval(interp_core_type *interp, object_type *obj);
+
 void output(interp_core_type *interp, object_type *obj);
+void output_stream(interp_core_type *interp, object_type *obj, FILE *fout);
 
 bool has_error(interp_core_type *interp);
 

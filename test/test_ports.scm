@@ -39,7 +39,11 @@
 
 (eof-object? (read in-port))
 
-
 (close-input-port in-port)
 
+(define out-port (open-output-file "garbage.txt"))
+
+(write '(1 2 3 4 5.1 ) out-port)
+
+(close-output-port out-port)
 

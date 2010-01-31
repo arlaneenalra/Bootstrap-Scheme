@@ -1108,6 +1108,35 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
     
 }
 
+/* write */
+object_type *prim_write(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    FILE *fout=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==1) {
+	/* writing to stdout */
+	fout=stdout;
+
+    } else if( len==2) {
+	/* writing to specified port */
+	fout=cadr(args)->value.port_val.port;
+
+    } else {
+	/* we have to have something to write */
+	interp->error=1;
+	return false;
+    }
+
+    /* object graph to write */
+    obj=car(args);
+    
+    output_stream(interp, obj, fout);
+    
+    return true;
+}
+
 /* read-char */
 object_type *prim_read_char(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -1199,6 +1228,36 @@ object_type *prim_open_input_file(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* open-output-file */
+object_type *prim_open_output_file(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *filename=0;
+    FILE *fin=0;
+    
+    /* make sure we have a file name */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+
+    /* TODO: add type checking */
+    filename=car(args)->value.string_val;
+
+    fin=fopen(filename, "w");
+    
+    /* make sure that we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=fin;
+    obj->value.port_val.output=1;
+    
+    return obj;
+}
+
 
 /* close-input-file close-output-file */
 object_type *prim_close(interp_core_type *interp, object_type *args) {
@@ -1284,14 +1343,19 @@ binding_type primitive_list[]={
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
+
     {"load", &prim_load, 1, 0},
     {"read", &prim_read, 1, 1},
+    {"write", &prim_write, 1, 1},
 
     {"read-char", &prim_read_char, 1, 1},
     {"peek-char", &prim_peek_char, 1, 1},
 
     {"open-input-port", &prim_open_input_file, 1, 1},
     {"open-input-file", &prim_open_input_file, 1, 1},
+
+    {"open-output-port", &prim_open_output_file, 1, 1},
+    {"open-output-file", &prim_open_output_file, 1, 1},
 
     {"close-input-port", &prim_close, 1, 1},
     {"close-output-port", &prim_close, 1, 1},
