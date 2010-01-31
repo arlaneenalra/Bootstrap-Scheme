@@ -7,6 +7,9 @@
 
 #include "parser_internal.h"
 
+#include "scheme.h"
+#include "lexer.h"
+
 
 void create_booleans(interp_core_type *interp);
 
@@ -314,6 +317,28 @@ object_type *parse_string(interp_core_type *interp, char *in) {
     return interp->added;
 }
 
+/* Parse used by load */
+object_type *parse_chain(interp_core_type *interp) {
+    reset(interp);
+    
+
+    if(yyparse(interp, interp->scanner)) {
+	return 0;
+    }
+
+    return interp->added;
+}
+
+void push_parse_state(interp_core_type *interp, FILE *fin) {
+    yypush_buffer_state(
+			yy_create_buffer(fin, YY_BUF_SIZE, interp->scanner),
+			interp->scanner);
+}
+
+void pop_parse_state(interp_core_type *interp) {
+    yypop_buffer_state(interp->scanner);
+}
+
 /* Create an instance of the Quote symbol */
 void create_quote(interp_core_type * interp) {
     object_type *obj=0;
@@ -348,6 +373,15 @@ void create_empty_list(interp_core_type *interp) {
     obj=alloc_object(interp,TUPLE);
 
     interp->empty_list=obj;
+}
+
+/* Create a marker for EOF */
+void create_eof_object(interp_core_type *interp) {
+    object_type *obj=0;
+
+    obj=alloc_object(interp,CHAR);
+
+    eof_object=obj;
 }
 
 /* setup the base environment */
@@ -388,6 +422,9 @@ interp_core_type *create_interp() {
 	
 	/* create the empty list */
 	create_empty_list(interp);
+
+	/* create the eof_object */
+	create_eof_object(interp);
 
 	/* setup the base environment */
 	create_base_environment(interp);

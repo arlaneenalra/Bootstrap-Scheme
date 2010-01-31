@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -191,7 +192,7 @@ bool is_tagged_list(interp_core_type *interp, object_type *obj) {
 
 /* Is this object a tuple? */
 bool is_tuple(interp_core_type *interp, object_type *obj) {
-    return obj!=0 && obj->type==TUPLE;
+    return obj!=0 && obj->type==TUPLE && obj!=interp->empty_list;
 }
 
 /* Is this is a primitive? */
@@ -354,6 +355,7 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
     return next;
 
 }
+
 
 /* begin */
 object_type *prim_begin(interp_core_type *interp, object_type *args) {
@@ -875,8 +877,12 @@ TEST(car(args)!=0 && car(args)->type==SYM, prim_is_symbol)
 TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
 TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
-TEST(car(args)!=0 && car(args)->type==TUPLE, prim_is_tuple)
+TEST(is_tuple(interp, car(args)), prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
+TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_is_eof_object)
+
+TEST(car(args)!=0 && car(args)->type==PORT && car(args)->value.port_val.input, prim_is_input_port)
+TEST(car(args)!=0 && car(args)->type==PORT && car(args)->value.port_val.output, prim_is_output_port)
 
 #define NUMERIC_TEST(test, name)					\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -1063,6 +1069,325 @@ object_type *prim_eval(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* load primitive */
+object_type *prim_load(interp_core_type *interp, object_type *args) {
+    FILE *fin=0;
+    char *filename=0;
+    
+    object_type *parse_result=interp->empty_list;
+    object_type *current=0;
+    object_type *parsed=0;
+    
+    /* make sure that we have one argument */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    filename=car(args)->value.string_val;
+    
+    /* open the file */
+    fin=fopen(filename, "r");
+
+    /* make sure we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+    
+    push_parse_state(interp, fin);
+
+    /* create our implicit begin form */
+    current=parse_result=cons(interp,
+		      create_symbol(interp, "begin"),interp->empty_list);
+
+    /* parse all objects in the file 
+       until eof or error */
+    while(interp->running==1 && interp->error==0) {
+
+	parsed=parse_chain(interp);
+
+	if(interp->running) {
+	    /* parse the file and attach it to our begin form */
+	    cdr(current)=cons(interp,
+			      parsed, interp->empty_list);
+
+	    current=cdr(current);
+	}
+
+    }
+
+    pop_parse_state(interp);
+
+    interp->running=1;
+
+    fclose(fin);
+
+    return parse_result;
+    
+}
+
+/* read */
+object_type *prim_read(interp_core_type *interp, object_type *args) {
+    FILE *fin=0;
+    
+    object_type *parsed=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val.port;
+    }
+    
+    push_parse_state(interp, fin);
+
+    parsed=parse_chain(interp);
+
+    if(!interp->running) {
+	parsed=eof_object;
+    }
+
+    pop_parse_state(interp);
+
+    interp->running=1;
+
+    return parsed;
+    
+}
+
+/* write */
+object_type *prim_write(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    FILE *fout=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==1) {
+	/* writing to stdout */
+	fout=stdout;
+
+    } else if( len==2) {
+	/* writing to specified port */
+	fout=cadr(args)->value.port_val.port;
+
+    } else {
+	/* we have to have something to write */
+	interp->error=1;
+	return false;
+    }
+
+    /* object graph to write */
+    obj=car(args);
+    
+    output_stream(interp, obj, fout);
+    
+    return true;
+}
+
+/* write-char */
+object_type *prim_write_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    FILE *fout=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==1) {
+	/* writing to stdout */
+	fout=stdout;
+
+    } else if( len==2) {
+	/* writing to specified port */
+	fout=cadr(args)->value.port_val.port;
+
+    } else {
+	/* we have to have something to write */
+	interp->error=1;
+	return false;
+    }
+
+    /* object graph to write */
+    obj=car(args);
+    
+    /* TODO: add type checking here */
+    fputc(obj->value.char_val, fout);
+    fflush(fout);
+
+    return true;
+}
+
+/* read-char */
+object_type *prim_read_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char c=0;
+
+    FILE *fin=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val.port;
+    }
+    
+    
+    c=fgetc(fin);
+
+    /* check for eof */
+    if(c==EOF) {
+	return eof_object;
+    }
+
+
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c;
+
+    return obj;
+}
+
+/* peek-char */
+object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char c=0;
+
+    FILE *fin=0;
+    
+    int len=list_length(interp, args);
+
+    if(len==0) {
+	fin=stdin;
+    } else {
+	fin=car(args)->value.port_val.port;
+    }
+    
+    
+    /* undo the read */
+    c=fgetc(fin);
+    ungetc(c, fin);
+
+    /* check for eof */
+    if(c==EOF) {
+	return eof_object;
+    }
+
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c;
+
+    return obj;
+}
+
+/* open-input-file */
+object_type *prim_open_input_file(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *filename=0;
+    FILE *fin=0;
+    
+    /* make sure we have a file name */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+
+    /* TODO: add type checking */
+    filename=car(args)->value.string_val;
+
+    fin=fopen(filename, "r");
+    
+    /* make sure that we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=fin;
+    obj->value.port_val.input=1;
+    
+    return obj;
+}
+
+/* open-output-file */
+object_type *prim_open_output_file(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    char *filename=0;
+    FILE *fin=0;
+    
+    /* make sure we have a file name */
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+
+    /* TODO: add type checking */
+    filename=car(args)->value.string_val;
+
+    fin=fopen(filename, "w");
+    
+    /* make sure that we could open the file */
+    if(!fin) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=fin;
+    obj->value.port_val.output=1;
+    
+    return obj;
+}
+
+
+/* close-input-file close-output-file */
+object_type *prim_close(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+    
+    obj=car(args);
+
+    /* don't want to close something that is
+       not a port */
+    if(obj->type != PORT) {
+	interp->error=1;
+	return false;
+    }
+
+    /* attempt to close the port, checking for errors */
+    if(fclose(obj->value.port_val.port)==EOF) {
+	/* Something went wrong here */
+	interp->error=1;
+	return false;
+    }
+
+    
+    return true;
+}
+
+/* error */
+object_type *prim_error(interp_core_type *interp, object_type *args) {
+    
+    /* If we don't have any arguments, return an 
+       empty list */
+    if(is_empty_list(interp, args)) {
+	return quote(interp, interp->empty_list);
+    }
+    
+    /* evalueate each argument */
+    while(!is_empty_list(interp, args)) {
+	output_stream(interp, car(args), stderr);
+	fprintf(stderr, " ");
+	args=cdr(args);
+    }
+
+    return prim_quit(interp, interp->empty_list);
+}
+
+
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0, 1},
@@ -1072,9 +1397,11 @@ binding_type primitive_list[]={
     {"if", &prim_if, 0, 0},
     {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
-    {"begin", &prim_begin, 0, 1},
+    {"begin", &prim_begin, 0, 0},
     {"let", &prim_let, 0, 0},
     {"apply", &prim_apply, 0, 0},
+
+    {"error",&prim_error, 1, 1},
 
     {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 1},
@@ -1118,5 +1445,26 @@ binding_type primitive_list[]={
     {"null-environment", &prim_null_environment, 1, 1},
     {"eval", &prim_eval, 1, 0},
 
+    {"load", &prim_load, 1, 0},
+    {"read", &prim_read, 1, 1},
+    {"write", &prim_write, 1, 1},
+
+    {"read-char", &prim_read_char, 1, 1},
+    {"write-char", &prim_write_char, 1, 1},
+    {"peek-char", &prim_peek_char, 1, 1},
+
+    {"open-input-port", &prim_open_input_file, 1, 1},
+    {"open-input-file", &prim_open_input_file, 1, 1},
+
+    {"open-output-port", &prim_open_output_file, 1, 1},
+    {"open-output-file", &prim_open_output_file, 1, 1},
+
+    {"close-input-port", &prim_close, 1, 1},
+    {"close-output-port", &prim_close, 1, 1},
+
+    {"eof-object?", &prim_is_eof_object, 1, 1},
+    {"input-port?", &prim_is_input_port, 1, 1},
+    {"output-port?", &prim_is_output_port, 1, 1},
+    
     {0,0} /* Terminate the list */
 };

@@ -8,7 +8,7 @@ BUILT_SOURCES=lexer.c scheme.c
 
 AM_YFLAGS=-d --verbose
 
-MOSTLYCLEANFILES=scheme.h scheme.output
+MOSTLYCLEANFILES=scheme.h scheme.output lexer.h
 
 include ../../Makefile.extra
 

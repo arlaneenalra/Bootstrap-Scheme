@@ -22,4 +22,5 @@
 
 (interaction-environment)
 
-(quit)
+(factorialy 5)
+;(quit)

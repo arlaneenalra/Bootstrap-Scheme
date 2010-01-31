@@ -1,6 +1,7 @@
 %option noyywrap reentrant bison-bridge
+%option always-interactive
 %option yylineno
-%option   outfile="lex.yy.c" header-file="lex.yy.h"
+%option   outfile="lex.yy.c" header-file="../lexer.h"
 
 %{
 #include "scheme.h"

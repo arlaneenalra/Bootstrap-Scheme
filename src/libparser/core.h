@@ -18,6 +18,7 @@ typedef enum {
     STRING,
     TUPLE,
     SYM,
+    PORT,
 
     PRIM, /* primitive c functions */
     CLOSURE, /* a closure */
@@ -48,6 +49,12 @@ typedef struct primitive {
     bool eval_end; /* evaluate result? */
 } primitive_type;
 
+typedef struct port {
+    FILE *port;
+    bool input;
+    bool output;
+} port_type;
+
 typedef struct closure {
     struct object *param;
     struct object *body;
@@ -67,6 +74,7 @@ typedef struct object {
 	tuple_type tuple;
 	primitive_type primitive;
 	closure_type closure;
+	port_type port_val;
     } value;
 
     gc_mark_type mark;
@@ -102,6 +110,8 @@ typedef struct interp_core {
 
     /* Object to be attached to the object graph */
     object_type *added;
+    
+    object_type *eof_object;
 
     /* Object we are currently working on */
     object_type *current;
@@ -126,8 +136,14 @@ void cleanup_interp(interp_core_type *interp);
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *parse_string(interp_core_type *interp, char *in);
 
+void push_parse_state(interp_core_type *interp, FILE *in);
+void pop_parse_state(interp_core_type *interp);
+object_type *parse_chain(interp_core_type *interp);
+
 object_type *eval(interp_core_type *interp, object_type *obj);
+
 void output(interp_core_type *interp, object_type *obj);
+void output_stream(interp_core_type *interp, object_type *obj, FILE *fout);
 
 bool has_error(interp_core_type *interp);
 
