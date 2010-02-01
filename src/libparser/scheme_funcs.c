@@ -176,7 +176,7 @@ bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     
     return type==FIXNUM || type==FLOATNUM 
 	|| type==CHAR || type==BOOL
-	|| type==STRING;
+	|| type==STRING || type==PRIM;
 }
 
 /* Is the object a quoted list? */
@@ -384,75 +384,42 @@ object_type *prim_begin(interp_core_type *interp, object_type *args) {
     return car(args);
 }
 
+
 /* apply */
 object_type *prim_apply(interp_core_type *interp, object_type *args) {
     object_type *call=0;
     object_type *tail=0;
-    object_type *result=0;
-    int len=0;
-    
-    /* If we don't have any arguments, return an 
-       empty list */
-    len=list_length(interp, args);
-    if(len<2) {
+    int arg_count=list_length(interp, args);
+
+    if(arg_count<2) {
 	interp->error=1;
 	return false;
     }
 
-    /* setup the procedure all */
     tail=call=cons(interp, car(args), interp->empty_list);
 
     args=cdr(args);
     
-    /* evaluate everything but the last argument */
-    while(!is_empty_list(interp, cdr(args))) {
-	result=eval(interp, car(args));
-	
-	if(!is_empty_list(interp, result)) {
-	    tail=cdr(tail)=cons(interp, result, interp->empty_list);
-	} else {
-	    break;
+    if(is_tuple(interp, car(args))) {
+	/* cdr(tail)=cons(interp, create_symbol(interp, "list"), */
+	/* 	       cons(interp, car(args), interp->empty_list)); */
+	cdr(tail)=car(args);
+    } else {
+	while(!is_empty_list(interp, args) && !is_empty_list(interp, car(args))) {
+	    tail=cdr(tail)=cons(interp, car(args), interp->empty_list);
+	    args=cdr(args);
 	}
-
-	args=cdr(args);
     }
 
-    cdr(tail)=eval(interp, car(args));
+    /* We don't want to re-evaluate arguments, so we 
+       quote them all individiually */
+    tail=cdr(call);
+    
+    while(!is_empty_list(interp, tail)) {
+	car(tail)=quote(interp, car(tail));
+	tail=cdr(tail);
+    }
 
-    /* args=cdr(args); */
-
-    /* if(len==2) { */
-    /* 	printf("one"); */
-    /* 	result=eval(interp, car(args)); */
-	
-    /* 	/\* propgate errors *\/ */
-    /* 	if(interp->error) { */
-    /* 	    return false; */
-    /* 	} */
-
-    /* 	cdr(call)=result; */
-    /* } else { */
-    /* 	printf("more"); */
-    /* 	/\* evalueate each argument *\/ */
-    /* 	while(!is_empty_list(interp, args)) { */
-
-    /* 	    result=eval(interp, car(args)); */
-
-    /* 	    if(!is_empty_list(interp, result)) { */
-    /* 		tail=cdr(tail)=cons(interp, result, interp->empty_list); */
-
-    /* 	    } else { */
-    /* 		break; */
-    /* 	    } */
-
-    /* 	    args=cdr(args); */
-    /* 	} */
-    /* } */
-
-    /* return the last argument */
-    printf("\ncall:");
-    output(interp, call);
-    printf("\n");
     return call;
 }
 
@@ -1440,7 +1407,7 @@ binding_type primitive_list[]={
     {"begin", &prim_begin, 0, 0},
     {"let", &prim_let, 0, 0},
 
-    {"apply", &prim_apply, 0, 0},
+    {"apply", &prim_apply, 1, 0},
 
     {"error",&prim_error, 1, 1},
 

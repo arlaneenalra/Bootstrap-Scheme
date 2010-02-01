@@ -10,6 +10,7 @@
 (apply + 1 2 3 '())
 (apply + '(1 2 3 ))
 (apply + 1 2 3 4 x)
+(apply + (list 1 2 3))
 
 (define args '(1 2 ))
 
@@ -20,6 +21,8 @@ args
 (define args '((1 . 2 )))
 (apply car args)
 
+
 (car (cons 1 2))
+(car '(1 . 2))
 
 (quit)

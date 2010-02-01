@@ -136,7 +136,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 	} else if(is_tuple(interp, obj)) { 	/* This should give us a means 
 						   of executing primitives */
 	    TRACE("p");
-	    
+
 	    /* Evaluate our object to see what we have */
 	    proc=eval(interp, car(obj));
 
@@ -146,45 +146,48 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		loop=0;
 		obj=false;
 
-	    } else if(is_primitive(interp, proc)) {
-		/* We have a primitive */
-		obj=eval_prim(interp, proc, obj);
+	    } else {
 		
-		/* Do we need to evaluate the result? */
-		if(proc->value.primitive.eval_end) {
-		    loop=0;
-		}
+		if(is_primitive(interp, proc)) {
+		    /* We have a primitive */
+		    obj=eval_prim(interp, proc, obj);
+		
+		    /* Do we need to evaluate the result? */
+		    if(proc->value.primitive.eval_end) {
+			loop=0;
+		    }
 
-	    } else if(is_closure(interp, proc)) {
-		/* always evaluate arguments of compound procecdures */
-		evaled_args=eval_list(interp, cdr(obj));
+		} else if(is_closure(interp, proc)) {
+		    /* always evaluate arguments of compound procecdures */
+		    evaled_args=eval_list(interp, cdr(obj));
 
-		/* check for error evaluating arguments */
-		if(has_error(interp)) {
-		    printf("\nfailed evaluating:");
-		    output(interp, obj);
-		    printf("\nwith args:");
-		    output(interp, cdr(obj));
-		    printf("\n");
+		    /* check for error evaluating arguments */
+		    if(has_error(interp)) {
+			printf("\nfailed evaluating:");
+			output(interp, obj);
+			printf("\nwith args:");
+			output(interp, cdr(obj));
+			printf("\n");
 		    
+			return false;
+		    }
+
+		    push_environment(interp, proc->value.closure.env);
+
+		    bind_argument_list(interp, proc->value.closure.param, evaled_args);
+
+		    obj=eval_tagged_list(interp, proc, obj);
+
+		    /* if we don't have a tuple here, we cannot have
+		       a tail call */
+		    if(!is_tuple(interp, obj) || is_empty_list(interp, obj)) {
+			obj=eval(interp, obj);
+			loop=0;
+		    }
+		} else {
+		    interp->error=1;
 		    return false;
 		}
-
-		push_environment(interp, proc->value.closure.env);
-
-		bind_argument_list(interp, proc->value.closure.param, evaled_args);
-
-		obj=eval_tagged_list(interp, proc, obj);
-
-		/* if we don't have a tuple here, we cannot have
-		   a tail call */
-		if(!is_tuple(interp, obj) || is_empty_list(interp, obj)) {
-		    obj=eval(interp, obj);
-		    loop=0;
-		}
-	    } else {
-		interp->error=1;
-		return false;
 	    }
 
 	    
