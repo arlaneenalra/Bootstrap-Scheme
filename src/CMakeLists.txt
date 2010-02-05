@@ -1,4 +1,4 @@
-include_dirctories(libparser)
+include_directories(libparser)
 
 link_directories(${libparser_BIN_DIR}/libparser)
 
