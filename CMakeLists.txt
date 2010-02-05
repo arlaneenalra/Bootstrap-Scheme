@@ -9,6 +9,6 @@ set(VERSION 0.2.0)
 
 add_subdirectory(src)
 
-set(CMAKE_REQUIRED_FLAGS -Wall)
+
 
 

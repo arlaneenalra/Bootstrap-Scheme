@@ -15,3 +15,5 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 add_library(libparser core.c eval.c gc_funcs.c output.c 
   scheme_funcs.c util.c ${BISON_PARSER_OUTPUTS} ${FLEX_LEXER_OUTPUTS})
+
+include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)
