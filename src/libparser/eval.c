@@ -171,7 +171,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    
 			return false;
 		    }
-
+		    
 		    push_environment(interp, proc->value.closure.env);
 
 		    bind_argument_list(interp, proc->value.closure.param, evaled_args);
