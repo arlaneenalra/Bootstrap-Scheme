@@ -36,3 +36,5 @@ working-string
 
 
 
+(substring "123456789" 0 4)
+(substring "123456789" 5 6)

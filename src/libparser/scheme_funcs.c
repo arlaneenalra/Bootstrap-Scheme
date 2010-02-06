@@ -1064,6 +1064,8 @@ TEST(car(args)!=0 && car(args)->type==PORT && car(args)->value.port_val.output, 
 NUMERIC_TEST(==, prim_equal)
 NUMERIC_TEST(<, prim_less)
 NUMERIC_TEST(>, prim_greater)
+NUMERIC_TEST(>=, prim_greater_equal)
+NUMERIC_TEST(<=, prim_less_equal)
 
 
 /* eq */
@@ -1564,6 +1566,8 @@ binding_type primitive_list[]={
     {"=", &prim_equal, 1, 1},
     {"<", &prim_less, 1, 1},
     {">", &prim_greater, 1, 1},
+    {">=", &prim_greater_equal, 1, 1},
+    {"<=", &prim_less_equal, 1, 1},
 
     {"null?", &prim_is_null, 1, 1},
     {"boolean?", &prim_is_boolean, 1, 1},

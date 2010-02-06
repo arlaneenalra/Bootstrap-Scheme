@@ -38,3 +38,19 @@
     )
   (inner (make-string (list-length list)) list 0))
 
+
+
+(define (substring str start end)
+  (define (inner new-str index)
+    (if (< index end)
+	(begin
+	  (string-set! new-str (- index start)
+		       (string-ref str index))
+
+	  (inner new-str (+ 1 index))
+
+	  )
+	new-str
+	))
+
+  (inner (make-string (- end start)) start))

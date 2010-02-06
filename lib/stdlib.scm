@@ -19,7 +19,7 @@
 
 ; output a string to the current default output
 ; port
-(define (emit-string str) 
+(define (interp-string str) 
   (define (inner index len)
     (if (< index len)
 	(begin
@@ -29,16 +29,27 @@
   (inner 0 (string-length str)))
 
 
-(define (emit-fixnum num)
-  (emit-string
-   (number->string num)))
 
-
-; TODO: find the real definition of emit
-(define (emit obj)
+(define (emit-interp obj)
   (cond
    ((string? obj) (emit-string obj))
-   ((integer? obj) (emit-fixnum obj))
+   ((integer? obj) (number->string obj))
    ((char? obj) (write-char obj))
    (else (error "I don't know what this is"))
    ))
+
+
+; replaces ~a with what ever obj is as a string
+(define (emit str obj)
+
+  (define obj-str
+    (emit-interp obj))
+
+  (define output
+     (make-string 
+      (+ (- (string-length template) 2)
+	 (string-length obj-str))))
+  
+  
+  )
+		
