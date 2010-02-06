@@ -109,9 +109,13 @@
       (begin
 	(attach str1-list)
 	(list->string str1-list))))
-    
-  
- 
 
 
-  
+(define (string-append . str)
+  (define (inner new-str . str)
+    (if (null? str)
+	new-str
+	(inner
+	 (string-one-append new-str (car str))
+	 (cdr str)))))
+	  
