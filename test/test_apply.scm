@@ -38,5 +38,7 @@ args
 (define args '(1 2 3 4 5 6 ))
 
 (apply sum args)
+(apply sum 1 2 3 4 5 6 args)
+(apply sum 1 2 3 4 5 6 args)
 
 (quit)

@@ -61,11 +61,21 @@ working-string
 	numbers
 	(massalloc (- num 1)))))
 
-(massalloc 500)
+(massalloc 50)
 
 ;; (string->list numbers)
 
 
 (string-append "1" "2" "3")
+(join ":" "1" "2" "3")
 
-(apply string-append numbers)
+;(apply string-append numbers)
+
+(apply join ":" numbers)
+
+(split "~a" "~a12 ~3 ~a testing ~aasd")
+(split "~" "~a12 ~3 ~a testing ~aasd")
+(split "~" "~a12 ~3 ~a testing ~aasd")
+
+(split "~a" "12 ~3 ~a testing ~aasd")
+

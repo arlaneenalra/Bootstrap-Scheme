@@ -57,44 +57,9 @@
   (inner (make-string (- end start)) start))
 
 
-; combine two strings
-;; (define (string-one-append str1 str2)
-;;   (define str1-len (string-length str1))
-;;   (define str2-len (string-length str2))
-  
-;;   ; iterate indexes
-;;   (define (str-iter str str-len)
-;;     (define index -1)
-;;     (lambda () 
-;;       (set! index (+ 1 index))
-;;       (if (>= index str-len)
-;; 	  '()
-;; 	    (string-ref str index))))
 
-;;   (define str1-iter (str-iter str1 str1-len))
-;;   (define str2-iter (str-iter str2 str2-len))
-  
-;;   (define new-str (make-string (+ str1-len str2-len)))
-;;   (define index 0)
-       
-  
-;;   ; loop through an interator
-;;   (define (do iter)
-;;     ((lambda (x)
-;;     (if (null? x)
-;; 	'()
-;; 	(begin 
-;; 	  (string-set! new-str index x)
-;; 	  (set! index (+ 1 index))
-;; 	  (do iter)))) (iter)))
-    
-
-;;   (do str1-iter)
-;;   (do str2-iter)
-;;   new-str
-;; )
-
-
+;; internal function that does combination
+;; of two strings
 (define (string-one-append str1 str2)
   (define str1-list (string->list str1))
   (define str2-list (string->list str2))
@@ -111,6 +76,7 @@
 	(list->string str1-list))))
 
 
+;; variadic string append
 (define (string-append . str)
   (define (inner new-str str)
     (if (null? str)
@@ -119,4 +85,63 @@
 	 (string-one-append new-str (car str))
 	 (cdr str))))
   (inner "" str))
+
+
+;; interleave str and every element of str-list
+(define (join str . str-list)
+  
+  (define (inner new-str str-list)
+    (if (null? str-list)
+	new-str
+	(inner
+	 (string-append new-str str (car str-list))
+	 (cdr str-list))))
+
+  (inner (car str-list) (cdr str-list)))
+
+
+;; break a into a list of substrings using 
+;; a pattern
+
+(define (split pattern str)
+
+  ; convert the pattern into
+  ; a list of characters
+  (define pattern-list
+    (string->list pattern))
+
+  (define str-list
+    (string->list str))
+
+  (define str-split '())
+  (define head '())
+  
+  
+  ; compare two lists of objects and see if they
+  ; are the same
+  (define (match pattern-list char-list)
+    (cond
+	   ; we're at the end of the pattern, 
+	   ((null? pattern-list) #t)
+	   
+	   ; we're at the end of the string,
+	   ; but not the end of the pattern
+	   ((null? char-list) #f)
+
+	   ; check next character
+	   ((eqv? (car pattern-list)
+		(car char-list))
+
+	    (match (cdr pattern-list)
+		   (cdr char-list)))
+	   
+	   ; no match
+	   (else #f)))
+
+  
+  ;; (define (split-inner str-list)
+    
+  ;;   )
+  (match pattern-list str-list)
+  )
 	  
