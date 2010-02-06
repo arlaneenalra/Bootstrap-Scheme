@@ -1,5 +1,6 @@
 
-; find the length of a list
+
+;; find the length of a list
 (define (list-length list)
   (define (inner list len) 
     (if (null? list)
@@ -8,7 +9,7 @@
   (inner list 0))
 
 
-; convert a string into a list of characters 
+;; convert a string into a list of characters 
 (define (string->list str)
   (define inner-list '())
   
@@ -26,7 +27,7 @@
   (inner str (- (string-length str) 1)))
 
 
-; convert a list of characters into a string 
+;; convert a list of characters into a string 
 (define (list->string list) 
   (define (inner str list index)
     (if (null? list)
@@ -40,7 +41,7 @@
 
 
 
-; extract a given substring by index
+;; extract a given substring by index
 (define (substring str start end)
   (define (inner new-str index)
     (if (< index end)
@@ -168,6 +169,8 @@
 
   ;; convert our lists back into strings
   (define (to-string list-of-lists)
+    (newline)
+
     (define list-of-strings '())
     
     (define (inner list-of-lists)
@@ -180,6 +183,16 @@
 	    (inner (cdr list-of-lists)))))
 
     (inner list-of-lists))
+
+
+  ;; check to see if we have a match at the very 
+  ;; start of the string with a non "" pattern
+
+  (if (and (match pattern-list str-list) 
+	   (not (eqv? pattern "")))
+      
+      (set! str-split
+	    (cons '() str-split)))
 
 
   (split-inner str-list)

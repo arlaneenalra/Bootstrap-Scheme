@@ -2,7 +2,7 @@
 
 ; load string functions that have been implemented 
 ; in scheme
-(load "lib/string.scm")
+(load "lib/stdlib.scm")
 
 
 (make-string 10 #\c)

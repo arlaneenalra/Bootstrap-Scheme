@@ -1,4 +1,4 @@
-; Define some rather basic operations in scheme
+;; Define some rather basic operations in scheme
 
 ;; ; define cons in scheme
 ;; (define (cons x y)
@@ -7,17 +7,19 @@
 ;;   (set-cdr! pair y)
 ;;   pair)
 
-; load the string code library
+;; load the string code library
+
+(load "lib/boolean.scm")
 
 (load "lib/string.scm")
 
 
-; Display a new line
+;; Display a new line
 (define (newline)
   (write-char #\newline))
 
-; output a string to the current default output
-; port
+;; output a string to the current default output
+;; port
 (define (emit-string str) 
   (define (inner index len)
     (if (< index len)
@@ -37,24 +39,18 @@
    ))
 
 
-; replaces ~a with what ever obj is as a string
+;; replaces ~a with what ever obj is as a string
 (define (emit-inner template obj)
 
   (define obj-str
     (emit-interp obj))
   
   
-  ;; (define output
-  ;;    (make-string 
-  ;;     (+ (- (string-length template) 2)
-  ;; 	 (string-length obj-str))))
-
-
   
   (emit-string obj-str))
 
 
-; Handle both forms of emit
+;; Handle both forms of emit
 (define (emit . args)
   (cond
    ((null? args) 
