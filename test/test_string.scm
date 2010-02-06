@@ -1,5 +1,10 @@
 ; convert a string to characters
 
+; load string functions that have been implemented 
+; in scheme
+(load "lib/string.scm")
+
+
 (make-string 10 #\c)
 
 (make-string 10 )
@@ -24,7 +29,10 @@ working-string
 (string-ref working-string 1)
 (string-ref working-string 0)
 
+(string->list "This is a test")
 
+(list-length (string->list "This was a test"))
+(list->string (string->list "This was a test"))
 
 
 
