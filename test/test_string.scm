@@ -38,3 +38,7 @@ working-string
 
 (substring "123456789" 0 4)
 (substring "123456789" 5 6)
+
+
+(string-one-append "This is" " a test")
+(string-one-append "This is another " " a test")
