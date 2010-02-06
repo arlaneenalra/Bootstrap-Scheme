@@ -606,6 +606,46 @@ object_type *prim_make_string(interp_core_type *interp, object_type * args) {
     return obj;
 }
 
+/* string-length */
+object_type *prim_string_length(interp_core_type *interp, object_type *args) {
+    
+    object_type *obj=0;
+    
+    if(list_length(interp, args)!=1) {
+	interp->error=1;
+	return false;
+    }
+
+    /* use strlen to find the length of our string */
+    obj=alloc_object(interp, FIXNUM);
+    obj->value.int_val=strlen(car(args)->value.string_val);
+
+    
+    return obj;    
+}
+
+/* string-set! */
+object_type *prim_string_set(interp_core_type *interp, object_type *args) {
+    
+    int64_t index=0;
+    char *c=0;
+    
+    if(list_length(interp, args)!=3) {
+	interp->error=1;
+	return false;
+    }
+
+    c=car(args)->value.string_val;
+    index=cadr(args)->value.int_val;
+
+    c[index]=caddr(args)->value.char_val;
+    
+    
+    return true;
+    
+}
+
+
 /* /\* String to List *\/ */
 /* object_type *prim_string_to_list(interp_core_type *interp, object_type *args) { */
     
@@ -1526,6 +1566,8 @@ binding_type primitive_list[]={
     /* {"list->string", &prim_list_to_string, 1, 1}, */
 
     {"make-string", &prim_make_string, 1, 1},
+    {"string-length", &prim_string_length, 1, 1},
+    {"string-set!", &prim_string_set, 1, 1},
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
