@@ -42,3 +42,29 @@ working-string
 
 (string-one-append "This is" " a test")
 (string-one-append "This is another " " a test")
+(string-one-append "" "Testing")
+(string-one-append "Testing" "")
+
+
+
+; let's see how long a string we can make
+(define numbers "")
+
+
+(define massalloc
+  (lambda (num)
+    (+ 1 1 )
+    (set! numbers 
+	  (string-one-append ":" numbers))
+
+    (set! numbers 
+	  (string-one-append (number->string num) numbers))
+
+    (if (= num 0)
+	numbers
+	(massalloc (- num 1)))))
+
+(massalloc 100)
+
+(string->list numbers)
+
