@@ -1151,7 +1151,7 @@ object_type *prim_and(interp_core_type *interp, object_type *args) {
     }
     
     /* return the last argument */
-    return true;
+    return result;
 
 }
 
@@ -1166,7 +1166,7 @@ object_type *prim_or(interp_core_type *interp, object_type *args) {
 	/* If the result is false, return false
 	   otherwise keep evaluating */
 	if(is_true(interp, result)) {
-	    return true;
+	    return result;
 	}
 
 	args=cdr(args);
