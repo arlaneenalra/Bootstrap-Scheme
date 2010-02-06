@@ -73,10 +73,13 @@ number:
     FIXED_NUMBER    { add_number(interp, get_text(scanner)); }
   | FLOAT_NUMBER    { add_float(interp, get_text(scanner)); }
 
-string:
-    DOUBLE_QUOTE
+string_end:
     STRING_CONSTANT { add_string(interp, get_text(scanner)); }
     DOUBLE_QUOTE
+  | DOUBLE_QUOTE    { add_string(interp, ""); }
+string:
+    DOUBLE_QUOTE
+    string_end
     
 object:
     boolean
