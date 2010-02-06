@@ -8,4 +8,4 @@
 ;;   pair)
 
 ; load the string code library
-(load "lib/string.h")
+(load "lib/string.scm")
