@@ -402,16 +402,29 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 
     args=cdr(args);
     
-    if(is_tuple(interp, car(args))) {
-	/* cdr(tail)=cons(interp, create_symbol(interp, "list"), */
-	/* 	       cons(interp, car(args), interp->empty_list)); */
-	cdr(tail)=car(args);
-    } else {
-	while(!is_empty_list(interp, args) && !is_empty_list(interp, car(args))) {
-	    tail=cdr(tail)=cons(interp, car(args), interp->empty_list);
-	    args=cdr(args);
+    /* walk everything but the last argument  */
+    while(!is_empty_list(interp, args) && !is_empty_list(interp, cdr(args))) {
+	tail=cdr(tail)=cons(interp, car(args), interp->empty_list);
+	args=cdr(args);
+    }
+    
+    /* make sure we don't blow up on no arguments */
+    if(!is_empty_list(interp, args)) {
+	if(is_tuple(interp, car(args))) {
+	    args=car(args);
+
+	    /* clone containers but not contents */
+	    while(!is_empty_list(interp, args)) {
+		tail=cdr(tail)=cons(interp, car(args), interp->empty_list);
+		args=cdr(args);
+	    }	    
+
+	    /*cdr(tail)=car(args);*/
+	} else {
+	    cdr(tail)=cons(interp, car(args), interp->empty_list);
 	}
     }
+    
 
     /* We don't want to re-evaluate arguments, so we 
        quote them all individiually */
