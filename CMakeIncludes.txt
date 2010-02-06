@@ -1,1 +1,1 @@
-set(CMAKE_C_FLAGS "-Wall")
+set(CMAKE_C_FLAGS "-Wall -g")
