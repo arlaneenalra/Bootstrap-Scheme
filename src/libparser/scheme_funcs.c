@@ -90,19 +90,20 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value,
 void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
 			object_type *value_list) {
 
-    object_type *binding=0;
+    /* we have a list of symbols */
+    while(!is_empty_list(interp, sym_list) && !is_empty_list(interp, value_list)
+	  && !is_symbol(interp, sym_list)) {
 
-    while(!is_empty_list(interp, sym_list) && !is_empty_list(interp, value_list)) {
-
-	/* create a new binding as we didn't find one */
-	binding=cons(interp, car(sym_list), car(value_list));
-    
-	/* add our new binding to the list of bindings */
-	car(interp->cur_env)=cons(interp, binding, 
-				  car(interp->cur_env));
+	bind_symbol(interp, car(sym_list), car(value_list), &interp->cur_env);
 
 	sym_list=cdr(sym_list);
 	value_list=cdr(value_list);
+    }
+
+    /* handle single, variadic argument lists */
+    if(is_symbol(interp, sym_list)) {
+	bind_symbol(interp, sym_list, value_list, &interp->cur_env);
+	return;
     }
 
     /* make sure that we have the same number of arguments
