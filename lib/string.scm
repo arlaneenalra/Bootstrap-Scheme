@@ -128,8 +128,8 @@
 
 (define (split pattern str)
 
-  ; convert the pattern into
-  ; a list of characters
+  ;; convert the pattern into
+  ;; a list of characters
   (define pattern-list
     (string->list pattern))
 
@@ -140,14 +140,18 @@
   (define head str-list)
 
   
-  ; do the actual split work
+  ;; do the actual split work
   (define (split-inner str-list)
 
     (cond
+     ;; End condition match
      ((null? str-list)
+      (if (null? head)
+	  '()
       (set! str-split 
-	    (cons  (or (match pattern-list head) head) str-split)))
+	    (cons  (or (match pattern-list head) head) str-split))))
 
+     
     ((match pattern-list (cdr str-list))
 	(begin
  	  (set! str-split 
@@ -162,7 +166,7 @@
     (else (split-inner (cdr str-list)))))
 
 
-  ; convert our lists back into strings
+  ;; convert our lists back into strings
   (define (to-string list-of-lists)
     (define list-of-strings '())
     
@@ -179,6 +183,5 @@
 
 
   (split-inner str-list)
-  
   
   (to-string str-split))
