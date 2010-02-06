@@ -49,7 +49,7 @@ CHAR_VAL      (newline|space|[^{WS}])
 
 {IDENT}+  { return SYMBOL; }
 
-[;].*$    /* Eat comments */
+[;].*     /* Eat comments */
 
 <<EOF>>   { return END_OF_FILE; }
 %%
