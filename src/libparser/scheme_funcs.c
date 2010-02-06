@@ -177,7 +177,8 @@ bool is_self_evaluating(interp_core_type *interp, object_type *obj) {
     
     return type==FIXNUM || type==FLOATNUM 
 	|| type==CHAR || type==BOOL
-	|| type==STRING || type==PRIM;
+	|| type==STRING || type==PRIM
+	|| type==CLOSURE;
 }
 
 /* Is the object a quoted list? */
