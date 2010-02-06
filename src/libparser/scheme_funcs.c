@@ -645,6 +645,29 @@ object_type *prim_string_set(interp_core_type *interp, object_type *args) {
     
 }
 
+/* string-ref */
+object_type *prim_string_ref(interp_core_type *interp, object_type *args) {
+    
+    object_type *obj=0;
+    int64_t index=0;
+    char *c=0;
+    
+    if(list_length(interp, args)!=2) {
+	interp->error=1;
+	return false;
+    }
+
+    c=car(args)->value.string_val;
+    index=cadr(args)->value.int_val;
+
+    obj=alloc_object(interp, CHAR);
+    obj->value.char_val=c[index];
+    
+    
+    return obj;
+    
+}
+
 
 /* /\* String to List *\/ */
 /* object_type *prim_string_to_list(interp_core_type *interp, object_type *args) { */
@@ -1568,6 +1591,7 @@ binding_type primitive_list[]={
     {"make-string", &prim_make_string, 1, 1},
     {"string-length", &prim_string_length, 1, 1},
     {"string-set!", &prim_string_set, 1, 1},
+    {"string-ref", &prim_string_ref, 1, 1},
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
