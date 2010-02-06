@@ -112,10 +112,11 @@
 
 
 (define (string-append . str)
-  (define (inner new-str . str)
+  (define (inner new-str str)
     (if (null? str)
 	new-str
 	(inner
 	 (string-one-append new-str (car str))
-	 (cdr str)))))
+	 (cdr str))))
+  (inner "" str))
 	  

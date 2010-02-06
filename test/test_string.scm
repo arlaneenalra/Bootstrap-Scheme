@@ -48,23 +48,24 @@ working-string
 
 
 ; let's see how long a string we can make
-(define numbers "")
+(define numbers '())
 
 
 (define massalloc
   (lambda (num)
     (+ 1 1 )
-    (set! numbers 
-	  (string-one-append ":" numbers))
-
-    (set! numbers 
-	  (string-one-append (number->string num) numbers))
-
+    (set! numbers
+	  (cons 
+	   (number->string num) numbers))
     (if (= num 0)
 	numbers
 	(massalloc (- num 1)))))
 
 (massalloc 500)
 
-(string->list numbers)
+;; (string->list numbers)
 
+
+(string-append "1" "2" "3")
+
+(apply string-append numbers)
