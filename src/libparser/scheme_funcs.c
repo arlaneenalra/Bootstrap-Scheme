@@ -1593,7 +1593,9 @@ binding_type primitive_list[]={
     {"pair?", &prim_is_tuple, 1, 1},
     {"procedure?", &prim_is_prim, 1, 1},
 
-    {"eq?", &prim_eq, 1, 1},
+    {"eq?", &prim_eq, 1, 1}, /* TODO: I need a good test suite for eq and eqv */
+    {"eqv?", &prim_eq, 1, 1}, 
+
     {"and", &prim_and, 0, 1},
     {"or", &prim_or, 0, 1},
     
