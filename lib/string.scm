@@ -103,9 +103,12 @@
     (if (null? (cdr list1))
 	(set-cdr! list1 str2-list)
 	(attach (cdr list1))))
-  (attach str1-list)
 
-  (list->string str1-list))
+  (if (null? str1-list)
+      (list->string str2-list)
+      (begin
+	(attach str1-list)
+	(list->string str1-list))))
     
   
  
