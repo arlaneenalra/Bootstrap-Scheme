@@ -575,6 +575,79 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     return result;
 }
 
+/* make-string */
+object_type *prim_make_string(interp_core_type *interp, object_type * args) {
+    
+    object_type *obj=0;
+    int64_t len=0;
+    char *c=0;
+    
+    int arg_len=list_length(interp, args);
+
+    /* we can accept one or two arguments */
+    if(arg_len <1 || arg_len > 2) {
+	interp->error=1;
+	return false;
+    }
+    
+    len=car(args)->value.int_val;
+    
+    c=alloc_string(interp, len);
+    
+    /* fill our string */
+    if(arg_len==2) {
+	memset(c, cadr(args)->value.char_val, len);
+    }
+
+
+    obj=alloc_object(interp, STRING);
+    obj->value.string_val=c;
+    
+    return obj;
+}
+
+/* /\* String to List *\/ */
+/* object_type *prim_string_to_list(interp_core_type *interp, object_type *args) { */
+    
+/*     object_type *obj=0; */
+/*     object_type *head=0; */
+/*     object_type *tail=0; */
+/*     char *c=0; */
+
+/*     /\* we have to have one argument and it must */
+/*        be a string *\/ */
+/*     if(list_length(interp, args)!=1 */
+/*        || car(args)->type!=STRING) { */
+/* 	interp->error=1; */
+/* 	return false; */
+/*     } */
+    
+/*     c=car(args)->value.string_val; */
+
+/*     /\* Convert our string to a list of characters *\/ */
+/*     while(*c!=0) { */
+
+/* 	/\* allocate our character *\/ */
+/* 	obj=alloc_object(interp, CHAR); */
+/* 	obj->value.char_val=*c; */
+	
+/* 	if(head==0) { */
+/* 	    head=tail=cons(interp, obj, interp->empty_list); */
+/* 	} else { */
+/* 	    tail=cdr(tail)=cons(interp, obj, interp->empty_list); */
+/* 	} */
+
+/* 	/\* move to the next character *\/ */
+/* 	c++; */
+/*     } */
+
+/*     return head; */
+/* } */
+
+/* object_type *prim_string_to_list(interp_core_type *interp, object_type *args) { */
+
+/* } */
+
 /* Symbol to String */
 object_type *prim_sym_to_string(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -1448,6 +1521,11 @@ binding_type primitive_list[]={
     {"string->number", &prim_string_to_num, 1, 1},
     {"symbol->string", &prim_sym_to_string, 1, 1},
     {"string->symbol", &prim_string_to_sym, 1, 1},
+
+    /* {"string->list", &prim_string_to_list, 1, 1}, */
+    /* {"list->string", &prim_list_to_string, 1, 1}, */
+
+    {"make-string", &prim_make_string, 1, 1},
 
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},

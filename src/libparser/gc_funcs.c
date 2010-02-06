@@ -36,6 +36,19 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     return 0;
 }
 
+/* allocate string memory */
+char *alloc_string(interp_core_type *interp, size_t len) {
+
+    char *c=(char *)GC_malloc(len+1);
+    
+    if(!c) {
+	fail("Unable to allocate string!");
+    }
+
+    
+    return c;
+}
+
 /* Make a copy of an object */
 object_type *clone(interp_core_type *interp, object_type *obj) {
     object_type *new_obj;
