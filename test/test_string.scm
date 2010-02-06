@@ -74,8 +74,8 @@ working-string
 (apply join ":" numbers)
 
 (split "~a" "~a12 ~3 ~a testing ~aasd")
-(split "~" "~a12 ~3 ~a testing ~aasd")
+(split "~a" " ~a12 ~3 ~a testing ~aasd")
 (split "~" "~a12 ~3 ~a testing ~aasd")
 
-(split "~a" "12 ~3 ~a testing ~aasd")
+(split "~a " "12 ~3 ~a testing ~aasd")
 

@@ -100,6 +100,29 @@
   (inner (car str-list) (cdr str-list)))
 
 
+
+;; compare two lists of objects and see if they
+;; are the same
+(define (match pattern-list char-list)
+  (cond
+   ;; we're at the end of the pattern, 
+   ((null? pattern-list) char-list) ;; this should be true
+   
+   ;; we're at the end of the string,
+   ;; but not the end of the pattern
+   ((null? char-list) #f)
+
+   ;; check next character
+   ((eqv? (car pattern-list)
+	  (car char-list))
+
+    (match (cdr pattern-list)
+	   (cdr char-list)))
+   
+   ;; no match
+   (else #f)))
+
+
 ;; break a into a list of substrings using 
 ;; a pattern
 
@@ -114,34 +137,48 @@
     (string->list str))
 
   (define str-split '())
-  (define head '())
+  (define head str-list)
+
   
-  
-  ; compare two lists of objects and see if they
-  ; are the same
-  (define (match pattern-list char-list)
+  ; do the actual split work
+  (define (split-inner str-list)
+
     (cond
-	   ; we're at the end of the pattern, 
-	   ((null? pattern-list) #t)
-	   
-	   ; we're at the end of the string,
-	   ; but not the end of the pattern
-	   ((null? char-list) #f)
+     ((null? str-list)
+      (set! str-split 
+	    (cons  (or (match pattern-list head) head) str-split)))
 
-	   ; check next character
-	   ((eqv? (car pattern-list)
-		(car char-list))
+    ((match pattern-list (cdr str-list))
+	(begin
+ 	  (set! str-split 
+		(cons (or (match pattern-list head) head) str-split))
 
-	    (match (cdr pattern-list)
-		   (cdr char-list)))
-	   
-	   ; no match
-	   (else #f)))
+	  (set! head (cdr str-list))
 
-  
-  ;; (define (split-inner str-list)
+	  (set-cdr! str-list '())
+
+	  (split-inner head)))
+
+    (else (split-inner (cdr str-list)))))
+
+
+  ; convert our lists back into strings
+  (define (to-string list-of-lists)
+    (define list-of-strings '())
     
-  ;;   )
-  (match pattern-list str-list)
-  )
-	  
+    (define (inner list-of-lists)
+      (if (null? list-of-lists)
+	  list-of-strings
+	  (begin
+	    (set! list-of-strings
+		  (cons (list->string (car list-of-lists))
+			list-of-strings))
+	    (inner (cdr list-of-lists)))))
+
+    (inner list-of-lists))
+
+
+  (split-inner str-list)
+  
+  
+  (to-string str-split))
