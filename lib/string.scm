@@ -58,42 +58,55 @@
 
 
 ; combine two strings
-(define (string-one-append str1 str2)
-  (define str1-len (string-length str1))
-  (define str2-len (string-length str2))
+;; (define (string-one-append str1 str2)
+;;   (define str1-len (string-length str1))
+;;   (define str2-len (string-length str2))
   
-  ; iterate indexes
-  (define (str-iter str str-len)
-    (define index -1)
-    (lambda () 
-      (set! index (+ 1 index))
-      (if (>= index str-len)
-	  '()
-	    (string-ref str index))))
+;;   ; iterate indexes
+;;   (define (str-iter str str-len)
+;;     (define index -1)
+;;     (lambda () 
+;;       (set! index (+ 1 index))
+;;       (if (>= index str-len)
+;; 	  '()
+;; 	    (string-ref str index))))
 
-  (define str1-iter (str-iter str1 str1-len))
-  (define str2-iter (str-iter str2 str2-len))
+;;   (define str1-iter (str-iter str1 str1-len))
+;;   (define str2-iter (str-iter str2 str2-len))
   
-  (define new-str (make-string (+ str1-len str2-len)))
-  (define index 0)
+;;   (define new-str (make-string (+ str1-len str2-len)))
+;;   (define index 0)
        
   
-  ; loop through an interator
-  (define (do iter)
-    ((lambda (x)
-    (if (null? x)
-	'()
-	(begin 
-	  (string-set! new-str index x)
-	  (set! index (+ 1 index))
-	  (do iter)))) (iter)))
+;;   ; loop through an interator
+;;   (define (do iter)
+;;     ((lambda (x)
+;;     (if (null? x)
+;; 	'()
+;; 	(begin 
+;; 	  (string-set! new-str index x)
+;; 	  (set! index (+ 1 index))
+;; 	  (do iter)))) (iter)))
     
 
-  (do str1-iter)
-  (do str2-iter)
-  new-str
-)
+;;   (do str1-iter)
+;;   (do str2-iter)
+;;   new-str
+;; )
 
+
+(define (string-one-append str1 str2)
+  (define str1-list (string->list str1))
+  (define str2-list (string->list str2))
+  
+  (define (attach list1)
+    (if (null? (cdr list1))
+	(set-cdr! list1 str2-list)
+	(attach (cdr list1))))
+  (attach str1-list)
+
+  (list->string str1-list))
+    
   
  
 

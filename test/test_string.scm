@@ -64,7 +64,7 @@ working-string
 	numbers
 	(massalloc (- num 1)))))
 
-(massalloc 100)
+(massalloc 500)
 
 (string->list numbers)
 
