@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	    // if there was no error, output the result
 	    if(!has_error(interp)) {
 		output(interp, obj);
-	    } else {	       
+	    } else {
 		printf("There was an error executing the given expression");
 	    }
 	}
