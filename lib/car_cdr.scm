@@ -70,6 +70,8 @@
 
 
 
+;; construct a procedure define based on a
+;; list of charactes
 (define (car-cdr-gen-proc x)
   (define symbol
     (string->symbol 
@@ -109,8 +111,22 @@
   ;; construct the define
   (cons 'define
 	(cons 
-	 (cons 'symbol 
+	 (cons symbol 
 	       (cons 'param '()))
 	 (cons
 	  (builder call-list) '()))))
 
+
+;; Evaluates the list of expressions in the given 
+;; environment
+(define (build-defines list env)
+  (let
+      ((proc (car-cdr-gen-proc (car list)))
+       (next (cdr list)))
+    (eval proc env)
+    (if (null? next)
+	#t
+    (build-defines next env))))
+
+;; build car-cdr friends
+(build-defines car-cdr-list (interaction-environment))

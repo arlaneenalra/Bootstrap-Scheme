@@ -1,8 +1,18 @@
 
 
+;;(define old-cadr cadr)
+;;(eq? old-cadr cadr)
+
 (load "lib/stdlib.scm")
 
-;;(list-list->list-string car-cdr-list)
+;;(eq? old-cadr cadr)
 
-(car-cdr-gen-proc (car car-cdr-list))
-(car-cdr-gen-proc (car (cdr car-cdr-list)))
+
+(define test '(1 2 3 ))
+
+(cadr test)
+;;(old-cadr test)
+
+
+;; (car-cdr-gen-proc (car car-cdr-list))
+;; (car-cdr-gen-proc (car (cdr car-cdr-list)))
