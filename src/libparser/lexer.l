@@ -2,6 +2,7 @@
 %option always-interactive
 %option yylineno
 %option   outfile="lexer.c" header-file="lexer.h"
+%option nounput noinput
 
 %{
 #include "scheme.h"
