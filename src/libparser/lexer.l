@@ -7,6 +7,9 @@
 %{
 #include "scheme.h"
 
+/* avoid a compiler warning */
+#define ECHO /* do nothing */
+
 %}
 
 DIGITS    [0-9]+
