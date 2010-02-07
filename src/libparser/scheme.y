@@ -44,7 +44,7 @@ expression:
   | END_OF_FILE    { end_of_file(interp); YYACCEPT; }
 
 list_end:
-    object_pair_list
+    list_next
     CLOSE_PAREN    { pop_state(interp); }
   | CLOSE_PAREN    { pop_state(interp); add_object(interp, interp->empty_list);}
 
@@ -52,10 +52,6 @@ list:
     OPEN_PAREN     { push_state(interp); }
     list_end       
 
-object_pair_list:
-    object         { set(interp, CAR); }
-  | list_next
-  
 list_next:
     object         { chain_state(interp); }
   | object         { chain_state(interp); }
