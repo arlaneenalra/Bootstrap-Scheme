@@ -101,6 +101,22 @@
   (inner (car str-list) (cdr str-list)))
 
 
+;; convert our lists back into strings
+(define (list-list->list-string list-of-lists)
+
+  (define list-of-strings '())
+  
+  (define (inner list-of-lists)
+    (if (null? list-of-lists)
+	list-of-strings
+	(begin
+	  (set! list-of-strings
+		(cons (list->string (car list-of-lists))
+		      list-of-strings))
+	  (inner (cdr list-of-lists)))))
+
+  (inner list-of-lists))
+
 
 ;; compare two lists of objects and see if they
 ;; are the same
@@ -167,22 +183,6 @@
     (else (split-inner (cdr str-list)))))
 
 
-  ;; convert our lists back into strings
-  (define (to-string list-of-lists)
-    (newline)
-
-    (define list-of-strings '())
-    
-    (define (inner list-of-lists)
-      (if (null? list-of-lists)
-	  list-of-strings
-	  (begin
-	    (set! list-of-strings
-		  (cons (list->string (car list-of-lists))
-			list-of-strings))
-	    (inner (cdr list-of-lists)))))
-
-    (inner list-of-lists))
 
 
   ;; check to see if we have a match at the very 
@@ -197,4 +197,4 @@
 
   (split-inner str-list)
   
-  (to-string str-split))
+  (list-list->list-string str-split))
