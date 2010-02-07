@@ -6,6 +6,9 @@
 #include "util.h"
 #include "parser_internal.h"
 
+#include "scheme.h"
+#include "lexer.h"
+
 void yyerror(interp_core_type *interp, void *scanner, char *s);
 
 %}
