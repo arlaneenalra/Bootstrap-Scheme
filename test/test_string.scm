@@ -69,9 +69,14 @@ working-string
 (string-append "1" "2" "3")
 (join ":" "1" "2" "3")
 
-;(apply string-append numbers)
+(apply string-append numbers)
 
-(apply join ":" numbers)
+(define number-string
+  (apply join ":" numbers))
+
+number-string
+
+(split ":" number-string)
 
 
 (match '(#\c) '(#\c #\d #\d #\c))

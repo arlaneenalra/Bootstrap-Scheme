@@ -13,6 +13,8 @@
 
 (load "lib/string.scm")
 
+(load "lib/car_cdr.scm")
+
 
 ;; Display a new line
 (define (newline)
