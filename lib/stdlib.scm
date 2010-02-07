@@ -47,9 +47,14 @@
   (define obj-str
     (emit-interp obj))
   
+  (define template-list
+    (split "~a" template))
   
-  
-  (emit-string obj-str))
+  (emit-string 
+   (string-append (car template-list)
+		  obj-str
+		  (cadr template-list))))
+
 
 
 ;; Handle both forms of emit
@@ -57,8 +62,10 @@
   (cond
    ((null? args) 
     (emit-string "Requires at least one argument"))
+
    ((null? (cdr args))
-    (emit-inner (car args) ""))
+    (emit-string (emit-interp (car args))))
+
    (else
     (emit-inner (car args) (cadr args)))))
 		
