@@ -21,7 +21,6 @@
 	result
 	(clone (cdr bits)
 	       (cons (car bits) result))))
-    
 
   (lambda ()
     (if (inner bits)
