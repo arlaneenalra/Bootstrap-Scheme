@@ -287,13 +287,14 @@ void reset(interp_core_type *interp) {
     TRACE("RESET\n");
 }
 
+
 /* Parse a file */
 object_type *parse(interp_core_type *interp, FILE *in) {
     reset(interp);
     
     yyset_in(in, interp->scanner);
     
-    if(yyparse(interp, interp->scanner)) {
+    if(parse_internal(interp, interp->scanner)) {
 	return 0;
     }
 
@@ -308,7 +309,7 @@ object_type *parse_string(interp_core_type *interp, char *in) {
     
     yy_scan_string(in, interp->scanner);
     
-    if(yyparse(interp, interp->scanner)) {
+    if(parse_internal(interp, interp->scanner)) {
 	return 0;
     }
 
@@ -322,7 +323,7 @@ object_type *parse_chain(interp_core_type *interp) {
     reset(interp);
     
 
-    if(yyparse(interp, interp->scanner)) {
+    if(parse_internal(interp, interp->scanner)) {
 	return 0;
     }
 

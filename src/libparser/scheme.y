@@ -98,3 +98,8 @@ void yyerror(interp_core_type *interp, void *scanner, char *s) {
 		       s, yyget_lineno(scanner));*/
       interp->error=1;
 }
+
+
+int parse_internal(interp_core_type *interp, void *scanner) {
+     return yyparse(interp, scanner);
+}

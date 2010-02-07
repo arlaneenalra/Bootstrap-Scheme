@@ -140,6 +140,8 @@ void push_parse_state(interp_core_type *interp, FILE *in);
 void pop_parse_state(interp_core_type *interp);
 object_type *parse_chain(interp_core_type *interp);
 
+int parse_internal(interp_core_type *interp, void *scanner);
+
 object_type *eval(interp_core_type *interp, object_type *obj);
 
 void output(interp_core_type *interp, object_type *obj);
