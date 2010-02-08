@@ -1,26 +1,28 @@
 ;; Tricks to define car and cdr down to appropriate depths
 
 
-(define (car-cdr-iter-inner bits)
-  (cond
-   ((null? bits) #f)
-   
-   ((eqv? (car bits) #\a)
-    (set-car! bits #\d))
-   (else (begin
-	   (set-car! bits #\a)
-	   (car-cdr-iter-inner (cdr bits))))))
 
 ; iterate through a list of binary numbers out to the given max
 (define (car-cdr-iter . bits)
-
-  (set! bits (car bits))
 
   (define (clone bits result)
     (if (null? bits)
 	result
 	(clone (cdr bits)
 	       (cons (car bits) result))))
+
+  (define (inner bits)
+    (cond
+     ((null? bits) #f)
+     
+     ((eqv? (car bits) #\a)
+      (set-car! bits #\d))
+     (else (begin
+	     (set-car! bits #\a)
+	     (inner (cdr bits))))))
+
+
+  (set! bits (car bits))
 
   (lambda ()
     (if (inner bits)
