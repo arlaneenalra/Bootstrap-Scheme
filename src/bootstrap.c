@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <gc.h>
 
-#include "libparser/core.h"
+#include "core.h"
 
 
 int main(int argc, char **argv) {

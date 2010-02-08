@@ -192,7 +192,8 @@
 	   (not (eqv? pattern "")))
       
       (set! str-split
-	    (cons '() str-split)))
+	    (cons '() str-split))
+      '())
 
 
   (split-inner str-list)

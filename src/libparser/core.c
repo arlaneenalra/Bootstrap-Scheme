@@ -134,7 +134,7 @@ object_type *create_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
 
     /* create a new buffer for the string value */
-    char *c=(char *)GC_malloc(strlen(str)+1);
+    char *c=alloc_string(interp, strlen(str)+1);
     strcpy(c, str);
 
     obj=alloc_object(interp, STRING);
@@ -457,4 +457,33 @@ int list_length(interp_core_type* interp, object_type *args) {
     }
 
     return count;
+}
+
+/* Make a copy of an object */
+object_type *clone(interp_core_type *interp, object_type *obj) {
+    object_type *new_obj;
+    object_type *next=0;
+
+    /* don't try to clone a null */
+    if(obj==0) {
+	return 0;
+    }
+    
+    if(obj->type==STRING) {
+	return create_string(interp, obj->value.string_val);
+    }
+
+    /* There should only be one instance of a given symbol */
+    if(obj->type==SYM) {
+	return obj;
+    }
+
+    new_obj=alloc_object(interp, obj->type);
+    next=new_obj->next; /* save off the next point */
+
+    memcpy(new_obj, obj, sizeof(object_type));
+    
+    new_obj->next=next;
+
+    return new_obj;
 }
