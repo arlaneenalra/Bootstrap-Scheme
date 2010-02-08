@@ -135,10 +135,12 @@ void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *parse_string(interp_core_type *interp, char *in);
+object_type *parse_chain(interp_core_type *interp);
 
 void push_parse_state(interp_core_type *interp, FILE *in);
 void pop_parse_state(interp_core_type *interp);
-object_type *parse_chain(interp_core_type *interp);
+
+object_type *clone(interp_core_type *interp, object_type *obj);
 
 int parse_internal(interp_core_type *interp, void *scanner);
 
@@ -148,7 +150,6 @@ void output(interp_core_type *interp, object_type *obj);
 void output_stream(interp_core_type *interp, object_type *obj, FILE *fout);
 
 bool has_error(interp_core_type *interp);
-
 
 void end_of_file(interp_core_type *interp);
 

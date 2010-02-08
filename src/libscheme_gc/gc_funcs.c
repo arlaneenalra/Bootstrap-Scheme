@@ -51,3 +51,14 @@ char *alloc_string(interp_core_type *interp, size_t len) {
     return c;
 }
 
+/* allocate and instance of the interpreter state */
+interp_core_type *alloc_interp() {
+
+    interp_core_type *interp=(interp_core_type *)GC_malloc(sizeof(interp_core_type));
+
+    if(!interp) {
+	fail("Unable to allocate interpreter instance!");
+    }
+    
+    return interp;
+}
