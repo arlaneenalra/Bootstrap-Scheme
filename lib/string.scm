@@ -182,6 +182,7 @@
      ((null? str-list)
       '())
 
+     ;; we have to handle "" as a pattern specially
      ((null? pattern-list)
       (begin
 	(set! str-split
@@ -191,7 +192,8 @@
 	(split-inner
 	 (cdr str-list)
 	 '())))
-	      
+
+     ;; match any other pattern here
      ((and (match pattern-list str-list) (not (null? pattern-list)))
 	(begin
 	  (set! str-split
@@ -221,19 +223,9 @@
 		    (reverse (car list)) rev-list))))))
     (reverse (inner list '())))
 
-
-
-  ;; check to see if we have a match at the very 
-  ;; start of the string with a non "" pattern
-
-  ;; (if (and (match pattern-list str-list) 
-  ;; 	   (not (eqv? pattern "")))
-      
-  ;;     (set! str-split
-  ;; 	    (cons '() str-split))
-  ;;     '())
-
-
+  
+  ;; split out the list of characters
   (split-inner str-list '())
 
+  ;; convert them back to strings
   (list-list->list-string (reverse-list-list str-split)))
