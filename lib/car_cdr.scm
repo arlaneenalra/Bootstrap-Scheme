@@ -84,18 +84,19 @@
   (define call-list
     (loop
      (lambda ()
-       (if (null? x)
-	   #f
-	   (begin 
-	     (define next
+       (let
+	   ((next x))
+	 (if (null? x)
+	     #f
+	     (begin
+	       ;; prune the list
+	       (set! x (cdr x))
+	       
 	       ;; Make the symbol
 	       (string->symbol
 		(string-append "c" 
-			       (list->string (cons (car x) '())) "r")))
-	     ;; prune the list
-	     (set! x (cdr x))
-	     next)))
-     '() '()))
+			       (list->string (cons (car next) '())) "r"))))))
+       '() '()))
 
   ;; construct actual S-Expressions for the body
   (define call 'param)
