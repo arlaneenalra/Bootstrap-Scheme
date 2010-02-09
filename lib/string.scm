@@ -154,8 +154,7 @@
     (string->list str))
 
   (define str-split '())
-  (define head str-list)
-
+  (define head '())
   
   ;; do the actual split work
   (define (split-inner str-list)
@@ -182,8 +181,8 @@
 
     (else (split-inner (cdr str-list)))))
 
-
-
+  ;; Fix a bug when running against guile
+  (set! head str-list)
 
   ;; check to see if we have a match at the very 
   ;; start of the string with a non "" pattern
