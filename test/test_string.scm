@@ -4,6 +4,10 @@
 ; in scheme
 (load "lib/stdlib.scm")
 
+(load "lib/boolean.scm")
+(load "lib/string.scm")
+(load "lib/car_cdr.scm")
+
 
 (make-string 10 #\c)
 
@@ -82,6 +86,7 @@ number-string
 (match '(#\c) '(#\c #\d #\d #\c))
 
 (split "~a" "~a12 ~3 ~a testing ~aasd")
+(split "~a" "~a12 ~3 ~a~a testing ~aasd")
 (split "~a" " ~a12 ~3 ~a testing ~aasd")
 (split "~" "~a12 ~3 ~a testing ~aasd")
 (split "" "12345")

@@ -163,6 +163,11 @@
     (string->list str))
 
   (define str-split '())
+
+  ;; strip the matched pattern out of our list
+  (define (strip-match list)
+    (or (match pattern-list list) list))
+
   
   ;; do the actual split work
   (define (split-inner str-list moved-list)
@@ -177,25 +182,29 @@
      ((null? str-list)
       '())
 
-     
-    ((match pattern-list (cdr str-list))
+     ((null? pattern-list)
+      (begin
+	(set! str-split
+	      (cons
+	       (cons (car str-list) '())
+	       str-split))
+	(split-inner
+	 (cdr str-list)
+	 '())))
+	      
+     ((and (match pattern-list str-list) (not (null? pattern-list)))
 	(begin
- 	  (set! str-split 
-		(cons 
-		 (cons 
-		  (car str-list) moved-list) 
-		       str-split))
+	  (set! str-split
+		(cons moved-list
+		      str-split))
 
-	  (split-inner
-	   (cdr str-list)
-	   '())))
+	      (split-inner
+	       (match pattern-list str-list)
+	       '())))
 
     (else (split-inner 
 	   (cdr str-list) 
 	   (cons (car str-list) moved-list)))))
-
-  (define (strip-match list)
-    (or (match pattern-list list) list))
 
   ;; the contents of a list of lists
   (define (reverse-list-list list)
@@ -209,7 +218,7 @@
 	   (else 
 	    (inner (cdr list) 
 		   (cons 
-		    (strip-match (reverse (car list))) rev-list))))))
+		    (reverse (car list)) rev-list))))))
     (reverse (inner list '())))
 
 
