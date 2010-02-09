@@ -86,9 +86,9 @@ number-string
 (match '(#\c) '(#\c #\d #\d #\c))
 
 (split "~a" "~a12 ~3 ~a testing ~aasd")
-(split "~a" "~a12 ~3 ~a~a testing ~aasd")
+(split "~a" "~a12 ~3 ~a~a~a testing ~aasd")
 (split "~a" " ~a12 ~3 ~a testing ~aasd")
-(split "~" "~a12 ~3 ~a testing ~aasd")
+(split "~" "~a12 ~3 ~~~~a testing ~aasd")
 (split "" "12345")
 
 (split "~a " "12 ~3 ~a testing ~aasd")
