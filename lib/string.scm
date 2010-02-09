@@ -8,6 +8,15 @@
 	(inner (cdr list) (+ 1 len))))
   (inner list 0))
 
+;; reverse a list
+(define (reverse list)
+  (define (inner list rev-list)
+    (if (null? list)
+	rev-list
+	(inner (cdr list)
+	       (cons (car list) rev-list))))
+  (inner list '()))
+
 
 ;; convert a string into a list of characters 
 (define (string->list str)
@@ -154,47 +163,68 @@
     (string->list str))
 
   (define str-split '())
-  (define head '())
   
   ;; do the actual split work
-  (define (split-inner str-list)
+  (define (split-inner str-list moved-list)
 
     (cond
      ;; End condition match
-     ((null? str-list)
-      (if (null? head)
-	  '()
+     ((and (null? str-list)
+	   (not (null? moved-list)))
       (set! str-split 
-	    (cons  (or (match pattern-list head) head) str-split))))
+      	    (cons  moved-list str-split)))
+
+     ((null? str-list)
+      '())
 
      
     ((match pattern-list (cdr str-list))
 	(begin
  	  (set! str-split 
-		(cons (or (match pattern-list head) head) str-split))
+		(cons 
+		 (cons 
+		  (car str-list) moved-list) 
+		       str-split))
 
-	  (set! head (cdr str-list))
+	  (split-inner
+	   (cdr str-list)
+	   '())))
 
-	  (set-cdr! str-list '())
+    (else (split-inner 
+	   (cdr str-list) 
+	   (cons (car str-list) moved-list)))))
 
-	  (split-inner head)))
+  (define (strip-match list)
+    (or (match pattern-list list) list))
 
-    (else (split-inner (cdr str-list)))))
+  ;; the contents of a list of lists
+  (define (reverse-list-list list)
+    (define (inner list rev-list)
+      (if (null? list)
+	  rev-list
+	  (cond
+	   ((null? (car list))
+	    (inner (cdr list)
+		   (cons '() rev-list)))
+	   (else 
+	    (inner (cdr list) 
+		   (cons 
+		    (strip-match (reverse (car list))) rev-list))))))
+    (reverse (inner list '())))
 
-  ;; Fix a bug when running against guile
-  (set! head str-list)
+
 
   ;; check to see if we have a match at the very 
   ;; start of the string with a non "" pattern
 
-  (if (and (match pattern-list str-list) 
-	   (not (eqv? pattern "")))
+  ;; (if (and (match pattern-list str-list) 
+  ;; 	   (not (eqv? pattern "")))
       
-      (set! str-split
-	    (cons '() str-split))
-      '())
+  ;;     (set! str-split
+  ;; 	    (cons '() str-split))
+  ;;     '())
 
 
-  (split-inner str-list)
-  
-  (list-list->list-string str-split))
+  (split-inner str-list '())
+
+  (list-list->list-string (reverse-list-list str-split)))
