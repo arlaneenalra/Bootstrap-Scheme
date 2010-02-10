@@ -1,7 +1,7 @@
 
 
 ;; find the length of a list
-(define (list-length list)
+(define (length list)
   (define (inner list len) 
     (if (null? list)
 	len
@@ -46,7 +46,7 @@
 	  (inner str (cdr list) (+ 1 index))
 	  ))
     )
-  (inner (make-string (list-length list)) list 0))
+  (inner (make-string (length list)) list 0))
 
 
 
