@@ -1,19 +1,18 @@
-;; Define some rather basic operations in scheme
 
-;; (load "lib/boolean.scm")
-
-;; (load "lib/string.scm")
-
-;; (load "lib/car_cdr.scm")
-
+;; TODO: This approach will still lead to namespace corruption, I'll
+;; need to come up with an eval based means to load into a private 
+;; environment rather than the procedure one.  But this will require 
+;; a more complete approach to libraries
 
 ;; Loads the given module and allows exported symbols to be moved into
 ;; the passed in environment
 (define (import-to-environment filename export-environment)
   
+  ;; Load a file into the lambda environment created with 
+  ;; this function's closure.  So long as nothing changes global 
+  ;; environment values this apporach should avoid poluting the 
+  ;; global namespace with library names
   (load filename)
-  
-  ;;(write  exported-list)
   
   ;; Mangle our list of variable names into a list of 
   ;; individual define statements hopefully without polluting
