@@ -1284,7 +1284,27 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
     fclose(fin);
 
     return parse_result;
+}
+
+/* provides - stashes list of exports to be processed in a parent environment */
+object_type *prim_provide(interp_core_type *interp, object_type *args) {
     
+    object_type * result=0;
+
+    /* If we have nothing to export, don't do anything */
+    if(list_length(interp, args)==0) {
+	return true;
+    }
+    
+    result=cons(interp, create_symbol(interp, "quote-list"), args);
+
+    result=cons(interp, 
+		create_symbol(interp, "define"),
+		cons(interp, 
+		     create_symbol(interp,"exported-list"), /* internal symbol */
+		     cons(interp, result, interp->empty_list)));
+    
+    return result;
 }
 
 /* read */
@@ -1570,6 +1590,8 @@ binding_type primitive_list[]={
     {"set-car!", &prim_set_car, 1, 1},
     {"set-cdr!", &prim_set_cdr, 1, 1},
     {"list", &prim_list, 1, 1},
+    {"quote-list", &prim_list, 0, 1},
+    {"provide", &prim_provide, 0, 0},
 
     {"+", &prim_plus, 1, 1},
     {"-", &prim_minus, 1, 1},

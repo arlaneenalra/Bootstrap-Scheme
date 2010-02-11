@@ -70,14 +70,18 @@
 		(loop iter3 (iter3) '())))))
 
 
+(define (make-symbol list)
+  (string->symbol 
+   (string-append
+    "c" (list->string list) "r")))
+
+
 
 ;; construct a procedure define based on a
 ;; list of charactes
 (define (car-cdr-gen-proc x)
   (define symbol
-    (string->symbol 
-     (string-append
-      "c" (list->string x) "r")))
+    (make-symbol x))
   
   ;; construct a list of symbols for the 
   ;; internals of our c?r proc
@@ -93,9 +97,8 @@
 	       (set! x (cdr x))
 	       
 	       ;; Make the symbol
-	       (string->symbol
-		(string-append "c" 
-			       (list->string (cons (car next) '())) "r"))))))
+	       (make-symbol (cons (car next) '()))))))
+			      
        '() '()))
 
   ;; construct actual S-Expressions for the body
@@ -121,14 +124,23 @@
 
 ;; Evaluates the list of expressions in the given 
 ;; environment
-(define (build-defines list env)
+(define (build-defines list export-list env)
   (let
       ((proc (car-cdr-gen-proc (car list)))
        (next (cdr list)))
     (eval proc env)
     (if (null? next)
-	#t
-    (build-defines next env))))
+	export-list
+    (build-defines next (cons (make-symbol (car list)) export-list) env))))
 
-;; build car-cdr friends
-(build-defines car-cdr-list (interaction-environment))
+;; build car-cdr friends and export them
+(define exported-list
+  (build-defines car-cdr-list '() (interaction-environment)))
+
+
+;; currently, export just populates exported-list with it's arguments
+;; but, this approach should future proof this module
+(eval (cons 'provide exported-list))
+
+
+

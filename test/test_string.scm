@@ -4,9 +4,8 @@
 ; in scheme
 (load "lib/stdlib.scm")
 
-(load "lib/boolean.scm")
-(load "lib/string.scm")
-(load "lib/car_cdr.scm")
+;; (load "lib/string.scm")
+;; (load "lib/car_cdr.scm")
 
 
 (make-string 10 #\c)
@@ -35,7 +34,7 @@ working-string
 
 (string->list "This is a test")
 
-(list-length (string->list "This was a test"))
+(length (string->list "This was a test"))
 (list->string (string->list "This was a test"))
 
 
@@ -44,10 +43,10 @@ working-string
 (substring "123456789" 5 6)
 
 
-(string-one-append "This is" " a test")
-(string-one-append "This is another " " a test")
-(string-one-append "" "Testing")
-(string-one-append "Testing" "")
+(string-append "This is" " a test")
+(string-append "This is another " " a test")
+(string-append "" "Testing")
+(string-append "Testing" "")
 
 
 
