@@ -34,13 +34,24 @@
     (inner inner exported-list ))
   )
 
-
-;; load strings library
+;; the lists library has for-each in it
 (import-to-environment "lib/list.scm" (interaction-environment))
-(import-to-environment "lib/string.scm" (interaction-environment))
-(import-to-environment "lib/boolean.scm" (interaction-environment))
-(import-to-environment "lib/car_cdr.scm" (interaction-environment))
 
 
+;; import a list of libraries now that we have 
+((lambda (env lib-list)
+   (for-each (lambda (lib)
+	       (import-to-environment lib env))
+	     lib-list))
+ (interaction-environment)
 
+ '( ;; list of libraries to load
+   "lib/string.scm"
+   "lib/boolean.scm"
+   "lib/car_cdr.scm"))
+
+
+;;
+
+#t ; we have to return true or bootstrap bombs
 

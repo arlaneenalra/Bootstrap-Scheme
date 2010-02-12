@@ -1,17 +1,6 @@
 
 (define val-list '())
 
-;; a for-each routine
-(define (for-each proc val-list)
-
-  (define (inner proc val-list)
-    (if (or (null? val-list) (null? (car val-list)))
-	'()
-	(begin
-	  (proc (car val-list))
-	  (inner proc (cdr val-list)))))
-
-  (inner proc val-list))
 
 (for-each 
  (lambda (x)
