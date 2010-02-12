@@ -2,7 +2,7 @@
 
 ; load string functions that have been implemented 
 ; in scheme
-(load "lib/stdlib.scm")
+;; (load "lib/stdlib.scm")
 
 ;; (load "lib/string.scm")
 ;; (load "lib/car_cdr.scm")
@@ -92,3 +92,4 @@ number-string
 
 (split "~a " "12 ~3 ~a testing ~aasd")
 
+(quit)
