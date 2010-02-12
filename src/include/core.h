@@ -137,6 +137,7 @@ typedef struct interp_core {
 
 interp_core_type *create_interp();
 void repl(interp_core_type *interp);
+void top_level_program(interp_core_type *interp, char *filename);
 void cleanup_interp(interp_core_type *interp);
 
 object_type *parse(interp_core_type *interp, FILE *in);

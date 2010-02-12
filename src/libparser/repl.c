@@ -7,27 +7,34 @@
 #include "scheme_funcs.h"
 #include "parser_internal.h"
 
-/* Load the main library */
-void load_main(interp_core_type *interp) {
+
+object_type * call_load(interp_core_type *interp, char *filename) {
     struct stat stat_buf;
     object_type *load_call=0;
-    object_type *result=0;
-    
+
     /* check the current directory */
-    if(stat("lib/main.scm", &stat_buf)) {
+    if(stat(filename, &stat_buf)) {
 	fail("Unable to locate libraries");
     }
-    
+
+    /* build a call to load */
     load_call=cons(interp, create_symbol(interp, "load"),
-		   cons(interp, create_string(interp, "lib/main.scm"),
+		   cons(interp, create_string(interp, filename),
 			interp->empty_list));
 
 
-    result=eval(interp, load_call);
+    return eval(interp, load_call);
+}
+
+/* Load the main library */
+void load_main(interp_core_type *interp) {
+    object_type *result=0;
+    
+    result=call_load(interp, "lib/main.scm");
 
     /* this is not a good test */
     if(result!=true) {
-	fail("There was a problem loading libraries");
+	fail("There was a problem loading system libraries");
     }
 }
 
@@ -62,7 +69,11 @@ void repl(interp_core_type *interp) {
 }
 
 /* execution of a top-level program */
-void top_level_program(interp_core_type *interp, char* file) {
-    /* TODO */
+void top_level_program(interp_core_type *interp, char* filename) {
+    object_type *result=0;
+    
+    load_main(interp);
+    
+    result=call_load(interp, filename);
 
 }
