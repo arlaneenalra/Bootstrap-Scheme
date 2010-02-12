@@ -124,6 +124,9 @@ typedef struct interp_core {
     /* Stores variable bindings */
     object_type *cur_env;
     
+    /* Top level environment */
+    object_type *top_env;
+    
     /* List of all symbols in the system */
     symbol_table_type symbols;
 

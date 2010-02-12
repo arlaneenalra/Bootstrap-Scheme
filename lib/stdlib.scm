@@ -34,18 +34,21 @@
     (inner inner exported-list ))
   )
 
+;; load the library into a library into the top
+;; level environment
+
+(define (require lib)
+  (import-to-environment lib (interaction-environment)))
+
 ;; the lists library has for-each in it
-(import-to-environment "lib/list.scm" (interaction-environment))
+(require "lib/list.scm")
 
 
-;; import a list of libraries now that we have 
-;; the lambda is there to avoid a define a loop in the
-;; environment graph and break how it is displayed
-((lambda (env lib-list)
+;; load each of a list of libraries
+((lambda (lib-list)
    (for-each (lambda (lib)
-	       (import-to-environment lib env))
+	       (require lib))
 	     lib-list))
- (interaction-environment)
 
  '( ;; list of libraries to load
    "lib/string.scm"

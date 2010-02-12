@@ -413,6 +413,8 @@ void create_base_environment(interp_core_type *interp) {
 		true,
 		&interp->cur_env);
 
+    interp->top_env=interp->cur_env;
+
 }
 
 /* Create an instance of the interpreter */

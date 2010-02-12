@@ -1179,7 +1179,8 @@ object_type *prim_or(interp_core_type *interp, object_type *args) {
 
 /* return the current environment */
 object_type *prim_interaction_environment(interp_core_type *interp, object_type *args) {
-    return interp->cur_env;
+    /*return interp->cur_env; */
+    return interp->top_env;
 }
 
 /* populate a new base environment */
