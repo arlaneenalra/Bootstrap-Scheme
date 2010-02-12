@@ -1,17 +1,18 @@
 
-;; TODO: This approach will still lead to namespace corruption, I'll
-;; need to come up with an eval based means to load into a private 
-;; environment rather than the procedure one.  But this will require 
+;; TODO: This approach will still lead to namespace 
+;; corruption, I'll need to come up with an eval based 
+;; means to load into a private environment rather 
+;; than the procedure one.  But this will require 
 ;; a more complete approach to libraries
 
-;; Loads the given module and allows exported symbols to be moved into
-;; the passed in environment
+;; Loads the given module and allows exported symbols to 
+;; be moved into the passed in environment
 (define (import-to-environment filename export-environment)
   
   ;; Load a file into the lambda environment created with 
-  ;; this function's closure.  So long as nothing changes global 
-  ;; environment values this apporach should avoid poluting the 
-  ;; global namespace with library names
+  ;; this function's closure.  So long as nothing changes 
+  ;; global environment values this apporach should avoid 
+  ;; poluting the global namespace with library names
   (load filename)
   
   ;; Mangle our list of variable names into a list of 
@@ -56,7 +57,11 @@
    "lib/car_cdr.scm"))
 
 
-;;
+;; define a short proxy to use until I get the 
+;; real io code implemented
+(define display write)
+(define (newline) (write-char #\newline))
+
 
 #t ; we have to return true or bootstrap bombs
 
