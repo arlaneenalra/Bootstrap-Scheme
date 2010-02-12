@@ -39,6 +39,8 @@
 
 
 ;; import a list of libraries now that we have 
+;; the lambda is there to avoid a define a loop in the
+;; environment graph and break how it is displayed
 ((lambda (env lib-list)
    (for-each (lambda (lib)
 	       (import-to-environment lib env))
