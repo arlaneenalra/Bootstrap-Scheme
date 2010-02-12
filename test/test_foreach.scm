@@ -1,4 +1,8 @@
 
+;; load our test library
+
+(require "lib/test.scm")
+
 (define val-list '())
 
 
@@ -8,4 +12,6 @@
 	 (cons (+ x x) val-list)))
  '(1 2 3 4 5 6 7 8 9 10))
 
-val-list
+
+(test (lambda () val-list) '(2 4 6 8 10 12 14 16 18 20))
+
