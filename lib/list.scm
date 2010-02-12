@@ -1,6 +1,6 @@
 
 ;; export some functions
-(provide length reverse)
+(provide length reverse for-each)
 
 ;; find the length of a list
 (define (length list)
@@ -18,3 +18,18 @@
 	(inner (cdr list)
 	       (cons (car list) rev-list))))
   (inner list '()))
+
+
+;; a for-each routine
+;; a for-each routine
+(define (for-each proc val-list)
+
+  (define (inner proc val-list)
+    (if (or (null? val-list) (null? (car val-list)))
+	'()
+	(begin
+	  (proc (car val-list))
+	  (inner proc (cdr val-list)))))
+
+  (inner proc val-list))
+
