@@ -100,5 +100,18 @@ void yyerror(interp_core_type *interp, void *scanner, char *s) {
 
 
 int parse_internal(interp_core_type *interp, void *scanner) {
-     return yyparse(interp, scanner);
+    int ret_val=0;
+    int parsing_flag=0;
+    
+    /* save off the flag */
+    parsing_flag=interp->parsing;
+
+    interp->parsing=1;
+
+    ret_val=yyparse(interp, scanner);
+
+    /* put it back to what it was before we started */
+    interp->parsing=parsing_flag;
+
+    return ret_val;
 }

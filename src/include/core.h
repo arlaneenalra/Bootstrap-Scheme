@@ -98,6 +98,7 @@ typedef struct symbol_table {
 typedef struct interp_core {
     bool error; /* An error has occured */
     bool running; /* The interpreter is running */
+    bool parsing; /* Is the parser running */
     
     /* Instances of #t and #f */
     bool_global_type boolean;
@@ -107,14 +108,15 @@ typedef struct interp_core {
 
     /* Instance of the quote symbol */
     object_type *quote;
-
-    /* Object to be attached to the object graph */
-    object_type *added;
     
     object_type *eof_object;
 
+    /* Object to be attached to the object graph */
+    object_type *added;
+
     /* Object we are currently working on */
     object_type *current;
+
 
     /* Used by the parser to generate lists */
     object_type *state_stack;

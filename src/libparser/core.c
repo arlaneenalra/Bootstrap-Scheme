@@ -331,13 +331,24 @@ object_type *parse_chain(interp_core_type *interp) {
 }
 
 void push_parse_state(interp_core_type *interp, FILE *fin) {
+    
+    /* we aren't parsing right now */
+    if(interp->parsing==0) {
+	yyset_in(fin, interp->scanner);
+	return;
+    }
+ 
     yypush_buffer_state(
 			yy_create_buffer(fin, YY_BUF_SIZE, interp->scanner),
 			interp->scanner);
 }
 
 void pop_parse_state(interp_core_type *interp) {
-    yypop_buffer_state(interp->scanner);
+
+    /* only do this if we were parsing */
+    if(interp->parsing) {
+	yypop_buffer_state(interp->scanner);
+    }
 }
 
 /* Create an instance of the Quote symbol */

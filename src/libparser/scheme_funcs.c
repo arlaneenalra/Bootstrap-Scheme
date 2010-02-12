@@ -1245,8 +1245,6 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
     }
     
     filename=car(args)->value.string_val;
-
-    push_parse_state(interp, fin);
     
     /* open the file */
     fin=fopen(filename, "r");
@@ -1256,6 +1254,10 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
 	interp->error=1;
 	return false;
     }
+
+
+    push_parse_state(interp, fin);
+
 
     /* create our implicit begin form */
     current=parse_result=cons(interp,
@@ -1278,6 +1280,7 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
     }
 
     pop_parse_state(interp);
+
 
     interp->running=1;
 
