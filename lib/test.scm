@@ -8,9 +8,14 @@
   (define actual '())
 
   (set! actual (test-proc))
-  (if (eq? actual expected)
+  (if (equal? actual expected)
       #t
-      #f))
+      (begin
+	(display "expected->?")
+	(write expected)
+	(display " recieved->")
+	(write actual)
+	#f)))
 
 
 ;; run a list of tests
@@ -23,10 +28,8 @@
 	 ((test-proc (car tuple))
 	  (expected (cdr tuple)))
        
-       (if (test-case (eval test-proc) expected)
-	   (write "GOOD")
-	   (write "FAIL")))
-     (newline))
+       (test-case (eval test-proc) expected)
+       (newline)))
    
    list))
 
