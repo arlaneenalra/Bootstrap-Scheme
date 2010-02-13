@@ -20,16 +20,61 @@
   (inner list '()))
 
 
-;; a for-each routine
-;; a for-each routine
-(define (for-each proc val-list)
 
+;; convert parallel lists into a single list
+;; of lists
+(define (prep-args val-list)
+
+  ;; make a list from the a row of the 
+  ;; parallel lists
+  (define (combind val-list flat-list)
+    
+    (if (null? val-list)
+	(reverse flat-list)
+	(combind (cdr val-list) 
+		 (cons (car (car val-list)) flat-list))))
+
+  (define (next val-list new-val-list)
+    (cond 
+     ((null? val-list) 
+      (reverse new-val-list))
+     
+     ((null? (car val-list))
+	     '())
+     
+     (else 
+      (next (cdr val-list) 
+	    (cons (cdr (car val-list)) new-val-list)))))
+
+  
+  (define (inner val-list args-list)
+    (let
+	((next-val (next val-list '())))
+
+      (if (null? next-val)
+	  (reverse args-list)
+	  (inner next-val (cons  
+			   (combind val-list '())
+			   args-list)))))
+
+
+  (inner val-list '()))
+	
+    
+
+;; a for-each routine
+;; a for-each routine
+(define (for-each proc . val-list)
+  
   (define (inner proc val-list)
     (if (or (null? val-list) (null? (car val-list)))
 	'()
 	(begin
-	  (proc (car val-list))
+	  (apply proc (car val-list))
 	  (inner proc (cdr val-list)))))
 
-  (inner proc val-list))
+  (inner proc (prep-args val-list)))
+
+
+#t;
 
