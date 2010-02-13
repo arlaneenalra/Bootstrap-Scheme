@@ -54,13 +54,8 @@
  '( ;; list of libraries to load
    "lib/string.scm"
    "lib/boolean.scm"
-   "lib/car_cdr.scm"))
-
-
-;; define a short proxy to use until I get the 
-;; real io code implemented
-(define display write)
-(define (newline) (write-char #\newline))
+   "lib/car_cdr.scm"
+   "lib/io.scm"))
 
 
 #t ; we have to return true or bootstrap bombs

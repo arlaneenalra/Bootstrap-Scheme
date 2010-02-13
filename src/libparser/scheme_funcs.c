@@ -1522,6 +1522,29 @@ object_type *prim_open_output_file(interp_core_type *interp, object_type *args) 
     return obj;
 }
 
+/* standard-error-port */
+object_type *prim_stderr(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=stderr;
+    obj->value.port_val.output=1;
+    
+    return obj;
+
+}
+
+/* standard-output-port */
+object_type *prim_stdout(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    obj=alloc_object(interp, PORT);
+    obj->value.port_val.port=stdout;
+    obj->value.port_val.output=1;
+    
+    return obj;
+
+}
 
 /* close-input-file close-output-file */
 object_type *prim_close(interp_core_type *interp, object_type *args) {
@@ -1661,6 +1684,9 @@ binding_type primitive_list[]={
 
     {"close-input-port", &prim_close, 1, 1},
     {"close-output-port", &prim_close, 1, 1},
+
+    {"standard-output-port", &prim_stdout, 1, 1},
+    {"standard-error-port", &prim_stderr, 1, 1},
 
     {"eof-object?", &prim_is_eof_object, 1, 1},
     {"input-port?", &prim_is_input_port, 1, 1},
