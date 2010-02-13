@@ -28,7 +28,9 @@
 	 ((test-proc (car tuple))
 	  (expected (cdr tuple)))
        
-       (test-case (eval test-proc) expected)
+       (if (test-case (eval test-proc) expected)
+	   (display "PASS")
+	   (display "FAIL"))
        (newline)))
    
    list))
