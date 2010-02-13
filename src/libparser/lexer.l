@@ -46,8 +46,8 @@ CHAR_VAL      (newline|space|[^{WS}])
 
 <EXPECT_STRING>{
 
-(\\n|\\["]|\\\\|[^\\"])*  { return STRING_CONSTANT; }
-\"                  { BEGIN(INITIAL); return DOUBLE_QUOTE; }
+	([^\"]|\\\")*  { return STRING_CONSTANT; }
+	\"             { BEGIN(INITIAL); return DOUBLE_QUOTE; }
 }
 
 
