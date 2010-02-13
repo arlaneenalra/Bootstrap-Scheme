@@ -78,8 +78,13 @@ void add_char(interp_core_type *interp, char *str) {
     
     if(strcmp(str, "newline")==0) {
 	c='\n';
+
     } else if(strcmp(str, "space")==0) {
 	c=' ';
+
+    } else if(*str=='x') { /* Hex encoded charater */
+	uint64_t val=strtoul(str+1, 0, 16);
+	c=0xff & val;
     }
     
     obj=alloc_object(interp, CHAR);

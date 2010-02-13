@@ -17,7 +17,7 @@ EOL       \n|\r\n|\n\r|\r
 WS	  {EOL}|[[:blank:]]
 IDENT     [!$%&*+\-./:<=>?@^_~[:alnum:]]
 
-CHAR_VAL      (newline|space|[^{WS}])
+CHAR_VAL      (newline|space|[^{WS}]|x[0-9A-F]+)
 
 %x EXPECT_CHAR
 %x EXPECT_STRING
