@@ -292,9 +292,9 @@ void reset(interp_core_type *interp) {
 object_type *parse(interp_core_type *interp, FILE *in) {
     reset(interp);
     
-    yyset_in(in, interp->scanner);
+    yyset_in(in, peek_scanner);
     
-    if(parse_internal(interp, interp->scanner)) {
+    if(parse_internal(interp, peek_scanner)) {
 	return 0;
     }
 
@@ -307,9 +307,9 @@ object_type *parse(interp_core_type *interp, FILE *in) {
 object_type *parse_string(interp_core_type *interp, char *in) {
     reset(interp);
     
-    yy_scan_string(in, interp->scanner);
+    yy_scan_string(in, peek_scanner);
     
-    if(parse_internal(interp, interp->scanner)) {
+    if(parse_internal(interp, peek_scanner)) {
 	return 0;
     }
 
@@ -323,7 +323,7 @@ object_type *parse_chain(interp_core_type *interp) {
     reset(interp);
     
 
-    if(parse_internal(interp, interp->scanner)) {
+    if(parse_internal(interp, peek_scanner)) {
 	return 0;
     }
 
@@ -343,8 +343,8 @@ void push_parse_state(interp_core_type *interp, FILE *fin) {
 
 void pop_parse_state(interp_core_type *interp) {
 
-    yylex_destroy(interp->scanner->scanner);
-    interp->scanner=interp->scanner->previous;
+    yylex_destroy(peek_scanner);
+    interp->scanner=peek_previous;
 }
 
 /* Create an instance of the Quote symbol */
@@ -417,7 +417,7 @@ void create_parser(interp_core_type *interp) {
     
     interp->scanner=alloc_scanner();
     
-    yylex_init_extra(interp, &(interp->scanner->scanner));
+    yylex_init_extra(interp, &(peek_scanner));
 }
 
 /* Create an instance of the interpreter */
@@ -460,7 +460,7 @@ interp_core_type *create_interp() {
 
 /* Clean up allocations in the interpreter. */
 void cleanup_interp(interp_core_type *interp) {
-    yylex_destroy(interp->scanner);
+    yylex_destroy(peek_scanner);
 }
 
 /* Find the length of a passed in list */

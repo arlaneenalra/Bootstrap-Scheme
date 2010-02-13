@@ -23,6 +23,8 @@
 #define false interp->boolean.false
 #define true interp->boolean.true
 #define eof_object interp->eof_object
+#define peek_scanner interp->scanner->scanner
+#define peek_previous interp->scanner->previous
 
 typedef struct binding {
     char *symbol;
