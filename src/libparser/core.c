@@ -100,6 +100,81 @@ void add_number(interp_core_type *interp, char *str) {
 /* create an instance of a string object */
 void add_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
+    char *c_write=0;
+    char *c_read=0;
+    char read=0;
+
+    c_write=c_read=str;
+    
+    /* In place character interpolation */
+    while(*c_read!=0) {
+	
+	read=*c_read;
+
+	/* look for \ character */
+	if(read=='\\') {
+	    c_read++;
+	    
+	    switch (*c_read) {
+	    case 'a': /* alarm */
+		read=0x07;
+		break;
+
+	    case 'b': /* backspace */
+		read=0x08;
+		break;
+
+	    case 't': /* character tab */
+		read=0x09;
+		break;
+		
+	    case 'n': /* linefeed */
+		read=0x0A;
+		break;
+
+	    case 'v': /* vertical tab */
+		read=0x0B;
+		break;
+
+	    case 'f': /* form feed */
+		read=0x0C;
+		break;
+
+	    case 'r': /* return */
+		read=0x0D;
+		break;
+
+	    case '"': /* double quote */
+		read='"';
+		break;
+		
+	    case '\\': /* backslash */
+		read='\\';
+		break;
+		
+	    case 'x': /* not implemented yet */
+		read='x';
+		break;
+		
+	    default:
+		read='!';
+		interp->error=1;
+		break;
+	    }
+	    
+	}
+	
+	/* store the read character and move
+	to next location */
+	*c_write=read;
+	c_write++;
+	c_read++;
+    }
+
+    /* add null terminator */
+    if(c_write!=c_read) {
+	*c_write=0;
+    }
 
     obj=create_string(interp, str);
     add_object(interp,obj);
