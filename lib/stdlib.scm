@@ -53,9 +53,11 @@
 
  '( ;; list of libraries to load
    "lib/string.scm"
+   "lib/math.scm"
    "lib/boolean.scm"
    "lib/car_cdr.scm"
-   "lib/io.scm"))
+   "lib/io.scm"
+   "lib/util.scm"))
 
 
 #t ; we have to return true or bootstrap bombs

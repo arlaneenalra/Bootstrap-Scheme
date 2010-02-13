@@ -28,7 +28,7 @@
    ((char? obj) 
     (write-char obj port))
    
-   ((integer? obj)
+   ((number? obj)
     (display-number obj port))
 
    (else 
