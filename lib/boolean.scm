@@ -1,6 +1,6 @@
 ;; Define some boolean operators
 
-(provide not boolean=? string=? equal?)
+(provide not boolean=? string=? equal? equal-seen)
 
 (define (not x)
   (if x #f #t))
@@ -17,10 +17,47 @@
   (and (string? x) (string? y) (eq? x y)))
 
 
+;; break cycles in equal-pair?
+;; TODO: This is very inefficient but will work
+(define (equal-seen x seen-x)
+  (cond
+   ((null? seen-x) #f)
+   ((eq? x (car seen-x)) #t)
+   (else (equal-seen x (cdr seen-x)))))
+      
+	      
+
+
 ;; walk each the tree of pairs
 ;; TODO: This will have to change to deal with cycles
 (define (equal-pair? x y)
-  (and (equal? (car x) (car y)) (equal? (cdr x) (cdr y))))
+  
+  (define (equal-inner x y seen-x seen-y)
+    (if (and (equal-seen x seen-x)
+	     (equal-seen y seen-y))
+	#t ;; We have a cyle
+
+	(and
+	 (if (and (pair? (car x)) (pair? (car y)))
+	     (equal-inner (car x)
+			  (car y)
+			  (cons x seen-x) 
+			  (cons y seen-y))
+	     (equal? (car x) (car y)))
+
+	 (if (and (pair? (cdr x)) (pair? (cdr y)))
+	     (equal-inner (cdr x)
+			  (cdr y)
+			  (cons x seen-x) 
+			  (cons y seen-y))
+	     (equal? (cdr x) (cdr y))))))
+
+  (equal-inner x y '() '()))
+		    
+		    
+
+    
+;;  (and (equal? (car x) (car y)) (equal? (cdr x) (cdr y))))
 
 ;; Deep equality checking
 (define (equal? x y)
@@ -30,4 +67,6 @@
     ((and (pair? x) (pair? y)) (equal-pair? x y))
 
     ;; if we get here, things are not equal
-    (else (eqv? x y))))
+    (else 
+     (begin
+       (eqv? x y)))))

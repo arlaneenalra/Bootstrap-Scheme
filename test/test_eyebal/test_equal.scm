@@ -8,6 +8,27 @@
 (define ABC (cons a (cons b (cons c '()))))
 (define acb (cons a (cons c (cons b '()))))
 
+;; Construct a cycle 
+(define (make-cycle)
+  (define cycle (cons 1 (cons 2 (cons 3 (cons 4 (cons 5 '()))))))
+  (define cycle-tail (cddddr cycle))
+  (set-cdr! cycle-tail cycle)
+  cycle)
+
+(define cycle-a (make-cycle))
+(define cycle-b (make-cycle))
+(define cycle-c (make-cycle))
+
+(let
+    ((cycle-c-tail (cdddr cycle-c)))  
+  (set-cdr! cycle-c-tail a))
+
+
+(newline)
+
+(pair? '())
+(eq? (cons 1 2) (cons 1 2))
+(eqv? (cons 1 1) '())
 
 (newline)
 
@@ -29,4 +50,10 @@
 
 (equal? abc a) ; #f
 
+
+(equal? cycle-a cycle-a) ; #t
+(equal? cycle-a cycle-b) ; #t
+(equal? cycle-b cycle-a) ; #t
+(equal? cycle-c cycle-a) ; #f
+(equal? cycle-a cycle-c) ; #f
 
