@@ -152,8 +152,13 @@ void add_string(interp_core_type *interp, char *str) {
 		read='\\';
 		break;
 		
-	    case 'x': /* not implemented yet */
-		read='x';
+	    case 'x': /* read a numeric character constant */
+		c_read++;
+		
+		/* TODO: this will need to be adapted to
+		   unicode */
+		uint64_t val=strtoul(c_read, &c_read, 16);
+		read=0xff & val;
 		break;
 		
 	    default:
