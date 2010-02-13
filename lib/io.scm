@@ -12,15 +12,27 @@
       ((char-list (string->list obj)))
     (for-each (lambda (char)
 		(write-char char port))
-	      char-list))
-  #t)
+	      char-list)))
+
+(define (display-number obj port)
+  (display-string 
+   (number->string obj)
+   port))
 
 ;; dispatch to the appropriate display method
 (define (display-internal obj port)
   (cond
-   ((string? obj) (display-string obj port))
-   ((char? obj) (write-char obj port))
-   (else (write obj port))))
+   ((string? obj) 
+    (display-string obj port))
+
+   ((char? obj) 
+    (write-char obj port))
+   
+   ((integer? obj)
+    (display-number obj port))
+
+   (else 
+    (write obj port))))
 
 
 
