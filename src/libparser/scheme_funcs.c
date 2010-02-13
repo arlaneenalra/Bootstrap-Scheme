@@ -1025,6 +1025,7 @@ TEST(is_empty_list(interp, car(args)), prim_is_null)
 TEST(car(args)!=0 && car(args)->type==BOOL, prim_is_boolean)
 TEST(car(args)!=0 && car(args)->type==SYM, prim_is_symbol)
 TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
+TEST(car(args)!=0 && car(args)->type==FLOATNUM, prim_is_real)
 TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
 TEST(is_tuple(interp, car(args)) && car(args)!=interp->empty_list, prim_is_tuple)
@@ -1643,6 +1644,7 @@ binding_type primitive_list[]={
     {"boolean?", &prim_is_boolean, 1, 1},
     {"symbol?", &prim_is_symbol, 1, 1},
     {"integer?", &prim_is_integer, 1, 1},
+    {"real?", &prim_is_real, 1, 1},
     {"char?", &prim_is_char, 1, 1},
     {"string?", &prim_is_string, 1, 1},
     {"pair?", &prim_is_tuple, 1, 1},
