@@ -460,7 +460,11 @@ interp_core_type *create_interp() {
 
 /* Clean up allocations in the interpreter. */
 void cleanup_interp(interp_core_type *interp) {
-    yylex_destroy(peek_scanner);
+
+    /* Clean up all allocated parsers */
+    while(interp->scanner!=0) {
+	pop_parse_state(interp);
+    }
 }
 
 /* Find the length of a passed in list */
