@@ -46,5 +46,3 @@
  '(((lambda () val-list) . (20 18 16 14 12 10 8 6 4 2))
    ((lambda () val-list2) . (21 19 17 15 13 11 9 7 5 3))
    ((lambda () val-list3) . (31 28 25 22 19 16 13 10 7 4))))
-
-(newline)

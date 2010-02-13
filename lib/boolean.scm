@@ -13,6 +13,7 @@
 
 ;; Check to see that both arguments are strings
 ;; and equal
+;; TODO: This needs to be rewritten as scheme
 (define (string=? x y)
   (and (string? x) (string? y) (eq? x y)))
 
@@ -70,3 +71,6 @@
     (else 
      (begin
        (eqv? x y)))))
+
+
+#t
