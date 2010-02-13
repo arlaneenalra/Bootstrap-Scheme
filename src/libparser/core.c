@@ -332,23 +332,19 @@ object_type *parse_chain(interp_core_type *interp) {
 
 void push_parse_state(interp_core_type *interp, FILE *fin) {
     
-    /* we aren't parsing right now */
-    if(interp->parsing==0) {
-	yyset_in(fin, interp->scanner);
-	return;
-    }
- 
-    yypush_buffer_state(
-			yy_create_buffer(fin, YY_BUF_SIZE, interp->scanner),
-			interp->scanner);
+    scanner_stack_type *scanner=alloc_scanner();
+
+    yylex_init_extra(interp, &(scanner->scanner));
+    yyset_in(fin, scanner->scanner);
+
+    scanner->previous=interp->scanner;
+    interp->scanner=scanner;
 }
 
 void pop_parse_state(interp_core_type *interp) {
 
-    /* only do this if we were parsing */
-    if(interp->parsing) {
-	yypop_buffer_state(interp->scanner);
-    }
+    yylex_destroy(interp->scanner->scanner);
+    interp->scanner=interp->scanner->previous;
 }
 
 /* Create an instance of the Quote symbol */
@@ -417,6 +413,13 @@ void create_base_environment(interp_core_type *interp) {
 
 }
 
+void create_parser(interp_core_type *interp) {
+    
+    interp->scanner=alloc_scanner();
+    
+    yylex_init_extra(interp, &(interp->scanner->scanner));
+}
+
 /* Create an instance of the interpreter */
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
@@ -443,8 +446,8 @@ interp_core_type *create_interp() {
 	/* setup the base environment */
 	create_base_environment(interp);
 
-	/* create an instance of the parser/lexer */
-	yylex_init_extra(interp, &(interp->scanner));
+	/* create the top level parser */
+	create_parser(interp);
 
 	interp->running=1;
 

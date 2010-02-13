@@ -1287,6 +1287,12 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
 
     fclose(fin);
 
+    if(has_error(interp)) {
+	reset(interp);
+	interp->error=1;
+	return false;
+    }
+
     return parse_result;
 }
 

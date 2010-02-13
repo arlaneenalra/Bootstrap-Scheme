@@ -93,6 +93,12 @@ typedef struct symbol_table {
 } symbol_table_type;
 
 
+/* used to keep track of a stack of lexers */
+typedef struct scanner_stack {
+    void * scanner;
+    struct scanner_stack *previous;
+} scanner_stack_type;
+
 /* Values that are required for an instance of the interpreter 
    to function properly */
 typedef struct interp_core {
@@ -130,7 +136,7 @@ typedef struct interp_core {
     /* List of all symbols in the system */
     symbol_table_type symbols;
 
-    void * scanner; /* an instance of the parser/lexer */
+    scanner_stack_type *scanner; /* an instance of the parser/lexer */
     
 } interp_core_type;
 
@@ -143,6 +149,7 @@ void cleanup_interp(interp_core_type *interp);
 object_type *parse(interp_core_type *interp, FILE *in);
 object_type *parse_string(interp_core_type *interp, char *in);
 object_type *parse_chain(interp_core_type *interp);
+void reset(interp_core_type *interp);
 
 void push_parse_state(interp_core_type *interp, FILE *in);
 void pop_parse_state(interp_core_type *interp);

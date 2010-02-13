@@ -54,11 +54,22 @@ char *alloc_string(interp_core_type *interp, size_t len) {
 /* allocate and instance of the interpreter state */
 interp_core_type *alloc_interp() {
 
-    interp_core_type *interp=(interp_core_type *)GC_malloc(sizeof(interp_core_type));
+    interp_core_type *interp=
+	(interp_core_type *)GC_malloc(sizeof(interp_core_type));
 
     if(!interp) {
 	fail("Unable to allocate interpreter instance!");
     }
     
     return interp;
+}
+
+
+/* allocate an instance of the lexer */
+scanner_stack_type *alloc_scanner() {
+
+    scanner_stack_type *scanner=
+	(scanner_stack_type *)GC_malloc(sizeof(scanner_stack_type));
+
+    return scanner;
 }
