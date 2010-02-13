@@ -9,19 +9,33 @@
 (define acb (cons a (cons c (cons b '()))))
 
 ;; Construct a cycle 
-(define (make-cycle)
+(define (make-cycle-cdr)
   (define cycle (cons 1 (cons 2 (cons 3 (cons 4 (cons 5 '()))))))
   (define cycle-tail (cddddr cycle))
   (set-cdr! cycle-tail cycle)
   cycle)
 
-(define cycle-a (make-cycle))
-(define cycle-b (make-cycle))
-(define cycle-c (make-cycle))
+(define (make-cycle-car)
+  (define cycle (cons (cons (cons (cons (cons 5 '()) 4) 3) 2) 1))
+  (define cycle-tail (caaaar cycle))
+  (set-car! cycle-tail cycle)
+  cycle)
+
+(define cycle-a (make-cycle-cdr))
+(define cycle-b (make-cycle-cdr))
+(define cycle-c (make-cycle-cdr))
+
+(define cycle-a-a (make-cycle-car))
+(define cycle-b-a (make-cycle-car))
+(define cycle-c-a (make-cycle-car))
 
 (let
     ((cycle-c-tail (cdddr cycle-c)))  
   (set-cdr! cycle-c-tail a))
+
+(let
+    ((cycle-c-tail (caaar cycle-c-a)))  
+  (set-car! cycle-c-tail a))
 
 
 (newline)
@@ -56,4 +70,13 @@
 (equal? cycle-b cycle-a) ; #t
 (equal? cycle-c cycle-a) ; #f
 (equal? cycle-a cycle-c) ; #f
+
+(newline)
+
+(equal? cycle-a-a cycle-a-a) ; #t
+(equal? cycle-a-a cycle-b-a) ; #t
+(equal? cycle-b-a cycle-a-a) ; #t
+(equal? cycle-c-a cycle-a-a) ; #f
+(equal? cycle-a-a cycle-c-a) ; #f
+
 
