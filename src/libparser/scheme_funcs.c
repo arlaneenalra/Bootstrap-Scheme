@@ -334,24 +334,13 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
     /* split pairs into parallel lists */
     while(!is_empty_list(interp, next)) {
 
-	/* avoid segfaults */
-	/* if(!is_tuple(interp, car(next)) || caar(next)==0 || */
-	/*    !is_tuple(interp, cdar(next)) || !cadar(next)==0) { */
-	/*     interp->error=1; */
-
-	/*     return false; */
-	/*     } */
-
 	sym_list=cons(interp, caar(next), sym_list);
 	arg_list=cons(interp, cadar(next), arg_list);
 
 	next=cdr(next);
     }
     
-
-
     body=cdr(args);
-
     
     /* construct the lambda version and return it */
     next=cons(interp, 
@@ -359,13 +348,69 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 		   cons(interp, sym_list, body)),
 	      arg_list);
 
-    /*    output(interp, next);
-	  printf("\n");*/
-
     return next;
 
 }
 
+
+/* let* */
+object_type *prim_let_star(interp_core_type *interp, object_type *args) {
+    object_type *next=0;
+    object_type *body=0;
+
+    object_type *binding=0;
+    object_type *bind_list=0;
+    object_type *bind_list_tail=0;
+
+    /* make sure that we have at least 2 arguments */
+    if(list_length(interp, args)<2) {
+	interp->error=1;
+	return false;
+    }
+
+    /* let takes a list of pairs as it's first argument */
+    next=car(args);
+    
+    /* make sure we have a tuple */
+    if(!is_tuple(interp, next)) {
+	interp->error=1;
+	return false;
+    }
+
+    /* split pairs into parallel lists */
+    while(!is_empty_list(interp, next)) {
+
+	binding=cons(interp, create_symbol(interp, "define"),
+		       cons(interp, caar(next), /* symbol */
+			    cons(interp, cadar(next), interp->empty_list))); /* value */
+
+	/* bind this item to our list of items */
+	if(bind_list==0) {
+	    bind_list_tail=bind_list=cons(interp, binding, interp->empty_list);
+	} else {
+	    cdr(bind_list_tail)=cons(interp, binding, interp->empty_list);
+	    bind_list_tail=cdr(bind_list_tail);
+	}
+
+	next=cdr(next);
+    }
+    
+    body=cdr(args);
+
+    if(bind_list!=0) {
+	cdr(bind_list_tail)=body;
+	body=bind_list;
+    }
+    
+    /* construct the lambda version and return it */
+    next=cons(interp, 
+	      cons(interp, create_symbol(interp, "lambda"),
+		   cons(interp, interp->empty_list, body)),
+	      interp->empty_list);
+
+    return next;
+
+}
 
 /* begin */
 object_type *prim_begin(interp_core_type *interp, object_type *args) {
@@ -1626,7 +1671,9 @@ binding_type primitive_list[]={
     {"cond", &prim_cond, 0, 0},
     {"lambda", &prim_lambda, 0, 1},
     {"begin", &prim_begin, 0, 0},
+
     {"let", &prim_let, 0, 0},
+    {"let*", &prim_let_star, 0, 0},
 
     {"apply", &prim_apply, 1, 0},
 
