@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -75,5 +76,9 @@ void top_level_program(interp_core_type *interp, char* filename) {
     load_main(interp);
     
     result=call_load(interp, filename);
-
+    
+    if(interp->error==1) {
+	fprintf(stderr, "There was an error executing script\n");
+	exit(-1);
+    }
 }

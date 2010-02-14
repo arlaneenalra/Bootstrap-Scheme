@@ -1605,6 +1605,16 @@ object_type *prim_error(interp_core_type *interp, object_type *args) {
     return 0; /* keep the compiler happy */
 }
 
+/* check for an interpreter error */
+object_type *prim_has_error(interp_core_type *interp, object_type *args) {
+
+    if(has_error(interp)) {
+	return true;
+    }
+    
+    return false;
+}
+
 
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
@@ -1621,6 +1631,7 @@ binding_type primitive_list[]={
     {"apply", &prim_apply, 1, 0},
 
     {"error",&prim_error, 1, 1},
+    {"error?", &prim_has_error, 1, 1},
 
     {"cons", &prim_cons, 1, 1},
     {"car", &prim_car, 1, 1},
