@@ -28,14 +28,22 @@
 
    ((lambda ()
       (caaar test-val-car)) . (((1 . 2) . 3) . 4))
-
    ((lambda ()
       (cdaar test-val-car)) . 5)
-
    ((lambda ()
       (cadar '((#f . (#t . #f))  . #f))) . #t)
    ((lambda ()
       (cddar '((1 2 3) . #f))) . (3))
+
+   ((lambda ()
+      (caadr '(#f . ((#t . #f) . #f)))) . #t)
+   ((lambda ()
+      (cdadr '(#f . ((#f . #t) . #f)))) . #t)
+
+   ((lambda ()
+      (caddr '(#f . (#f . (#t . #f))))) . #t)
+   ((lambda ()
+      (cdddr test-val)) . (4 5 6 7 8 9 10))
 
 ))
 
