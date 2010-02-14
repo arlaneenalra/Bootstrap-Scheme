@@ -1138,6 +1138,7 @@ object_type *prim_eq(interp_core_type *interp, object_type *args) {
 object_type *prim_and(interp_core_type *interp, object_type *args) {
     object_type *result=0;
 
+    result=true; /* default to true */
     /* evalueate each argument */
     while(!is_empty_list(interp, args)) {
 	result=eval(interp, car(args));
@@ -1598,7 +1599,10 @@ object_type *prim_error(interp_core_type *interp, object_type *args) {
 	args=cdr(args);
     }
 
-    return prim_quit(interp, interp->empty_list);
+    cleanup_interp(interp);
+    exit(-1);
+    
+    return 0; /* keep the compiler happy */
 }
 
 

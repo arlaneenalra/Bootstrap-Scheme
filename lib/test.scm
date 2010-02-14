@@ -20,6 +20,8 @@
 
 ;; run a list of tests
 (define (test list)
+  
+  (define failed #f)
 
   (for-each 
 
@@ -27,13 +29,18 @@
      (let
 	 ((test-proc (car tuple))
 	  (expected (cdr tuple)))
-       
+
        (if (test-case (eval test-proc) expected)
 	   (display "PASS")
-	   (display "FAIL"))
+	   (begin
+	     (set! failed #t)
+	     (display "FAIL")))
        (newline)))
    
-   list))
+   list)
+  (if failed
+      (error "Test failures"))
+  )
 
 
 #t

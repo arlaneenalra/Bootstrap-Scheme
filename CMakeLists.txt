@@ -4,11 +4,16 @@ project(bootstrap C)
 cmake_minimum_required(VERSION 2.6)
 
 INCLUDE(CPack)
+INCLUDE(CTest)
+
+set(UPDATE_TYPE git)
 
 set(VERSION 0.2.0)
 
 add_subdirectory(src)
 
+ADD_TEST(for-each src/bootstrap test/test_foreach.scm)
+ADD_TEST(and_or src/bootstrap test/test_and_or.scm)
 
 
 
