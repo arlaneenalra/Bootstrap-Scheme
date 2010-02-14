@@ -11,7 +11,7 @@
   (if (equal? actual expected)
       #t
       (begin
-	(display "expected->?")
+	(display "expected->")
 	(write expected)
 	(display " recieved->")
 	(write actual)
