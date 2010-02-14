@@ -52,7 +52,6 @@
       (cadaar '(((#f . (#t . #f))  . #f) . #f))) . #t)
    ((lambda ()
       (cddaar '(((1 2 3) . #f) . #f))) . (3))
-
    ((lambda ()
       (caadar '((#f . ((#t . #f) . #f)) . #f))) . #t)
    ((lambda ()
@@ -66,21 +65,16 @@
       (caaadr '(#f . (((#t . #f) . #f) . #f)))) . #t)
    ((lambda ()
       (cdaadr '(#f . (((#f . #t) . #f) . #f)))) . #t)
-
    ((lambda ()
       (cadadr '(#f . ((#f . (#t . #f))  . #f)))) . #t)
-
    ((lambda ()
       (cddadr '(#f . ((1 2 3) . #f)))) . (3))
-
    ((lambda ()
       (caaddr '(#f . (#f . ((#t . #f) . #f))))) . #t)
    ((lambda ()
       (cdaddr '(#f #f . ((#f . #t) . #f)))) . #t)
-
    ((lambda ()
       (cadddr '(#f #f #f . (#t . #f)))) . #t)
-
    ((lambda ()
       (cddddr test-val)) . (5 6 7 8 9 10))))
 
