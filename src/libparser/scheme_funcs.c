@@ -352,6 +352,63 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 
 }
 
+/* /\* letrec *\/ */
+/* object_type *prim_letrec(interp_core_type *interp, object_type *args) { */
+/*     object_type *next=0; */
+/*     object_type *body=0; */
+
+/*     object_type *binding=0; */
+/*     object_type *bind_list=0; */
+/*     object_type *bind_list_tail=0; */
+
+/*     /\* make sure that we have at least 2 arguments *\/ */
+/*     if(list_length(interp, args)<2) { */
+/* 	interp->error=1; */
+/* 	return false; */
+/*     } */
+
+/*     /\* let takes a list of pairs as it's first argument *\/ */
+/*     next=car(args); */
+    
+/*     /\* make sure we have a tuple *\/ */
+/*     if(!is_tuple(interp, next)) { */
+/* 	interp->error=1; */
+/* 	return false; */
+/*     } */
+
+/*     /\* split pairs into parallel lists *\/ */
+/*     while(!is_empty_list(interp, next)) { */
+
+/* 	binding=cons(interp, create_symbol(interp, "define"), */
+/* 		       cons(interp, caar(next), /\* symbol *\/ */
+/* 			    cons(interp, cadar(next), interp->empty_list))); /\* value *\/ */
+
+/* 	/\* bind this item to our list of items *\/ */
+/* 	if(bind_list==0) { */
+/* 	    bind_list_tail=bind_list=cons(interp, binding, interp->empty_list); */
+/* 	} else { */
+/* 	    cdr(bind_list_tail)=cons(interp, binding, interp->empty_list); */
+/* 	    bind_list_tail=cdr(bind_list_tail); */
+/* 	} */
+
+/* 	next=cdr(next); */
+/*     } */
+    
+/*     body=cdr(args); */
+
+/*     if(bind_list!=0) { */
+/* 	cdr(bind_list_tail)=body; */
+/* 	body=bind_list; */
+/*     } */
+    
+/*     /\* construct the lambda version and return it *\/ */
+/*     next=cons(interp,  */
+/* 	      cons(interp, create_symbol(interp, "lambda"), */
+/* 		   cons(interp, interp->empty_list, body)), */
+/* 	      interp->empty_list); */
+
+/*     return next; */
+/* } */
 
 /* let* */
 object_type *prim_let_star(interp_core_type *interp, object_type *args) {
@@ -1674,6 +1731,8 @@ binding_type primitive_list[]={
 
     {"let", &prim_let, 0, 0},
     {"let*", &prim_let_star, 0, 0},
+    {"letrec", &prim_let_star, 0, 0}, /* for now, these appear equivalent */
+    {"letrec*", &prim_let_star, 0, 0}, /* for now, these appear equivalent */
 
     {"apply", &prim_apply, 1, 0},
 
