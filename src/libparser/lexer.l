@@ -34,7 +34,8 @@ CHAR_VAL      (newline|space|[^{WS}]|x[0-9A-F]+)
 {WS}*     /* Do nothing with white space */
 
 [-]?{DIGITS} { return FIXED_NUMBER; }
-[-]?{DIGITS}?"."{DIGITS} { return FLOAT_NUMBER; }
+[-+]?({DIGITS}|nan|inf)?"."{DIGITS} { return FLOAT_NUMBER; }
+
 
 
 #\\       { BEGIN(EXPECT_CHAR); }
