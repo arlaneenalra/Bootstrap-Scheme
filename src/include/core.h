@@ -13,6 +13,7 @@ struct interp_core;
 typedef enum {
     FIXNUM,
     FLOATNUM,
+    IMAG,
     BOOL,
     CHAR,
     STRING,
@@ -61,6 +62,12 @@ typedef struct closure {
     struct object *env;
 } closure_type;
 
+typedef struct imaginary {
+    long double real;
+    long double imaginary;
+
+} imaginary_type;
+
 /* Define a structure to represent a memory cell */
 typedef struct object {
     object_type_enum type;
@@ -68,6 +75,7 @@ typedef struct object {
     union {
 	int64_t int_val;
 	long double float_val; /* There should be a better way to do this */
+	imaginary_type imaginary;
 	char char_val; 
 	char *string_val;
 	bool bool_val;
