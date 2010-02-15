@@ -692,11 +692,44 @@ object_type *prim_if(interp_core_type *interp, object_type *args) {
     return result;
 }
 
+/* make-vector */
+object_type *prim_make_vector(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    object_type *fill=0;
+    uint64_t len=0;
+    uint64_t i=0;
+
+    int arg_len=list_length(interp, args);
+    
+    if(arg_len<1 || arg_len>2 || car(args)->type!=FIXNUM) {
+	interp->error=1;
+	return false;
+    }
+    
+
+    /* set the fill object */
+    if(arg_len==2) {
+	fill=cadr(args);
+    } else {
+	fill=interp->empty_list;
+    }
+
+    len=car(args)->value.int_val;
+
+    obj=alloc_vector(interp, len);
+
+    for(i=0;i<len;i++) {
+	obj->value.vector.vector[i]=fill;
+    }
+
+    return obj;
+}
+
 /* make-string */
-object_type *prim_make_string(interp_core_type *interp, object_type * args) {
+object_type *prim_make_string(interp_core_type *interp, object_type *args) {
     
     object_type *obj=0;
-    int64_t len=0;
+    uint64_t len=0;
     char *c=0;
     
     int arg_len=list_length(interp, args);
@@ -1818,6 +1851,8 @@ binding_type primitive_list[]={
     {"eof-object?", &prim_is_eof_object, 1, 1},
     {"input-port?", &prim_is_input_port, 1, 1},
     {"output-port?", &prim_is_output_port, 1, 1},
+
+    {"make-vector", &prim_make_vector, 1, 1},
     
     {0,0} /* Terminate the list */
 };

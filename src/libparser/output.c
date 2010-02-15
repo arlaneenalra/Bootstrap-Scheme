@@ -10,6 +10,7 @@ void output_stream(interp_core_type *interp, object_type *obj, FILE *fout) {
     static object_type *last_closure=0;
     object_type *car=0;
     object_type *cdr=0;
+    uint64_t i=0;
 
 
     /* make sure there is something to display */
@@ -132,6 +133,21 @@ void output_stream(interp_core_type *interp, object_type *obj, FILE *fout) {
 	output_stream(interp, obj->value.closure.body, fout);
 	fprintf(fout,">");
 	last_closure=0;
+	break;
+
+    case VECTOR:
+	fprintf(fout, "#(");
+	
+	/* walk the vector and output it's contents */
+	for(i=0; i<obj->value.vector.length; i++) {
+	    output_stream(interp, obj->value.vector.vector[i], fout);
+	    
+	    if(i+1<obj->value.vector.length) {
+		fprintf(fout, " ");
+	    }
+	}
+
+	fprintf(fout, ")");
 	break;
 
     default:
