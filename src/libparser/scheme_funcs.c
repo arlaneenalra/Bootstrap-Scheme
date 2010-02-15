@@ -741,6 +741,53 @@ object_type *prim_vector_length(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* vector-ref */
+object_type *prim_vector_ref(interp_core_type *interp, object_type *args) {
+    
+    object_type *obj=0;
+    uint64_t index=0;
+    
+    if(list_length(interp, args)!=2 || car(args)->type!=VECTOR 
+       || cadr(args)->type!=FIXNUM) {
+	interp->error=1;
+	return false;
+    }
+
+    index=cadr(args)->value.int_val;
+    
+    if(index>=car(args)->value.vector.length) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=car(args)->value.vector.vector[index];
+
+    return obj;
+}
+
+/* vector-set! */
+object_type *prim_vector_set(interp_core_type *interp, object_type *args) {
+    
+    uint64_t index=0;
+    
+    if(list_length(interp, args)!=3 || car(args)->type!=VECTOR 
+       || cadr(args)->type!=FIXNUM) {
+	interp->error=1;
+	return false;
+    }
+
+    index=cadr(args)->value.int_val;
+    
+    if(index>=car(args)->value.vector.length) {
+	interp->error=1;
+	return false;
+    }
+
+    car(args)->value.vector.vector[index]=caddr(args);
+
+    return true;
+}
+
 /* make-string */
 object_type *prim_make_string(interp_core_type *interp, object_type *args) {
     
@@ -1872,6 +1919,8 @@ binding_type primitive_list[]={
     {"vector?", &prim_is_vector, 1, 1},
     {"make-vector", &prim_make_vector, 1, 1},
     {"vector-length", &prim_vector_length, 1, 1},
+    {"vector-ref", &prim_vector_ref, 1, 1},
+    {"vector-set!", &prim_vector_set, 1, 1},
     
     {0,0} /* Terminate the list */
 };
