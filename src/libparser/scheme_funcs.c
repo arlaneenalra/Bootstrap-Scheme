@@ -977,9 +977,7 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
 	if(*walk=='.') {
 	    obj->type=FLOATNUM;
 	    walk=0;
-	} else if(!isdigit(*walk)) {
-	    walk=0;
-	}else {
+	} else {
 	    walk++;
 	}
     }
