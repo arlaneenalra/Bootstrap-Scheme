@@ -725,6 +725,22 @@ object_type *prim_make_vector(interp_core_type *interp, object_type *args) {
     return obj;
 }
 
+/* vector-length */
+object_type *prim_vector_length(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    if(list_length(interp, args)!=1 || car(args)->type!=VECTOR) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=alloc_object(interp, FIXNUM);
+    
+    obj->value.int_val=car(args)->value.vector.length;
+    
+    return obj;
+}
+
 /* make-string */
 object_type *prim_make_string(interp_core_type *interp, object_type *args) {
     
@@ -1855,6 +1871,7 @@ binding_type primitive_list[]={
 
     {"vector?", &prim_is_vector, 1, 1},
     {"make-vector", &prim_make_vector, 1, 1},
+    {"vector-length", &prim_vector_length, 1, 1},
     
     {0,0} /* Terminate the list */
 };
