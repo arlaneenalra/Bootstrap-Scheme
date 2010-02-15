@@ -17,6 +17,7 @@ typedef enum {
     BOOL,
     CHAR,
     STRING,
+    VECTOR,
     TUPLE,
     SYM,
     PORT,
@@ -31,7 +32,7 @@ typedef enum {
     MARK_RED, /* Everything else */
     MARK_BLACK,
 
-    MARK_PERM,  /* Things that will not be deallocated while we are running */
+    MARK_PERM  /* Things that will not be deallocated while we are running */
 } gc_mark_type;
 
 struct object;
@@ -62,6 +63,11 @@ typedef struct closure {
     struct object *env;
 } closure_type;
 
+typedef struct vector {
+    uint64_t length;
+    struct object **vector;
+} vector_type;
+
 typedef struct imaginary {
     long double real;
     long double imaginary;
@@ -78,6 +84,7 @@ typedef struct object {
 	imaginary_type imaginary;
 	char char_val; 
 	char *string_val;
+	vector_type vector;
 	bool bool_val;
 	tuple_type tuple;
 	primitive_type primitive;

@@ -43,7 +43,7 @@ void load_main(interp_core_type *interp) {
 void repl(interp_core_type *interp) {
 
     printf("Simple Bootstrapper\n");
-    printf("sizeof(object_type) %zu\n", sizeof(object_type));
+    printf("sizeof(object_type) %" PRIi64 "\n", sizeof(object_type));
     
     load_main(interp);
 
@@ -58,7 +58,7 @@ void repl(interp_core_type *interp) {
     	if(interp->running) {
     	    obj=eval(interp, obj);
 	
-    	    // if there was no error, output the result
+    	    /* if there was no error, output the result */
     	    if(!has_error(interp)) {
     		output(interp, obj);
     	    } else {

@@ -108,6 +108,7 @@ void add_string(interp_core_type *interp, char *str) {
     char *c_write=0;
     char *c_read=0;
     char read=0;
+    uint64_t val;
 
     c_write=c_read=str;
     
@@ -162,7 +163,7 @@ void add_string(interp_core_type *interp, char *str) {
 		
 		/* TODO: this will need to be adapted to
 		   unicode */
-		uint64_t val=strtoul(c_read, &c_read, 16);
+		val=strtoul(c_read, &c_read, 16);
 		read=0xff & val;
 		break;
 		
@@ -233,6 +234,7 @@ object_type *create_string(interp_core_type *interp, char *str) {
 object_type *create_symbol(interp_core_type *interp, char *str) {
     object_type *list=0;
     object_type *obj=0;
+    char *c=0;
 
     obj=get_symbol(interp, str);
     
@@ -242,7 +244,7 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     }
 
     /* create a new buffer for the string value */
-    char *c=alloc_string(interp, strlen(str));
+    c=alloc_string(interp, strlen(str));
     strcpy(c, str);
 
     obj=alloc_object(interp, SYM);

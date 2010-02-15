@@ -110,10 +110,10 @@ void output_stream(interp_core_type *interp, object_type *obj, FILE *fout) {
 	fprintf(fout,"%s", obj->value.string_val);
 	break;
     case PRIM:
-	fprintf(fout,"#<primitive procedure:@%p>", obj->value.primitive.fn);
+	fprintf(fout,"#<primitive procedure:@%p>", (void *)obj->value.primitive.fn);
 	break;
     case PORT:
-	fprintf(fout,"#<port:@%p in:%i out:%i>", obj->value.port_val.port,
+	fprintf(fout,"#<port:@%p in:%i out:%i>", (void *)obj->value.port_val.port,
 	       obj->value.port_val.input, obj->value.port_val.output);
 	break;
     case CLOSURE:

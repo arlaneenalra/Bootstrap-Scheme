@@ -4,7 +4,6 @@
 #include "core.h"
 #include "util.h"
 #include "scheme_funcs.h"
-//#include "parser_internal.h"
 
 #include <gc.h>
 
@@ -36,6 +35,27 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     fail("Unable to new object");
     
     return 0;
+}
+
+/* allocate a vector object */
+object_type *alloc_vector(interp_core_type *interp, uint64_t len) {
+    object_type *obj=0;
+    uint64_t i=0;
+    
+    obj=alloc_object(interp, VECTOR);
+    
+    /* allocate an array of object_type pointers */
+    obj->value.vector.vector=
+	(object_type **)GC_malloc(sizeof(object_type *) * len);
+    
+    /* set every element in the vector to be the empty list */
+    for(i=0;i<len;i++) {
+	obj->value.vector.vector[i]=interp->empty_list;
+    }
+    
+    obj->value.vector.length=len;
+
+    return obj;
 }
 
 /* allocate string memory */

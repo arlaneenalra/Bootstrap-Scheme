@@ -6,11 +6,11 @@
 
 
 int main(int argc, char **argv) {
-
+    interp_core_type * interp=0;
     
     GC_INIT();
 
-    interp_core_type * interp=create_interp();
+    interp=create_interp();
     
     if(argc==1) {
 	repl(interp);
