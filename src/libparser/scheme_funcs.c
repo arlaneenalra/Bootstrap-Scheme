@@ -1161,6 +1161,7 @@ TEST(car(args)!=0 && car(args)->type==FIXNUM, prim_is_integer)
 TEST(car(args)!=0 && car(args)->type==FLOATNUM, prim_is_real)
 TEST(car(args)!=0 && car(args)->type==CHAR, prim_is_char)
 TEST(car(args)!=0 && car(args)->type==STRING, prim_is_string)
+TEST(car(args)!=0 && car(args)->type==VECTOR, prim_is_vector)
 TEST(is_tuple(interp, car(args)) && car(args)!=interp->empty_list, prim_is_tuple)
 TEST(car(args)!=0 && car(args)->type==PRIM, prim_is_prim)
 TEST(car(args)!=0 && car(args)->type==CHAR && car(args)==eof_object, prim_is_eof_object)
@@ -1852,6 +1853,7 @@ binding_type primitive_list[]={
     {"input-port?", &prim_is_input_port, 1, 1},
     {"output-port?", &prim_is_output_port, 1, 1},
 
+    {"vector?", &prim_is_vector, 1, 1},
     {"make-vector", &prim_make_vector, 1, 1},
     
     {0,0} /* Terminate the list */
