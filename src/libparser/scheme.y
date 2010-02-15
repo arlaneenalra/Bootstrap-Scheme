@@ -18,6 +18,7 @@ void yyerror(interp_core_type *interp, void *scanner, char *s);
 %lex-param {void *scanner}
 
 %token OPEN_PAREN
+%token START_VECTOR
 %token CLOSE_PAREN
 %token DOT
 
@@ -43,6 +44,20 @@ expression:
     object         { YYACCEPT; }
   | END_OF_FILE    { end_of_file(interp); YYACCEPT; }
 
+vector_body:
+    object         { chain_state(interp); }
+  | object         { chain_state(interp); }
+    vector_body
+
+vector_end:
+    CLOSE_PAREN    { pop_state(interp); add_vector(interp); }
+  | vector_body
+    CLOSE_PAREN    { pop_state(interp); add_vector(interp); }
+
+vector:
+    START_VECTOR   { push_state(interp); }
+    vector_end
+   
 list_end:
     list_next
     CLOSE_PAREN    { pop_state(interp); }
@@ -76,6 +91,7 @@ string_end:
     STRING_CONSTANT { add_string(interp, get_text(scanner)); }
     DOUBLE_QUOTE
   | DOUBLE_QUOTE    { add_string(interp, ""); }
+
 string:
     DOUBLE_QUOTE
     string_end
@@ -88,6 +104,7 @@ object:
   | number
   | list
   | quoted_list
+  | vector
 
 
 %%

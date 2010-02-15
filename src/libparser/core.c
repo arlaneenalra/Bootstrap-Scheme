@@ -102,6 +102,33 @@ void add_number(interp_core_type *interp, char *str) {
     add_object(interp, obj);
 }
 
+/* parse and add a vector */
+void add_vector(interp_core_type *interp) {
+    object_type *obj=0;
+    object_type *next=0;
+    uint64_t len=0;
+    uint64_t i=0;
+
+    /* figure out how long the list is */
+    len=list_length(interp, interp->added);
+
+    /* create a new vector */
+    obj=alloc_vector(interp, len);
+    obj->value.vector.length=len;
+    
+    next=interp->added;
+    
+    while(next!=interp->empty_list) {
+	obj->value.vector.vector[i]=car(next);
+
+	next=cdr(next);
+	i++;
+    }
+    
+    interp->added=obj;
+    
+}
+
 /* create an instance of a string object */
 void add_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
