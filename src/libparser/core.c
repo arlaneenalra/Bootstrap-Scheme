@@ -270,9 +270,34 @@ void add_symbol(interp_core_type *interp, char *str) {
 /* Create an instance of a floating point number */
 void add_float(interp_core_type *interp, char *str) {
     object_type *obj=0;
+    char *c=str;
     
+    /* check for / */
+    while(*c!=0 && *c!='/') {
+	c++;
+    }
+   
     obj=alloc_object(interp, FLOATNUM);
-    obj->value.float_val=strtold(str, 0);
+
+    /* if we found a / then do the division 
+       otherwise we convert it as any other real */
+    if(*c=='/') {
+	long double x,y;
+	x=strtold(str,0);
+	c++;
+	y=strtold(c,0);
+	
+	/* check for div by 0 */
+	if(y==0.0) {
+	    interp->error=1;
+	    obj->value.float_val=0;
+	} else {
+	    obj->value.float_val=x/y;
+	}
+	
+    } else {
+	obj->value.float_val=strtold(str, 0);
+    }
 
     add_object(interp, obj);
 }

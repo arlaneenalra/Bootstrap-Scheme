@@ -16,6 +16,7 @@ DIGITS    [0-9]+
 EOL       \n|\r\n|\n\r|\r
 WS	  {EOL}|[[:blank:]]
 IDENT     [!$%&*+\-./:<=>?@^_~[:alnum:]]
+SIGNS     [-+]
 
 CHAR_VAL      (newline|space|[^{WS}]|x[0-9A-F]+)
 
@@ -33,8 +34,9 @@ CHAR_VAL      (newline|space|[^{WS}]|x[0-9A-F]+)
 
 {WS}*     /* Do nothing with white space */
 
-[-]?{DIGITS} { return FIXED_NUMBER; }
-[-+]?({DIGITS}|nan|inf)?"."{DIGITS} { return FLOAT_NUMBER; }
+{SIGNS}?{DIGITS}                       { return FIXED_NUMBER; }
+{SIGNS}?({DIGITS}|nan|inf)?"."{DIGITS} { return FLOAT_NUMBER; }
+{SIGNS}?{DIGITS}[/]{DIGITS}              { return FLOAT_NUMBER; }
 
 
 
