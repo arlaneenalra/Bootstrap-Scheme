@@ -53,6 +53,7 @@
 
  '( ;; list of libraries to load
    "lib/string.scm"
+   "lib/vector.scm"
    "lib/math.scm"
    "lib/boolean.scm"
    "lib/car_cdr.scm"
