@@ -34,39 +34,37 @@
 (define (equal-pair? x y)
   
   (define (equal-inner x y seen-x seen-y)
-    (if (and (equal-seen x seen-x)
-	     (equal-seen y seen-y))
-	#t ;; We have a cyle
+    (cond 
+     ((and (equal-seen x seen-x)
+	   (equal-seen y seen-y)) #t) ;; We have a cyle
 
-	(and
-	 (if (and (pair? (car x)) (pair? (car y)))
-	     (equal-inner (car x)
-			  (car y)
-			  (cons x seen-x) 
-			  (cons y seen-y))
-	     (equal? (car x) (car y)))
+     ((and (null? x) (null? y)) #t) ;; we have two nulls
 
-	 (if (and (pair? (cdr x)) (pair? (cdr y)))
-	     (equal-inner (cdr x)
-			  (cdr y)
-			  (cons x seen-x) 
-			  (cons y seen-y))
-	     (equal? (cdr x) (cdr y))))))
+     (else (and
+	    (if (and (pair? (car x)) (pair? (car y)))
+		(equal-inner (car x)
+			     (car y)
+			     (cons x seen-x) 
+			     (cons y seen-y))
+		(equal? (car x) (car y)))
+
+	    (if (and (pair? (cdr x)) (pair? (cdr y)))
+		(equal-inner (cdr x)
+			     (cdr y)
+			     (cons x seen-x) 
+			     (cons y seen-y))
+		(equal? (cdr x) (cdr y)))))))
 
   (equal-inner x y '() '()))
 		    
 		    
-
-    
-
 ;; Check a pair of vectors for equality 
 (define (equal-vector? x y)
   (let ((x (vector->list x))
 	(y (vector->list y)))
-	(equal-pair? x y)))
+    (equal-pair? x y)))
 	   
   
-
 ;; Deep equality checking
 (define (equal? x y)
   (cond
