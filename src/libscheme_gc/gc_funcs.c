@@ -43,9 +43,11 @@ object_type *alloc_vector(interp_core_type *interp, uint64_t len) {
     
     obj=alloc_object(interp, VECTOR);
     
-    /* allocate an array of object_type pointers */
-    obj->value.vector.vector=
-	(object_type **)GC_malloc(sizeof(object_type *) * len);
+    if(len!=0) {
+	/* allocate an array of object_type pointers */
+	obj->value.vector.vector=
+	    (object_type **)GC_malloc(sizeof(object_type *) * len);
+    }
     
     obj->value.vector.length=len;
 

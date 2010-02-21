@@ -50,7 +50,7 @@ vector_body:
     vector_body
 
 vector_end:
-    CLOSE_PAREN    { pop_state(interp); add_vector(interp); }
+    CLOSE_PAREN    { pop_state(interp); add_empty_vector(interp); }
   | vector_body
     CLOSE_PAREN    { pop_state(interp); add_vector(interp); }
 

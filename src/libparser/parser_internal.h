@@ -29,6 +29,7 @@ void add_float(interp_core_type *interp, char *str);
 void add_string(interp_core_type *interp, char *str);
 void add_quote(interp_core_type *interp);
 void add_vector(interp_core_type *interp);
+void add_empty_vector(interp_core_type *interp);
 void add_symbol(interp_core_type *interp, char *str);
 
 

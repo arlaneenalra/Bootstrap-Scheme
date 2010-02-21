@@ -102,6 +102,14 @@ void add_number(interp_core_type *interp, char *str) {
     add_object(interp, obj);
 }
 
+void add_empty_vector(interp_core_type *interp) {
+    object_type *obj=0;
+
+    obj=alloc_vector(interp, 0);
+    
+    interp->added=obj;
+}
+
 /* parse and add a vector */
 void add_vector(interp_core_type *interp) {
     object_type *obj=0;
@@ -114,7 +122,6 @@ void add_vector(interp_core_type *interp) {
 
     /* create a new vector */
     obj=alloc_vector(interp, len);
-    obj->value.vector.length=len;
     
     next=interp->added;
     
@@ -126,7 +133,6 @@ void add_vector(interp_core_type *interp) {
     }
     
     interp->added=obj;
-    
 }
 
 /* create an instance of a string object */
