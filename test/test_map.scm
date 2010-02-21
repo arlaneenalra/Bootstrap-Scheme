@@ -3,19 +3,6 @@
 
 (require "lib/test.scm")
 
-(define val-list3 '())
-
-
-;; third test case
-(for-each 
- (lambda (x y z)
-   (set! val-list3
-	 (cons (+ x y z) val-list3)))
- '(1 2 3 4 5 6 7 8 9 10)
- '(2 3 4 5 6 7 8 9 10 11)
- '(1 2 3 4 5 6 7 8 9 10))
-
-
 (test
  '(((lambda () (map 
 		(lambda (x)
@@ -33,5 +20,23 @@
 		  (+ x y z))
 		'(1 2 3 4 5 6 7 8 9 10)
 		'(2 3 4 5 6 7 8 9 10 11)
-		'(1 2 3 4 5 6 7 8 9 10))) . (4 7 10 13 16 19 22 25 28 31))))
+		'(1 2 3 4 5 6 7 8 9 10))) . (4 7 10 13 16 19 22 25 28 31))
+
+   ((lambda () (map 
+		cadr
+		'((a b) (d e) (g h)))) . (b e h))
+
+   ((lambda () (map 
+		+
+		'(1 2 3) '(4 5 6))) . (5 7 9))
+
+   ((lambda () 
+      (let ((count 0))
+	(map (lambda (ignored)
+	       (set! count (+ count 1))
+	       count)
+	     '(a b)))) . (1 2))
+			
+
+))
 
