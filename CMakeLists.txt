@@ -13,6 +13,7 @@ set(VERSION 0.2.0)
 add_subdirectory(src)
 
 ADD_TEST(for-each src/bootstrap test/test_foreach.scm)
+ADD_TEST(map src/bootstrap test/test_map.scm)
 ADD_TEST(and_or src/bootstrap test/test_and_or.scm)
 ADD_TEST(car_cdr src/bootstrap test/test_car_cdr.scm)
 ADD_TEST(equal src/bootstrap test/test_equal.scm)
