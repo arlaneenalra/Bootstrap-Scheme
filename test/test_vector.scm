@@ -32,5 +32,15 @@
 
    ((lambda ()
       (list->vector '(dididit dah))) . #(dididit dah))
+   
+   ((lambda ()
+      (let ((vec '#(1 2 3 4 5 )))
+	(vector-fill! vec #\b)
+	vec)) . #(#\b #\b #\b #\b #\b))
+
+   ((lambda ()
+      (let ((vec '#()))
+   	(vector-fill! vec #\b)
+   	vec)) . #())
 
    ))

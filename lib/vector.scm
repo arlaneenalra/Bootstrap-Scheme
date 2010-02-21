@@ -1,6 +1,6 @@
 
 ;; export some basic vector functions
-(provide vector vector->list list->vector)
+(provide vector vector->list list->vector vector-fill!)
 
 
 ;; convert the given list into a vector
@@ -28,3 +28,14 @@
 ;; Create a vector containing the passed in arguments
 (define (vector . list)
   (list->vector list))
+
+
+;; Fills a vector with the given object
+(define (vector-fill! vec fill)
+  (define (inner index)
+    (write index)
+    (if (>= index 0)
+	(begin
+	  (vector-set! vec index fill)
+	  (inner (- index 1)))))
+  (inner (- (vector-length vec) 1)))
