@@ -1,6 +1,7 @@
 
 ;; export some basic vector functions
-(provide vector vector->list list->vector vector-fill! vector-for-each)
+(provide vector vector->list list->vector vector-fill! 
+	 vector-for-each vector-map)
 
 
 ;; convert the given list into a vector
@@ -41,13 +42,18 @@
 
 
 
+;; convert vectors to lists
+(define (prep-vec-args vec-list new-args)
+  (if (null? vec-list)
+      (reverse new-args)
+      (prep-vec-args
+       (cdr vec-list)
+       (cons (vector->list (car vec-list)) new-args))))
+
 ;; for-each for vectors
 (define (vector-for-each proc . vec-list)
-  (define (inner vec-list new-args)
-    (if (null? vec-list)
-	(reverse new-args)
-	(inner
-	 (cdr vec-list)
-	 (cons (vector->list (car vec-list)) new-args))))
+  (apply for-each proc (prep-vec-args vec-list '())))
 
-  (apply for-each proc (inner vec-list '())))
+;; vector-map
+(define (vector-map proc . vec-list)
+  (list->vector (apply map proc (prep-vec-args vec-list '()))))
