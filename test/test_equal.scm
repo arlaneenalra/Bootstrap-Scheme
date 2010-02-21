@@ -44,7 +44,8 @@
 
 
 (test
- '(((lambda () (eq? (cons 1 2) (cons 1 2))) . #f)
+ '(((lambda () (equal? '() '())) . #t)
+   ((lambda () (eq? (cons 1 2) (cons 1 2))) . #f)
    ((lambda () (eqv? (cons 1 1) '())) . #f)
    ((lambda () (equal? a a)) . #t)
    ((lambda () (equal? a b)) . #t)
