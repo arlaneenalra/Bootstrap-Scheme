@@ -17,3 +17,6 @@ ADD_TEST(and_or src/bootstrap test/test_and_or.scm)
 ADD_TEST(car_cdr src/bootstrap test/test_car_cdr.scm)
 ADD_TEST(equal src/bootstrap test/test_equal.scm)
 ADD_TEST(let src/bootstrap test/test_let.scm)
+ADD_TEST(vector src/bootstrap test/test_vector.scm)
+
+

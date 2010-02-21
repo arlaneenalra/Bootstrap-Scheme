@@ -5,6 +5,10 @@
 (define b '(1 2 3 4))
 (define c '(1 2 3 ))
 
+(define vec-a '#(1 2 3 4))
+(define vec-b '#(1 2 3 4))
+(define vec-c '#(1 2 3))
+
 (define abc (cons a (cons b (cons c '()))))
 (define ABC (cons a (cons b (cons c '()))))
 (define acb (cons a (cons c (cons b '()))))
@@ -55,6 +59,12 @@
    ((lambda () (equal? abc acb)) . #f)
 
    ((lambda () (equal? abc a)) . #f)
+
+   ((lambda () (equal? vec-a vec-a)) . #t)
+   ((lambda () (equal? vec-a vec-b)) . #t)
+   ((lambda () (equal? vec-b vec-a)) . #t)
+   ((lambda () (equal? vec-c vec-a)) . #f)
+   ((lambda () (equal? vec-a vec-c)) . #f)
 
    ((lambda () (equal? cycle-a cycle-a)) . #t)
    ((lambda () (equal? cycle-a cycle-b)) . #t)

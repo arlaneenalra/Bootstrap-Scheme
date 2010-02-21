@@ -58,7 +58,14 @@
 		    
 
     
-;;  (and (equal? (car x) (car y)) (equal? (cdr x) (cdr y))))
+
+;; Check a pair of vectors for equality 
+(define (equal-vector? x y)
+  (let ((x (vector->list x))
+	(y (vector->list y)))
+	(equal-pair? x y)))
+	   
+  
 
 ;; Deep equality checking
 (define (equal? x y)
@@ -66,6 +73,7 @@
     ((and (boolean? x) (boolean? y)) (boolean=? x y))
     ((and (string? x) (string? y)) (string=? x y))
     ((and (pair? x) (pair? y)) (equal-pair? x y))
+    ((and (vector? x) (vector? y)) (equal-vector? x y))
 
     ;; if we get here, things are not equal
     (else 
