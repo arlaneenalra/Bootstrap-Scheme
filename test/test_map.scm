@@ -35,8 +35,5 @@
 	(map (lambda (ignored)
 	       (set! count (+ count 1))
 	       count)
-	     '(a b)))) . (1 2))
-			
-
-))
+	     '(a b)))) . (1 2))))
 
