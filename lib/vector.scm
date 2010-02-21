@@ -1,6 +1,6 @@
 
 ;; export some basic vector functions
-(provide vector vector->list list->vector vector-fill!)
+(provide vector vector->list list->vector vector-fill! vector-for-each)
 
 
 ;; convert the given list into a vector
@@ -33,9 +33,21 @@
 ;; Fills a vector with the given object
 (define (vector-fill! vec fill)
   (define (inner index)
-    (write index)
     (if (>= index 0)
 	(begin
 	  (vector-set! vec index fill)
 	  (inner (- index 1)))))
   (inner (- (vector-length vec) 1)))
+
+
+
+;; for-each for vectors
+(define (vector-for-each proc . vec-list)
+  (define (inner vec-list new-args)
+    (if (null? vec-list)
+	(reverse new-args)
+	(inner
+	 (cdr vec-list)
+	 (cons (vector->list (car vec-list)) new-args))))
+
+  (apply for-each proc (inner vec-list '())))
