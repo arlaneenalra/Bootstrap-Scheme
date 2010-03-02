@@ -43,7 +43,7 @@ void load_main(interp_core_type *interp) {
 void repl(interp_core_type *interp) {
 
     printf("Simple Bootstrapper\n");
-    printf("sizeof(object_type) %" PRIi64 "\n", sizeof(object_type));
+    printf("sizeof(object_type) %" PRIi64 "\n", (uint64_t)sizeof(object_type));
     
     load_main(interp);
 
