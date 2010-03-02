@@ -1,0 +1,12 @@
+;; This file contains a mapping between library names/versions and 
+;; file locations for those libraries.
+
+(
+
+ ((rnrs (6)) . "lib/rnrs-6.scm") ;; r6rs composite library
+ ((rnrs base (6)) . "lib/rnrs-base-6.scm")
+ ((rnrs io (6)) . "lib/rnrs-io-6.scm")
+
+)
+
+
