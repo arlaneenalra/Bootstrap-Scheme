@@ -58,7 +58,8 @@
    "lib/boolean.scm"
    "lib/car_cdr.scm"
    "lib/io.scm"
-   "lib/util.scm"))
+   "lib/util.scm"
+   "lib/loader.scm"))
 
 
 #t ; we have to return true or bootstrap bombs
