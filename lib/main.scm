@@ -1,7 +1,6 @@
-;; This file should be loaded by any call to bootstrap
+;; Setup the base system and boostrap the library loader
 
 (load "lib/stdlib.scm")
-
 
 
 ;; definintions for a simple repl
