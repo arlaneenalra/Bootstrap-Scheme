@@ -37,12 +37,16 @@
   (define (inner ref name)
     (cond 
 
-     ((symbol? (car ref))
-      (inner (cdr ref) (cons (car ref) name)))
-
      ;; no version specified
      ((null? ref)
       (cons (reverse name) '()))
+
+     ;; skip library escape
+     ((equal? 'library (car ref))
+      (inner (cadr ref) name))
+
+     ((symbol? (car ref))
+      (inner (cdr ref) (cons (car ref) name)))
 
      (else
       (cons (reverse name) (car ref)))))
@@ -59,8 +63,7 @@
     (name-version library-name))
 
   ;; are the names equal?
-  (equal? (car ref) (car lib))
-)
+  (equal? (car ref) (car lib)))
   
 
 
@@ -94,10 +97,18 @@
   ;; have one defined already
   (for-each 
    (lambda (library)
-     (write 
-      (read-library
-       (get-library library)))
-     (newline))
+     (define lib-def
+       (read-library
+	(get-library library)))
+     
+     (display "name:")
+     (write (car (name-version lib-def)))
+     (newline)
+     
+     (display "body:")
+     (write (cddddr lib-def))
+     (newline)
+     )
 
    import-list)
 

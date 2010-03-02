@@ -2,7 +2,7 @@
 
 (import '(rnrs)
 	'(rnrs base)
-	'(rnrs io)
+	'(library (rnrs io))
 
 	'(rnrs (6))
 	'(rnrs base (6))
