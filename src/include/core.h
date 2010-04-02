@@ -5,6 +5,12 @@
 
 #include <inttypes.h>
 
+/* Add in some debugging messages */
+#ifdef DEBUG
+#define TRACE(x)  (void)fprintf(stderr, "%s",x);
+#else
+#define TRACE(x)
+#endif
 
 typedef int8_t bool;
 struct interp_core;

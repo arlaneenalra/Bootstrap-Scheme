@@ -1,7 +1,10 @@
 #include "core.h"
 #include "util.h"
 #include "scheme_funcs.h"
-#include "parser_internal.h"
+
+#include "eval_internal.h"
+
+/* #include "parser_internal.h"*/
 
 /* Evaluate a symbol */
 object_type *eval_symbol(interp_core_type *interp, object_type *obj) {

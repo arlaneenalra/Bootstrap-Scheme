@@ -1,16 +1,18 @@
 
 add_subdirectory(libparser)
+add_subdirectory(libeval)
 add_subdirectory(libscheme_gc)
 
-include_directories(libparser libscheme_gc)
+include_directories(libparser libeval libscheme_gc)
 
 link_directories(${libparser_BIN_DIR}/libparser
-	${libscheme_gc_BIN_DIR}/libscheme_gc)
+  ${libeval_BIN_DIR}/libeval
+  ${libscheme_gc_BIN_DIR}/libscheme_gc)
 
 
 add_executable(bootstrap bootstrap.c)
 
-target_link_libraries(bootstrap libparser libscheme_gc gc)
+target_link_libraries(bootstrap libparser libeval libscheme_gc gc)
 
 
 include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)

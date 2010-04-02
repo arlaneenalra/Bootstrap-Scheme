@@ -13,7 +13,7 @@ ADD_FLEX_BISON_DEPENDENCY(LEXER PARSER)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_library(libparser core.c eval.c output.c repl.c
+add_library(libparser core.c output.c repl.c
   scheme_funcs.c util.c ${BISON_PARSER_OUTPUTS} ${FLEX_LEXER_OUTPUTS})
 
 include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)
