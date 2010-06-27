@@ -1,0 +1,9 @@
+* Current Project Goals
+** Full r6rs compliance
+** Reasonable performance
+
+* Possible TODOs
+** Will very likely need to rewrite the lexer by hand
+*** It does not appear that flex supports unicode
+*** flex currently has a memory leak when parsing multiple string buffers
+**
