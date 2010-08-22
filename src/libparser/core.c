@@ -11,6 +11,7 @@
 #include "lexer.h"
 
 void clear_state_stack(interp_core_type *interp);
+void create_parser(interp_core_type *interp);
 
 /* Attach an added object to our graph of objects */
 void set(interp_core_type *interp, setting_type_enum setting) {
@@ -358,6 +359,10 @@ void reset(interp_core_type *interp) {
 object_type *parse(interp_core_type *interp, FILE *in) {
     reset(interp);
     
+    if(!interp->scanner) {
+	create_parser(interp);
+    }
+    
     yyset_in(in, peek_scanner);
     
     if(parse_internal(interp, peek_scanner)) {
@@ -372,6 +377,10 @@ object_type *parse(interp_core_type *interp, FILE *in) {
 /* Parse a string */
 object_type *parse_string(interp_core_type *interp, char *in) {
     reset(interp);
+
+    if(!interp->scanner) {
+	create_parser(interp);
+    }
     
     yy_scan_string(in, peek_scanner);
     
@@ -388,7 +397,10 @@ object_type *parse_string(interp_core_type *interp, char *in) {
 object_type *parse_chain(interp_core_type *interp) {
     reset(interp);
     
-
+    if(!interp->scanner) {
+	create_parser(interp);
+    }
+    
     if(parse_internal(interp, peek_scanner)) {
 	return 0;
     }
