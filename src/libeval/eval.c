@@ -14,7 +14,7 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
-	printf("\nUnound Variable: %s@%p\n", obj->value.string_val, (void *)obj);
+	printf("\nUnbound Variable: %s@%p\n", obj->value.string_val, (void *)obj);
 
 	/* Unbound variable */
 	interp->error=1;
@@ -37,7 +37,7 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
 	evaled=eval(interp, car(next));
 	
 	if(interp->error) {
-	    return 0;
+	    return false;
 	}
 	
 	/* first value has to be treated differently */
@@ -70,7 +70,7 @@ object_type *eval_prim(interp_core_type *interp, object_type *proc,
 
 	/* propagate errors */
 	if(interp->error) {
-	    return 0;
+	    return false;
 	}
     } else {
 	evaled_args=cdr(obj);
@@ -117,7 +117,7 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
     
     /* make sure that the interpreter is alive */
     if(has_error(interp)) {
-	return 0;
+	return false;
     }
 
     while(!has_error(interp) && loop) {

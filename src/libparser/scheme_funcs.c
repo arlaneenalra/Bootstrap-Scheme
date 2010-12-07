@@ -1429,6 +1429,52 @@ object_type *prim_eval(interp_core_type *interp, object_type *args) {
     }
 }
 
+/* with-exception-handler */
+object_type *prim_with_exception_handler(interp_core_type *interp, object_type *args) {
+    int arg_count=list_length(interp, args);
+    object_type *result=0;
+    object_type *state_stack=0;
+
+    /* we have to have two arguments */
+    if(arg_count!=2) {
+        interp->error=1;
+        return false;
+    }
+        
+    /* save off some things we need in event of an error */
+    state_stack=interp->state_stack;
+    
+
+    /* attempt to eval */
+    result=eval(interp,cadr(args));
+
+    /* we had an error */
+    if(has_error(interp)) {
+
+        reset(interp);
+        
+        /* restore the state stack */
+        interp->state_stack=state_stack;
+
+        printf("\nHandler:");
+        output(interp, result);
+        printf("\n");
+
+        /* attempt to run the exception handler */
+        result=cons(interp, 
+                         car(args), 
+                         cons(interp, 
+                              result, interp->empty_list));
+        printf("\nHandler:");
+        output(interp, result);
+        printf("\n");
+
+        result=eval(interp,result);
+    }
+
+    return result;
+}
+
 /* load primitive */
 object_type *prim_load(interp_core_type *interp, object_type *args) {
     FILE *fin=0;
@@ -1890,7 +1936,9 @@ binding_type primitive_list[]={
     {"interaction-environment", &prim_interaction_environment, 1, 1},
     {"null-environment", &prim_null_environment, 1, 1},
     {"environment", &prim_environment, 1, 1},
+
     {"eval", &prim_eval, 1, 0},
+    {"with-exception-handler", &prim_with_exception_handler, 0, 0},
 
     {"load", &prim_load, 1, 0},
     {"read", &prim_read, 1, 1},
