@@ -3,7 +3,7 @@
 (define env (interaction-environment))
 
 (define (handler e) 
-  (write "An exception has occured:")
+  (display "An exception has occured: ")
   (display e)
   (newline))
 

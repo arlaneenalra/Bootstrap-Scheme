@@ -39,12 +39,8 @@ void load_main(interp_core_type *interp) {
     }
 }
 
-/* a very simple repl environment */
-void repl(interp_core_type *interp) {
-
-    printf("Simple Bootstrapper\n");
-    printf("sizeof(object_type) %" PRIi64 "\n", (uint64_t)sizeof(object_type));
-    
+/* a c based repl */
+void repl_c(interp_core_type *interp) {
     load_main(interp);
 
     /* while the interpreter is running */
@@ -66,6 +62,19 @@ void repl(interp_core_type *interp) {
     	    }
     	}
     	printf("\n");
+    }
+}
+
+/* a very simple repl environment */
+void repl(interp_core_type *interp, int scheme) {
+
+    printf("Simple Bootstrapper\n");
+    printf("sizeof(object_type) %" PRIi64 "\n", (uint64_t)sizeof(object_type));
+
+    if(scheme) {
+        top_level_program(interp, "lib/repl.scm");
+    } else {
+        repl_c(interp);
     }
 }
 

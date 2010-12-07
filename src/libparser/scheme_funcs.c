@@ -1456,19 +1456,11 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
         /* restore the state stack */
         interp->state_stack=state_stack;
 
-        printf("\nHandler:");
-        output(interp, result);
-        printf("\n");
-
         /* attempt to run the exception handler */
         result=cons(interp, 
                          car(args), 
                          cons(interp, 
                               result, interp->empty_list));
-        printf("\nHandler:");
-        output(interp, result);
-        printf("\n");
-
         result=eval(interp,result);
     }
 

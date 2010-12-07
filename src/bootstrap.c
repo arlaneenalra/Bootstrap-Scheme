@@ -13,7 +13,9 @@ int main(int argc, char **argv) {
     interp=create_interp();
     
     if(argc==1) {
-	repl(interp);
+	repl(interp, 0); /* c repl */
+    } else if(argc==2 && argv[1][0]=='s') {
+        repl(interp, 1); /* scheme repl */
     } else {
 	top_level_program(interp, argv[1]);
     }

@@ -163,7 +163,7 @@ typedef struct interp_core {
 
 
 interp_core_type *create_interp();
-void repl(interp_core_type *interp);
+void repl(interp_core_type *interp, int scheme);
 void top_level_program(interp_core_type *interp, char *filename);
 void cleanup_interp(interp_core_type *interp);
 
