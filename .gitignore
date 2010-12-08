@@ -19,3 +19,4 @@ src/libparser/scheme.c
 Testing
 TAGS
 *.gz
+build*

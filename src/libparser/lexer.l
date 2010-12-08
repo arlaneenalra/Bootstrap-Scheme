@@ -1,7 +1,6 @@
 %option noyywrap reentrant bison-bridge
 %option always-interactive
 %option yylineno
-%option   outfile="lexer.c" header-file="lexer.h"
 %option nounput noinput
 
 %{

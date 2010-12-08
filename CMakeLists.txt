@@ -1,7 +1,7 @@
 
 project(bootstrap C)
 
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8.1)
 
 INCLUDE(CPack)
 INCLUDE(CTest)
