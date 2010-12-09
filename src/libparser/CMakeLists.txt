@@ -1,4 +1,6 @@
 
+include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)
+
 # setup flex and bison
 find_package(BISON)
 find_package(FLEX)
@@ -14,7 +16,7 @@ ADD_FLEX_BISON_DEPENDENCY(LEXER PARSER)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_library(libparser 
+add_library(parser 
   core.c 
   output.c 
   repl.c
@@ -23,4 +25,3 @@ add_library(libparser
   ${BISON_PARSER_OUTPUTS} 
   ${FLEX_LEXER_OUTPUTS})
 
-include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)

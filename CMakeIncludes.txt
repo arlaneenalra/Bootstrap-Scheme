@@ -1,3 +1,5 @@
 set(CMAKE_C_FLAGS "-Wall -g -O3 -std=gnu99 -pedantic")
 
 include_directories(${PROJECT_SOURCE_DIR}/src/include)
+
+set(BUILD_SHARED_LIBS 1)
