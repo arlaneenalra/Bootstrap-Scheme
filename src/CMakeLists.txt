@@ -2,6 +2,7 @@
 add_subdirectory(libparser)
 add_subdirectory(libeval)
 add_subdirectory(libscheme_gc)
+add_subdirectory(libexception)
 
 include_directories(libparser libeval libscheme_gc)
 

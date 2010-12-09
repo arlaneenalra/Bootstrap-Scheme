@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <dlfcn.h>
 
 #include "core.h"
 #include "util.h"
@@ -1584,6 +1585,56 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
     
 }
 
+/* load-plugin */
+object_type *prim_load_plugin(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    binding_type *library_bindings;
+    void *handle=0;
+    char *error=0;
+
+    int len=list_length(interp, args);
+    
+    /* we have to have at least one argument */
+    if(len!=1) {
+        interp->error=1;
+        return false;
+    }
+
+    obj=car(args);
+    /* make sure we have a string */
+    if(obj->type != STRING) {
+        interp->error=1;
+        return false;
+    }
+
+    /* we won't be unloading this libraries */
+    handle=dlopen(obj->value.string_val, RTLD_NOW);
+
+    /* did the library load? */
+    if(!handle) {
+        interp->error=1;
+        fprintf(stderr, "%s: %s\n", args->value.string_val, dlerror());
+        return false;
+    }
+
+    dlerror();
+
+    /* load the symbols and attach them to our environment */
+    library_bindings=(binding_type *)dlsym(handle, "primitive_list");
+
+    /* make sure it worked */
+    error=dlerror();    
+    if(error) {
+        fprintf(stderr, "%s\n", error);
+        return false;
+    }
+
+    /* bind the symbols */
+    bind_symbol_list(interp, library_bindings, &(interp->cur_env));
+
+    return true;
+}
+
 /* write */
 object_type *prim_write(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
@@ -1935,6 +1986,8 @@ binding_type primitive_list[]={
     {"load", &prim_load, 1, 0},
     {"read", &prim_read, 1, 1},
     {"write", &prim_write, 1, 1},
+
+    {"load-plugin", &prim_load_plugin, 1, 1},
 
     {"read-char", &prim_read_char, 1, 1},
     {"write-char", &prim_write_char, 1, 1},
