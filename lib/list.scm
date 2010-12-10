@@ -1,6 +1,14 @@
 
 ;; export some functions
-(provide length reverse for-each map)
+(provide length reverse for-each map list?)
+
+;; check to see if the current object 
+;; is a list
+(define (list? list)
+  (cond
+   ((equal? '() list) #t)
+   ((pair? list) (list? (cdr list)))
+   (else #f)))
 
 ;; find the length of a list
 (define (length list)

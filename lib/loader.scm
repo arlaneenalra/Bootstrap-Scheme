@@ -91,7 +91,7 @@
 
 
 ;; import a library into the current execution environment
-(define (import . import-list)
+(define (import-internal . import-list)
   
   ;; load the libs list if we don't 
   ;; have one defined already
@@ -113,6 +113,13 @@
    import-list)
 
   #t)
+
+;; macro for import
+;; (define-macro (import import-list)
+;;   ((lambda ()   (import-internal import-list))))
+
+(define-macro (import import-list)
+  (import-internal import-list))
 
 ;; load library definitions
 (load-libs)
