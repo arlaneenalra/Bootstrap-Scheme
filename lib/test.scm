@@ -39,8 +39,7 @@
    
    list)
   (if failed
-      (error "Test failures"))
-  )
+      (error "Test failures")))
 
-
+  
 #t
