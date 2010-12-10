@@ -161,11 +161,15 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 		    }
 
 		} else if(is_closure(interp, proc)) {
-		    /* always evaluate arguments of compound procecdures */
-		    evaled_args=eval_list(interp, cdr(obj));
+		    /* don't eval arguments if we have a macro */
+                    if(proc->value.closure.eval_first) {
+                        evaled_args=eval_list(interp, cdr(obj));
+                    } else {
+                        evaled_args=cdr(obj);
+                    }
 
 		    /* check for error evaluating arguments */
-		    if(has_error(interp)) {
+                    if(has_error(interp)) {
 			printf("\nfailed evaluating:");
 			output(interp, obj);
 			printf("\nwith args:");

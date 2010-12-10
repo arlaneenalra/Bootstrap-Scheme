@@ -19,5 +19,7 @@ ADD_TEST(car_cdr src/bootstrap test/test_car_cdr.scm)
 ADD_TEST(equal src/bootstrap test/test_equal.scm)
 ADD_TEST(let src/bootstrap test/test_let.scm)
 ADD_TEST(vector src/bootstrap test/test_vector.scm)
+ADD_TEST(macros src/bootstrap test/test_macros.scm)
+
 
 

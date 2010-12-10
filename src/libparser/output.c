@@ -129,6 +129,7 @@ void output_stream(interp_core_type *interp, object_type *obj, FILE *fout) {
 
 	fprintf(fout,"#<closure: params:");
 	output_stream(interp, obj->value.closure.param, fout);
+        fprintf(fout," eval: %i", obj->value.closure.eval_first);
 	fprintf(fout," body:");
 	output_stream(interp, obj->value.closure.body, fout);
 	fprintf(fout,">");

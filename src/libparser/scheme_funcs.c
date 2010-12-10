@@ -301,6 +301,7 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     obj->value.closure.env=interp->cur_env;
     obj->value.closure.param=car(args);
     obj->value.closure.body=cdr(args);
+    obj->value.closure.eval_first=1; /* eval args */
 
     return obj;
 }
@@ -546,6 +547,37 @@ object_type *prim_list(interp_core_type *interp, object_type *args) {
     return args;
 }
 
+/* quotes its arguments and applies a primitive wrapper with
+   the eval_first set to false
+ */
+object_type *prim_define_macro(interp_core_type *interp, object_type *args) {
+    object_type *obj=0;
+    
+    /* make sure we have the correct arguments */
+    if(list_length(interp, args)<2) {
+	interp->error=1;
+	return false;
+    }
+
+    /* You can bind a symbol or a 
+       special list */
+    if(!is_tagged_list(interp, car(args))) {
+	interp->error=1;
+	return false;
+    }
+
+    obj=prim_lambda(interp,
+                    cons(interp, cdar(args),
+                         cdr(args)));
+
+    /* clear the eval flag */
+    obj->value.closure.eval_first=0;
+
+    bind_symbol(interp, caar(args), /* Symbol */
+                obj,
+                &interp->cur_env); /* Body */
+    return true;
+}
 
 /* define */
 object_type *prim_define(interp_core_type *interp, object_type *args) {
@@ -1905,6 +1937,8 @@ object_type *prim_has_error(interp_core_type *interp, object_type *args) {
 /* Setup scheme primitive function bindings */
 binding_type primitive_list[]={
     {"define", &prim_define, 0, 1},
+    {"define-macro", &prim_define_macro, 0, 1}, /* This is custom */
+
     {"set!", &prim_set, 0, 1},
     {"quit", &prim_quit, 0, 1},
     {"quote", &prim_quote, 0, 1},

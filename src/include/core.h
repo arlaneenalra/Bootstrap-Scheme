@@ -67,6 +67,7 @@ typedef struct closure {
     struct object *param;
     struct object *body;
     struct object *env;
+    bool eval_first;
 } closure_type;
 
 typedef struct vector {
