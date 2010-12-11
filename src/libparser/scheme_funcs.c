@@ -1476,10 +1476,12 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
         
     /* save off some things we need in event of an error */
     state_stack=interp->state_stack;
-    
 
     /* attempt to eval */
-    result=eval(interp,cadr(args));
+    result=eval(interp,
+                cons(interp, 
+                     cadr(args),
+                     interp->empty_list));
 
     /* we had an error */
     if(has_error(interp)) {
@@ -2015,7 +2017,7 @@ binding_type primitive_list[]={
     {"environment", &prim_environment, 1, 1},
 
     {"eval", &prim_eval, 1, 0},
-    {"with-exception-handler", &prim_with_exception_handler, 0, 0},
+    {"with-exception-handler", &prim_with_exception_handler, 1, 1},
 
     {"load", &prim_load, 1, 0},
     {"read", &prim_read, 1, 1},

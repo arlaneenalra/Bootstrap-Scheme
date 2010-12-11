@@ -92,10 +92,11 @@ object_type *eval_tagged_list(interp_core_type *interp, object_type *proc,
     TRACE("Co");
 
     body=proc->value.closure.body;
-	
+
     /* loop until we have the last call */
     while(!is_empty_list(interp, cdr(body))) {
 	TRACE("Cb");
+        
 	eval(interp, car(body));
 	body=cdr(body);
     }
@@ -167,6 +168,14 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
                     } else {
                         evaled_args=cdr(obj);
                     }
+
+                    /* printf("\nProc:"); */
+                    /* output(interp, proc); */
+                    /* printf("\nevaluating:"); */
+                    /* output(interp, obj); */
+                    /* printf("\nwith args:"); */
+                    /* output(interp, cdr(obj)); */
+                    /* printf("\n"); */
 
 		    /* check for error evaluating arguments */
                     if(has_error(interp)) {

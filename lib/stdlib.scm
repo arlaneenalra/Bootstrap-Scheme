@@ -5,6 +5,7 @@
 ;; than the procedure one.  But this will require 
 ;; a more complete approach to libraries
 
+
 ;; Loads the given module and allows exported symbols to 
 ;; be moved into the passed in environment
 (define (import-to-environment filename export-environment)
@@ -14,7 +15,7 @@
   ;; global environment values this apporach should avoid 
   ;; poluting the global namespace with library names
   (load filename)
-  
+
   ;; Mangle our list of variable names into a list of 
   ;; individual define statements hopefully without polluting
   ;; the libraries namespace
@@ -59,8 +60,8 @@
    "lib/car_cdr.scm"
    "lib/io.scm"
    "lib/util.scm"
-   "lib/loader.scm"))
-
+   "lib/loader.scm"
+   ))
 
 #t ; we have to return true or bootstrap bombs
 

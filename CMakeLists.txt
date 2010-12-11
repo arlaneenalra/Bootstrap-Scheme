@@ -21,5 +21,5 @@ ADD_TEST(let src/bootstrap test/test_let.scm)
 ADD_TEST(vector src/bootstrap test/test_vector.scm)
 ADD_TEST(macros src/bootstrap test/test_macros.scm)
 ADD_TEST(list src/bootstrap test/test_list.scm)
-
+ADD_TEST(apply src/bootstrap test/test_apply.scm)
 
