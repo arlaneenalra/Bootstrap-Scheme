@@ -9,24 +9,22 @@
         (+ (car x) (inner (cdr x)))))
   (inner x))
 
-(test
- '(
-   ((lambda () (apply + 1 2 3 '())) . 6)
-   ((lambda () (apply + '(1 2 3 ))) . 6)
-   ((lambda () (apply + 1 2 3 4 x)) . 20)
+(test-suite
+   (make-test ((apply + 1 2 3 '())) 6)
+   (make-test ((apply + '(1 2 3 ))) 6)
+   (make-test ((apply + 1 2 3 4 x)) 20)
 
-   ((lambda () (apply + (list 3 4))) . 7) ;; Why is this failing?
+   (make-test ((apply + (list 3 4))) 7) 
+ 
+   (make-test ((apply cons '(1 2))) (1 . 2))
 
-   ((lambda () (apply cons '(1 2))) . (1 . 2))
+   (make-test ((let ((args '(1 2)))
+                  (apply cons args))) (1 . 2))
 
-   ((lambda () (let ((args '(1 2)))
-                 (apply cons args))) . (1 . 2))
-
-   ((lambda () (let
+   (make-test ((let
                    ((args '(1 2 3 4 5 6)))
-                 (apply sum args))) . 21)
+                 (apply sum args))) 21)
 
-   ((lambda () (let
+   (make-test ((let
                    ((args '(1 2 3 4 5 6)))
-                 (apply sum 1 2 3 4 5 6 args))) . 42)
-   ))
+                 (apply sum 1 2 3 4 5 6 args))) 42))

@@ -3,12 +3,10 @@
 (require "lib/test.scm")
 
 
-(test 
- '(
-   ((lambda () (list? '())) . #t)
-   ((lambda () (list? 1)) . #f)
-   ((lambda () (list? '(1 . 2))) . #f)
-   ((lambda () (list? '(1 2))) . #t)
-   ))
+(test-suite 
+ (make-test ((list? '())) #t)
+ (make-test ((list? 1)) #f)
+ (make-test ((list? '(1 . 2))) #f)
+ (make-test ((list? '(1 2))) #t))
 
 
