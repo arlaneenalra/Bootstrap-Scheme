@@ -35,10 +35,10 @@ typedef enum {
 
 /* used by the gc */
 typedef enum {
-    MARK_RED, /* Everything else */
-    MARK_BLACK,
+    RED, /* Everything else */
+    BLACK,
 
-    MARK_PERM  /* Things that will not be deallocated while we are running */
+    PERM  /* Things that will not be deallocated while we are running */
 } gc_mark_type;
 
 struct object;
@@ -108,6 +108,33 @@ typedef struct bool_global {
     object_type *false;
 } bool_global_type;
 
+/* garbage collector core */
+typedef unsigned int gc_root_count_type;
+
+/* Core components of the Garbage Collection Subsystem */
+typedef struct gc_core {
+
+    gc_mark_type mark;
+
+    /* lists of active and dead objects */
+    object_type *active_list;
+    object_type *dead_list;
+
+    /* list of objects created while protection 
+       was turned on */
+    uint64_t protect_count;
+    object_type *protected_list;
+
+    /* list of objects that have been swept and marked 
+       permenant */
+    object_type *perm_list;
+
+    /* used to keep track of all our root pointers */
+    gc_root_count_type root_number;
+    object_type ***roots;
+    
+} gc_core_type;
+
 
 /* Stores symbols for look up latter. */
 typedef struct symbol_table {
@@ -159,6 +186,8 @@ typedef struct interp_core {
     symbol_table_type symbols;
 
     scanner_stack_type *scanner; /* an instance of the parser/lexer */
+
+    gc_core_type *gc; /* the garbage collector */
     
 } interp_core_type;
 

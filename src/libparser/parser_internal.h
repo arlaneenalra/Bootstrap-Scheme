@@ -9,7 +9,6 @@
 #endif
 
 /* include the bohem gc and our gc stuff */
-#include <gc.h> 
 #include "gc_funcs.h"
 
 /* Used to tell add object that we are setting a car or cdr */

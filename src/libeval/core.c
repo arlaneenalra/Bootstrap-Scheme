@@ -6,7 +6,6 @@
 #include "scheme_funcs.h"
 
 /* include the bohem gc and our gc stuff */
-#include <gc.h> 
 #include "gc_funcs.h"
 
 

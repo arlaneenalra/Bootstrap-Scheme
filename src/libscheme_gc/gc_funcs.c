@@ -5,13 +5,76 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
-#include <gc.h>
+void free_all(object_type *list);
+
+/* create an instance of our garbage collector */
+gc_core_type *gc_create() {
+    gc_core_type *gc=0;
+    
+    gc=(gc_core_type *)calloc(1, sizeof(gc_core_type));
+
+    if(!gc) {
+        fail("Unable to allocate gc");
+    }
+
+    gc->mark=RED;
+
+    return gc;
+}
+
+/* clean up garbage collector instance */
+void gc_destroy(gc_core_type *gc) {
+    
+    if(!gc) {
+        return;
+    }
+
+    /* free our lists of objects */
+    free_all(gc->active_list);
+    free_all(gc->dead_list);
+    free_all(gc->perm_list);
+
+    /* free our array of root pointers */
+    free(gc->roots);
+    
+    free(gc);
+}
+
+/* free all objects in a list */
+/* TODO: complete this! */
+void free_all(object_type *list) {
+    object_type *next=list;
+
+    while(list) {
+	next=list->next;
+
+	/* handle any internal objects */
+	switch(list->type) {
+	case STRING:
+	case SYM:
+	    free(list->value.string_val);
+	    break;
+	    
+	case VECTOR:
+	    if(list->value.vector.vector) {
+		free(list->value.vector.vector);
+	    }
+	    break;
+
+	default:
+	    break;
+	}
+
+	free(list);
+	list=next;
+    }
+}
 
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     object_type *obj=0;
 	
-    obj=(object_type *)GC_malloc(sizeof(object_type));
+    obj=(object_type *)calloc(1, sizeof(object_type));
 
     /* check to make sure there was memory to allocate and then
        make sure that we have a properly typed and zeroed object */
@@ -46,7 +109,7 @@ object_type *alloc_vector(interp_core_type *interp, uint64_t len) {
     if(len!=0) {
 	/* allocate an array of object_type pointers */
 	obj->value.vector.vector=
-	    (object_type **)GC_malloc(sizeof(object_type *) * len);
+	    (object_type **)calloc(1, sizeof(object_type *) * len);
     }
     
     obj->value.vector.length=len;
@@ -57,7 +120,7 @@ object_type *alloc_vector(interp_core_type *interp, uint64_t len) {
 /* allocate string memory */
 char *alloc_string(interp_core_type *interp, size_t len) {
 
-    char *c=(char *)GC_malloc(len+1);
+    char *c=(char *)calloc(1, len+1);
     
     if(!c) {
 	fail("Unable to allocate string!");
@@ -71,11 +134,14 @@ char *alloc_string(interp_core_type *interp, size_t len) {
 interp_core_type *alloc_interp() {
 
     interp_core_type *interp=
-	(interp_core_type *)GC_malloc(sizeof(interp_core_type));
+	(interp_core_type *)calloc(1, sizeof(interp_core_type));
 
     if(!interp) {
 	fail("Unable to allocate interpreter instance!");
     }
+
+    /* attach the garbage collector */
+    interp->gc=gc_create();
     
     return interp;
 }
@@ -85,7 +151,7 @@ interp_core_type *alloc_interp() {
 scanner_stack_type *alloc_scanner() {
 
     scanner_stack_type *scanner=
-	(scanner_stack_type *)GC_malloc(sizeof(scanner_stack_type));
+	(scanner_stack_type *)calloc(1, sizeof(scanner_stack_type));
 
     return scanner;
 }

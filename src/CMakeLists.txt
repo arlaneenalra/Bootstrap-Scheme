@@ -13,7 +13,7 @@ link_directories(${libparser_BIN_DIR}/libparser
 
 add_executable(bootstrap bootstrap.c)
 
-target_link_libraries(bootstrap parser eval scheme_gc gc)
+target_link_libraries(bootstrap parser eval scheme_gc dl)
 
 
 include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)

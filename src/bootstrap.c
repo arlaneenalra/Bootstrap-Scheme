@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <gc.h>
 
 #include "core.h"
 
@@ -8,7 +7,7 @@
 int main(int argc, char **argv) {
     interp_core_type * interp=0;
     
-    GC_INIT();
+    //GC_INIT();
 
     interp=create_interp();
     
