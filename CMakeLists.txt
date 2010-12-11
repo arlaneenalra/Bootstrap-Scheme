@@ -12,6 +12,7 @@ set(VERSION 0.2.0)
 
 add_subdirectory(src)
 
+ADD_TEST(test src/bootstrap test/test_test.scm)
 ADD_TEST(with-exception-handler src/bootstrap test/test_with_exception_handler.scm)
 ADD_TEST(for-each src/bootstrap test/test_foreach.scm)
 ADD_TEST(map src/bootstrap test/test_map.scm)
@@ -23,5 +24,5 @@ ADD_TEST(vector src/bootstrap test/test_vector.scm)
 ADD_TEST(macros src/bootstrap test/test_macros.scm)
 ADD_TEST(list src/bootstrap test/test_list.scm)
 ADD_TEST(apply src/bootstrap test/test_apply.scm)
-
+ADD_TEST(test src/bootstrap test/test_test.scm)
 
