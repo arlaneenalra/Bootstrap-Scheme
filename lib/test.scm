@@ -1,7 +1,6 @@
 ;; Define functions for use in testing core functionality
 
-(provide test)
-
+(provide make-test test-suite)
 
 ;; A simple exception handler
 (define (test-exception-handler exception)
@@ -58,5 +57,54 @@
    list)
   (if failed
       (error "Test failures")))
+
+;; construct a test case 
+(define-macro (make-test test-proc result)
+
+  (cons 
+   (cons 'lambda
+         (cons '()
+               test-proc))
+   result))
+
+;; iterate over tests and attempt to
+;; execute them
+(define (test-suite . tests)
+
+  (newline)
+  (display "Suite: ")
+  (write tests)
+  (newline)
+
+  (test tests))
   
+  ;; ;; Are we at the end of the suite?
+  ;; (if (null? tests)
+  ;;     #t
+  ;;     (let*
+  ;;         ((test-pair (car tests))
+  ;;          (test-proc (car test-pair))
+  ;;          (expected  (cdr test-pair)))
+        
+  ;;       ;; (display "proc->")
+  ;;       ;; (write test-proc)
+  ;;       ;; (newline)
+        
+  ;;       ;; (display "expected->")
+  ;;       ;; (write expected)
+  ;;       ;; (newline)
+
+        
+  ;;       (and 
+  ;;        (if (test-case test-proc expected) ;; execute the test case
+  ;;            (begin
+  ;;              (display "PASS")
+  ;;              #t)
+  ;;            (begin
+  ;;              (display "FAIL")
+  ;;              #f))
+  ;;        (test-suite (cdr tests))))))
+         
+
+    
 #t
