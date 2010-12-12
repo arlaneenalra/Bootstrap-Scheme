@@ -1466,7 +1466,7 @@ object_type *prim_eval(interp_core_type *interp, object_type *args) {
 object_type *prim_with_exception_handler(interp_core_type *interp, object_type *args) {
     int arg_count=list_length(interp, args);
     object_type *result=0;
-    object_type *state_stack=0;
+    object_type *cur_env=0;
 
     /* we have to have two arguments */
     if(arg_count!=2) {
@@ -1475,7 +1475,7 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
     }
         
     /* save off some things we need in event of an error */
-    state_stack=interp->state_stack;
+    cur_env=interp->cur_env;
 
     /* attempt to eval */
     result=eval(interp,
@@ -1488,8 +1488,8 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
 
         reset(interp);
         
-        /* restore the state stack */
-        interp->state_stack=state_stack;
+        /* restore the environment stack */
+        interp->cur_env=cur_env;
 
         /* attempt to run the exception handler */
         result=cons(interp, 
