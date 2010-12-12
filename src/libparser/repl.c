@@ -55,10 +55,13 @@ void repl_c(interp_core_type *interp) {
     	    obj=eval(interp, obj);
 	
     	    /* if there was no error, output the result */
-    	    if(!has_error(interp)) {
+    	    if(has_error(interp)) {
     		printf("There was an error executing the given expression");
-    	    }
-            output(interp, interp->exception ? interp->exception : obj);
+                output(interp, interp->exception ? interp->exception : obj);
+    	    } else {
+                output(interp, obj);
+            }
+
     	}
     	printf("\n");
     }

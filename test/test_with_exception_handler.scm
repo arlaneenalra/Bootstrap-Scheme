@@ -4,6 +4,9 @@
 (define (handler e)
   #t)
 
+(define (true) #t)
+(define (false) #f)
+
 (test-suite
  ;; Exception
  (make-test ((with-exception-handler 
@@ -23,4 +26,10 @@
  (make-test ((with-exception-handler 
               handler
               (lambda () #f)))
-            #f))
+            #f)
+ (make-test ((with-exception-handler 
+              handler
+              (false)))
+            #f)
+ 
+)

@@ -1411,7 +1411,7 @@ object_type *prim_or(interp_core_type *interp, object_type *args) {
 
 /* return the current environment */
 object_type *prim_interaction_environment(interp_core_type *interp, object_type *args) {
-    /*return interp->cur_env; */
+    /* return interp->cur_env; */
     return interp->top_env;
 }
 
@@ -1611,10 +1611,6 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
 	fin=car(args)->value.port_val.port;
     }
 
-    if(has_error(interp)) {
-        printf("E1");
-    }
-
     push_parse_state(interp, fin);
 
     parsed=parse_chain(interp);
@@ -1623,16 +1619,7 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
 	parsed=eof_object;
     }
 
-    if(has_error(interp)) {
-        printf("E2");
-    }
-
     pop_parse_state(interp);
-
-    if(has_error(interp)) {
-        printf("E3");
-    }
-
 
     interp->running=1;
 
