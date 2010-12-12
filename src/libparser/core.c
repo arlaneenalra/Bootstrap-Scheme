@@ -421,8 +421,17 @@ void push_parse_state(interp_core_type *interp, FILE *fin) {
 
 void pop_parse_state(interp_core_type *interp) {
 
+    scanner_stack_type *previous=0;
+
     yylex_destroy(peek_scanner);
-    interp->scanner=peek_previous;
+    
+    previous=peek_previous;
+    
+    /* clean up the scanner allocation */
+    free(interp->scanner);
+
+    interp->scanner=previous;
+    
 }
 
 void create_parser(interp_core_type *interp) {

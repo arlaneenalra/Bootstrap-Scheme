@@ -49,6 +49,8 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
     if(obj) {
 	return obj;
     }
+    
+    gc_protect(interp);
 
     /* create a new buffer for the string value */
     c=alloc_string(interp, strlen(str));
@@ -56,11 +58,17 @@ object_type *create_symbol(interp_core_type *interp, char *str) {
 
     obj=alloc_object(interp, SYM);
     obj->value.string_val=c;
+
+    gc_mark_perm(interp, obj);
 	
     /* add our new symbol to the symbol list */
     list=cons(interp, obj, interp->symbols.list);
 
+    gc_mark_perm(interp, list);
+
     interp->symbols.list=list;
+    
+    gc_unprotect(interp);
 
     return obj;
 }
@@ -92,11 +100,14 @@ void create_booleans(interp_core_type *interp) {
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=1;
 
-    true=obj;
+    gc_mark_perm(interp, obj);
 
+    true=obj;
     
     obj=alloc_object(interp,BOOL);
     obj->value.bool_val=0;
+
+    gc_mark_perm(interp, obj);
 
     false=obj;
 }
@@ -107,6 +118,8 @@ void create_empty_list(interp_core_type *interp) {
 
     obj=alloc_object(interp,TUPLE);
 
+    gc_mark_perm(interp, obj);
+
     interp->empty_list=obj;
 }
 
@@ -115,6 +128,8 @@ void create_eof_object(interp_core_type *interp) {
     object_type *obj=0;
 
     obj=alloc_object(interp,CHAR);
+
+    gc_mark_perm(interp, obj);
 
     eof_object=obj;
 }
@@ -140,6 +155,18 @@ void create_base_environment(interp_core_type *interp) {
 
 }
 
+void register_with_gc(interp_core_type *interp) {
+    gc_register_root(interp, &(interp->added));
+    gc_register_root(interp, &(interp->current));
+    gc_register_root(interp, &(interp->state_stack));
+
+    /* this should be sufficient */
+    gc_register_root(interp, &(interp->top_env));
+
+    /* TODO: This should not be needed */
+    gc_register_root(interp, &(interp->symbols.list));
+}
+
 /* Create an instance of the interpreter */
 interp_core_type *create_interp() {
     interp_core_type *interp=0;
@@ -148,8 +175,8 @@ interp_core_type *create_interp() {
     
     /* Setup the interpreter */
     if(interp) {
-	bzero(interp, sizeof(interp_core_type));
-
+        /* keep things simple, protect allocations */
+        gc_protect(interp);
 
 	/* create some special values */
 	create_booleans(interp);
@@ -165,6 +192,11 @@ interp_core_type *create_interp() {
 
 	/* setup the base environment */
 	create_base_environment(interp);
+
+        register_with_gc(interp);
+        
+        /* unprotect allocations */
+        gc_unprotect(interp);
 
 	interp->running=1;
 
@@ -182,6 +214,10 @@ void cleanup_interp(interp_core_type *interp) {
     while(interp->scanner!=0) {
 	pop_parse_state(interp);
     }
+
+    gc_destroy(interp->gc);
+
+    free(interp);
 }
 
 /* Find the length of a passed in list */

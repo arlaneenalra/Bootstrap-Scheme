@@ -5,7 +5,195 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
+#define GC_PRE_ALLOC_BLOCK 100
+
 void free_all(object_type *list);
+void set_next_mark_objects(gc_core_type * gc);
+void mark_objects(gc_mark_type mark, object_type *obj);
+
+/* figure out what the next mark is going to be */
+void set_next_mark_objects(gc_core_type * gc) {
+    
+    /* we only have two marks */
+    gc->mark=gc->mark==RED ? BLACK : RED;
+}
+
+/* tree through objects and mark them */
+void mark_objects(gc_mark_type mark, object_type *obj) {
+    
+    /* Walk until we run out of obects or see one that is
+       already marked. Objects marked permenant are treated 
+       as marked. */
+    while(obj && obj->mark != mark && obj->mark != PERM) {
+	obj->mark=mark;
+
+	switch (obj->type) {
+	case TUPLE:
+	case CHAIN:
+	    mark_objects(mark, cdr(obj)); /* walk the other branch */	    
+	    obj=car(obj);
+	    break;
+
+	case VECTOR:
+	    /* walk all elements of the vector */
+	    for(int i=0; i<obj->value.vector.length;i++) {
+		mark_objects(mark, obj->value.vector.vector[i]);
+	    }
+	    obj=0;
+
+	    break;
+
+	default:
+	    obj=0; /* nothing more to do here */
+	}
+    }
+}
+
+/* return the number of objects in a list of objects */
+uint64_t count_list(object_type *list) {
+    uint64_t count=0;
+    
+    while(list) {
+	count++;
+	list=list->next;
+    }
+    return count;
+}
+
+/* allocate a block of objects that can be used for gc_alloc_object */
+void alloc_block(gc_core_type *gc, int num) {
+    object_type * obj=0;
+    
+    for(int i=num; i>0; i--) {
+	obj=(object_type *)calloc(1, sizeof(object_type));
+	obj->next=gc->dead_list;
+	gc->dead_list=obj;
+    }
+}
+
+/* Output some useful statistics about the garbage collector */
+void gc_stats(gc_core_type * gc) {
+    uint64_t active=count_list(gc->active_list);
+    uint64_t dead=count_list(gc->dead_list);
+    uint64_t protected=count_list(gc->protected_list);
+    uint64_t perm=count_list(gc->perm_list);
+    uint64_t total=active+dead+protected+perm;
+    
+
+    printf("GC:Active: %" PRIi64 ", Dead: %" PRIi64 ", Protected: %" PRIi64 ", "
+	   "Permenant: %" PRIi64 ", Total Objects: %" PRIi64  ", Roots: %i, Depth: %" PRIi64 "\n", 
+	   active, dead, protected, perm, total, gc->root_number, gc->protect_count);
+}
+
+/* run a manual sweep */
+void gc_sweep(gc_core_type *gc) {
+    gc_root_count_type i=0;
+
+    object_type *obj=0;
+    object_type *obj_next=0;
+    
+    printf("\nSweep:");
+    gc_stats(gc);
+
+    /* if we are under protection, don't sweep */
+    /* if(gc->protect_count>0) {
+	printf("Protected\n");
+	return;
+	}*/
+    
+    /* setup the next mark */
+    set_next_mark_objects(gc);
+
+    /* Walk all of our root pointers and tree through their 
+       referenced objects.  Mark the reachable objects with 
+       the new mark. */
+
+    for(i=0;i<gc->root_number;i++) {
+	obj=*(gc->roots[i]); /* get the object pointed to by this root */
+
+	/* tree down and mark all reachable objects */
+	mark_objects(gc->mark,obj);
+    }
+
+    /* now move all objects unmarked objects to the top of the dead list */
+    
+    obj=gc->active_list;
+    gc->active_list=0; /* clear the active list */
+    
+    while(obj) {
+	obj_next=obj->next;
+	
+	/* if our object is marked, add it to the live list */
+	if(obj->mark == gc->mark) {
+	    obj->next=gc->active_list;
+	    gc->active_list=obj;
+
+	} else if(obj->mark == PERM) {
+	    /* move object out the list of active objects and
+	       into our permenant object list. */
+	    obj->next=gc->perm_list;
+	    gc->perm_list=obj;
+	    
+	} else {
+	    /* otherwise, add it to the dead list */
+	    obj->next=gc->dead_list;
+	    gc->dead_list=obj;
+	}
+	
+	/* move on to the next object */
+	obj=obj_next;
+    }
+    
+    gc_stats(gc);
+}
+
+/* Turn allocated object protection on */
+void gc_protect(interp_core_type *interp) {
+    gc_stats(interp->gc);
+    interp->gc->protect_count++;
+}
+
+/* Turn off allocated object protection */
+void gc_unprotect(interp_core_type *interp) {
+    object_type *obj=0;
+    gc_core_type *gc=interp->gc;
+
+    gc_stats(gc);
+
+    gc->protect_count--;
+    
+    /* Something went wrong with protection counting */
+    if(gc->protect_count<0) {
+	fail("Too many unprotects!");
+    }
+
+    /* we can safely run the gc */
+    if(gc->protect_count==0) {
+	
+	/* move protected objects into the active_list */
+	obj=gc->protected_list;
+	
+	while(obj) {
+	    gc->protected_list=obj->next;
+	    obj->next=gc->active_list;
+	    
+	    /* we need to remark them since there could have
+	       been a gc since protection was turned on */
+	    if(obj->mark!=PERM) {
+		obj->mark=gc->mark;
+	    }
+	    
+	    /* attach and move to the next object */
+	    gc->active_list=obj;
+	    obj=gc->protected_list;
+	}
+
+	/* if there are no dead objects, let's do a collections */
+	if(!gc->dead_list) {
+	    gc_sweep(gc);
+	}
+    }
+}
 
 /* create an instance of our garbage collector */
 gc_core_type *gc_create() {
@@ -19,6 +207,8 @@ gc_core_type *gc_create() {
 
     gc->mark=RED;
 
+    alloc_block(gc, 100);
+
     return gc;
 }
 
@@ -28,6 +218,8 @@ void gc_destroy(gc_core_type *gc) {
     if(!gc) {
         return;
     }
+    
+    gc_stats(gc);
 
     /* free our lists of objects */
     free_all(gc->active_list);
@@ -38,6 +230,37 @@ void gc_destroy(gc_core_type *gc) {
     free(gc->roots);
     
     free(gc);
+}
+
+/* Register a root pointer with the gc */
+void gc_register_root(interp_core_type *interp, object_type **root_ptr) {
+    
+    object_type ***new_roots=0;
+    gc_core_type *gc=interp->gc;
+    
+    /* allocate a new root array with one more element*/
+    new_roots=calloc(gc->root_number+1,sizeof(object_type*));
+    
+    if(!new_roots) {
+        fail("Unable to allocate new root array");
+    }
+
+    if(gc->roots) {
+
+	/* copy old list of roots to the new array */
+	memcpy(new_roots, gc->roots, (gc->root_number * sizeof(object_type*)));
+	free(gc->roots);
+    }
+    
+    new_roots[gc->root_number]=root_ptr;
+
+    gc->roots=new_roots;
+    gc->root_number++;
+}
+
+/* mark an object as permenant */
+void gc_mark_perm(interp_core_type *interp, object_type *obj) {
+    obj->mark=PERM;
 }
 
 /* free all objects in a list */
@@ -73,31 +296,56 @@ void free_all(object_type *list) {
 /* Allocate and return an new object instance */
 object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     object_type *obj=0;
-	
-    obj=(object_type *)calloc(1, sizeof(object_type));
+    gc_core_type *gc=interp->gc;
+
+    /* check to see if we have any dead objects */
+    if(!gc->dead_list) {
+        gc_sweep(gc);
+    }
+
+    /* Are there any dead objects out there now? */
+    if(gc->dead_list) {
+
+	/* pop an object off the top of the dead list */
+	obj=gc->dead_list;
+	gc->dead_list=obj->next;
+	/* zero out the block */
+	memset(obj, 0, sizeof(object_type));
+
+    } else {
+	alloc_block(gc, GC_PRE_ALLOC_BLOCK); /* allocate a block of objects for next time */
+	obj=(object_type *)calloc(1, sizeof(object_type));	
+    }
 
     /* check to make sure there was memory to allocate and then
        make sure that we have a properly typed and zeroed object */
-    if(obj) {
-
-	obj->type=obj_type;
-
-	/* do some special purpose init */
-	switch(obj_type) {
-	case TUPLE:
-	    cdr(obj)=interp->empty_list;
-	    break;
-
-	default:
-	    break;
-	}
-
-	return obj;
+    if(!obj) {
+        fail("Unable to allocate new object");
+        return 0;
     }
-    
-    fail("Unable to new object");
-    
-    return 0;
+
+    obj->type=obj_type;
+
+    /* do some special purpose init */
+    switch(obj_type) {
+    case TUPLE:
+        cdr(obj)=interp->empty_list;
+        break;
+
+    default:
+        break;
+    }
+
+    /* Attach to garbage collector */
+    if(gc->protect_count==0) {
+	obj->next=gc->active_list;
+	gc->active_list=obj;
+    } else {
+	obj->next=gc->protected_list;
+	gc->protected_list=obj;
+    }
+
+    return obj;    
 }
 
 /* allocate a vector object */
