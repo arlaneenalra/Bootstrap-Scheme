@@ -1486,6 +1486,14 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
     /* we had an error */
     if(has_error(interp)) {
 
+        result=interp->exception; /* extract the exception object if any */
+        
+        /* check for no exception object */
+        if(!result) {
+            result=create_string(interp, "Undefined Exception!");
+        }
+
+        /* clean this up so we can run code */
         reset(interp);
         
         /* restore the environment stack */

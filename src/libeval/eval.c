@@ -15,6 +15,7 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
+        /* we have an unbound variable */
         set_exception(interp, "Unbound Variable: %s@%p\n",
                       obj->value.string_val, (void *)obj);
 	return false;
@@ -145,7 +146,8 @@ object_type *eval(interp_core_type *interp, object_type *obj) {
 
 	    /* make sure that we actually have a proc to work with */
 	    if(has_error(interp) || proc==0) {
-		interp->error=1;
+		/* interp->error=1; */
+                wrap_exception(interp, "List tag did not evaluate to proc!");
 		loop=0;
 		obj=false;
 
