@@ -1,6 +1,9 @@
 
 (require "lib/test.scm")
 
+(define (handler e)
+  #t)
+
 (test-suite
  ;; Exception
  (make-test ((with-exception-handler 
@@ -11,4 +14,13 @@
  (make-test ((with-exception-handler 
               (lambda (x) #f)
               (lambda () #t)))
-            #t))
+            #t)
+ 
+ (make-test ((with-exception-handler 
+              handler
+              (lambda () #f bad)))
+            #t) 
+ (make-test ((with-exception-handler 
+              handler
+              (lambda () #f)))
+            #f))
