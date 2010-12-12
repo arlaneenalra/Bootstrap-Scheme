@@ -35,12 +35,8 @@ object_type *quote(interp_core_type *interp, object_type *obj) {
     /* Create a (quote ...) list */
     /* and now (quote ( ... )) */
 
-    gc_protect(interp);
-
     ret_val=cons(interp, interp->quote,
 		 cons(interp, obj, interp->empty_list));
-
-    gc_unprotect(interp);
     
     return ret_val;
 }
@@ -65,14 +61,14 @@ void fixnum_to_floatnum(interp_core_type *interp, object_type **num) {
 void normalize_numbers(interp_core_type *interp, object_type **num, 
 		       object_type **num2) {
 
-    gc_protect(interp);
+    
 
     if((*num)->type!=(*num2)->type) {
 	fixnum_to_floatnum(interp, num);
 	fixnum_to_floatnum(interp, num2);
     }
 
-    gc_unprotect(interp);
+    
 }
 
 /* create an instance of a primitive object */
@@ -80,14 +76,14 @@ object_type *create_primitive(interp_core_type *interp, fn_type primitive,
 			      bool eval_first, bool eval_end) {
     object_type *obj=0;
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, PRIM);
     obj->value.primitive.fn=primitive;
     obj->value.primitive.eval_first=eval_first;
     obj->value.primitive.eval_end=eval_end;
     
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -97,7 +93,7 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value,
 		 object_type **env) {
     object_type *binding=0;
     
-    gc_protect(interp);
+    
 
     /* create a new binding as we didn't find one */
     binding=cons(interp, sym, value);
@@ -106,14 +102,14 @@ void bind_symbol(interp_core_type *interp, object_type *sym, object_type *value,
     car((*env))=cons(interp, binding, 
 		     car((*env)));
 
-    gc_unprotect(interp);
+    
 }
 
 /* bind a parallel list of symbols and arguments */
 void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
 			object_type *value_list) {
 
-    gc_protect(interp);
+    
 
     /* we have a list of symbols */
     while(!is_empty_list(interp, sym_list) && !is_empty_list(interp, value_list)
@@ -131,7 +127,7 @@ void bind_argument_list(interp_core_type *interp, object_type *sym_list,
 	return;
     }
 
-    gc_unprotect(interp);
+    
 
     /* make sure that we have the same number of arguments
        as we have symbols */
@@ -146,7 +142,7 @@ void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
     object_type *obj=0;
     int i=0;
 
-    gc_protect(interp);
+    
 
     /* bind every symbol in the list of primitives */
     for(i=0; binding_list[i].symbol!=0;i++) {
@@ -157,7 +153,7 @@ void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
 				     binding_list[i].eval_end), env);
     }
 
-    gc_protect(interp);
+    
 }
 
 object_type *get_binding(interp_core_type *interp, 
@@ -317,11 +313,11 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    gc_protect(interp);
+    
 
     obj=cons(interp, car(args), cadr(args));
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -330,7 +326,7 @@ object_type *prim_cons(interp_core_type *interp, object_type *args) {
 object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
     
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, CLOSURE);
     
@@ -339,7 +335,7 @@ object_type *prim_lambda(interp_core_type *interp, object_type *args) {
     obj->value.closure.body=cdr(args);
     obj->value.closure.eval_first=1; /* eval args */
 
-    gc_unprotect(interp);
+    
 
     return obj;
 }
@@ -371,7 +367,7 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     /* split pairs into parallel lists */
     while(!is_empty_list(interp, next)) {
@@ -390,7 +386,7 @@ object_type *prim_let(interp_core_type *interp, object_type *args) {
 		   cons(interp, sym_list, body)),
 	      arg_list);
 
-    gc_unprotect(interp);
+    
 
     return next;
 
@@ -478,7 +474,7 @@ object_type *prim_let_star(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     /* split pairs into parallel lists */
     while(!is_empty_list(interp, next)) {
@@ -511,7 +507,7 @@ object_type *prim_let_star(interp_core_type *interp, object_type *args) {
 		   cons(interp, interp->empty_list, body)),
 	      interp->empty_list);
 
-    gc_unprotect(interp);
+    
 
     return next;
 
@@ -552,7 +548,7 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 
     args=cdr(args);
 
-    gc_protect(interp);
+    
 
     /* walk everything but the last argument  */
     while(!is_empty_list(interp, args) && !is_empty_list(interp, cdr(args))) {
@@ -587,7 +583,7 @@ object_type *prim_apply(interp_core_type *interp, object_type *args) {
 	tail=cdr(tail);
     }
 
-    gc_unprotect(interp);
+    
 
     return call;
 }
@@ -616,6 +612,8 @@ object_type *prim_define_macro(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
+    
+
     gc_protect(interp);
 
     obj=prim_lambda(interp,
@@ -628,8 +626,10 @@ object_type *prim_define_macro(interp_core_type *interp, object_type *args) {
     bind_symbol(interp, caar(args), /* Symbol */
                 obj,
                 &interp->cur_env); /* Body */
-    
+
     gc_unprotect(interp);
+    
+    
 
     return true;
 }
@@ -651,6 +651,8 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
+    
+
     gc_protect(interp);
 
     if(is_symbol(interp, car(args))) {
@@ -668,6 +670,7 @@ object_type *prim_define(interp_core_type *interp, object_type *args) {
     }
 
     gc_unprotect(interp);
+    
 
     return true;
 }
@@ -808,7 +811,7 @@ object_type *prim_make_vector(interp_core_type *interp, object_type *args) {
 
     len=car(args)->value.int_val;
 
-    gc_protect(interp);
+    
 
     obj=alloc_vector(interp, len);
 
@@ -816,7 +819,7 @@ object_type *prim_make_vector(interp_core_type *interp, object_type *args) {
 	obj->value.vector.vector[i]=fill;
     }
 
-    gc_unprotect(interp);
+    
 
     return obj;
 }
@@ -830,13 +833,13 @@ object_type *prim_vector_length(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, FIXNUM);
     
     obj->value.int_val=car(args)->value.vector.length;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -905,7 +908,7 @@ object_type *prim_make_string(interp_core_type *interp, object_type *args) {
     
     len=car(args)->value.int_val;
 
-    gc_protect(interp);
+    
     
     c=alloc_string(interp, len);
     
@@ -918,7 +921,7 @@ object_type *prim_make_string(interp_core_type *interp, object_type *args) {
     obj=alloc_object(interp, STRING);
     obj->value.string_val=c;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -933,13 +936,13 @@ object_type *prim_string_length(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    gc_protect(interp);
+    
 
     /* use strlen to find the length of our string */
     obj=alloc_object(interp, FIXNUM);
     obj->value.int_val=strlen(car(args)->value.string_val);
 
-    gc_unprotect(interp);
+    
     
     return obj;    
 }
@@ -980,12 +983,12 @@ object_type *prim_string_ref(interp_core_type *interp, object_type *args) {
     c=car(args)->value.string_val;
     index=cadr(args)->value.int_val;
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c[index];
 
-    gc_unprotect(interp);
+    
     
     return obj;
     
@@ -1090,13 +1093,13 @@ object_type *prim_char_to_int(interp_core_type *interp, object_type *args) {
 	return false;	
     }
 
-    gc_protect(interp);
+    
 
     /* convert our char to a string */
     obj=alloc_object(interp, FIXNUM);
     obj->value.int_val=car(args)->value.char_val;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -1117,13 +1120,13 @@ object_type *prim_int_to_char(interp_core_type *interp, object_type *args) {
 	return false;	
     }
 
-    gc_protect(interp);
+    
 
     /* convert our char to a string */
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=car(args)->value.int_val;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -1183,7 +1186,7 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
 	walk++;
     }
 
-    gc_protect(interp);
+    
 
     /* assume we have an integer until otherwise determined */
     obj=alloc_object(interp, FIXNUM);
@@ -1213,7 +1216,7 @@ object_type *prim_string_to_num(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    gc_unprotect(interp);
+    
 
     return obj;
 }
@@ -1241,12 +1244,12 @@ object_type *prim_mod(interp_core_type *interp, object_type *args) {
 	return false;
     }
     
-    gc_protect(interp);
+    
 
     result=clone(interp, dividend);
     result->value.int_val%=divisor->value.int_val;
     
-    gc_unprotect(interp);
+    
 
     return result;
 }
@@ -1273,12 +1276,12 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     result=clone(interp, dividend);
     result->value.int_val/=divisor->value.int_val;
 
-    gc_unprotect(interp);
+    
 
     return result;
 }
@@ -1291,10 +1294,10 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
 									\
 	/* No argument means we return 0 */				\
 	if(is_empty_list(interp, args)) {				\
-            gc_protect(interp);                                         \
+                                                     \
 	    result=alloc_object(interp, FIXNUM);			\
 	    result->value.int_val=0;					\
-            gc_unprotect(interp);                                       \
+                                                   \
 	    return result;						\
 	}								\
 									\
@@ -1526,7 +1529,7 @@ object_type *prim_null_environment(interp_core_type *interp, object_type *args) 
 object_type *prim_environment(interp_core_type *interp, object_type *args) {
     object_type *env=0;
     
-    gc_protect(interp);
+    
 
     env=cons(interp, interp->empty_list, interp->empty_list);
 
@@ -1539,7 +1542,7 @@ object_type *prim_environment(interp_core_type *interp, object_type *args) {
 		true,
 		&env);
     
-    gc_unprotect(interp);
+    
 
     return env;
 }
@@ -1578,10 +1581,10 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
         return false;
     }
 
-    gc_protect(interp);
+    
 
     /* save off some things we need in event of an error */
-    state_stack=interp->state_stack;
+    state_stack=interp->cur_env;
 
     /* attempt to eval */
     result=eval(interp,
@@ -1595,7 +1598,7 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
         reset(interp);
         
         /* restore the state stack */
-        interp->state_stack=state_stack;
+        interp->cur_env=state_stack;
 
         /* attempt to run the exception handler */
         result=cons(interp, 
@@ -1605,7 +1608,7 @@ object_type *prim_with_exception_handler(interp_core_type *interp, object_type *
         result=eval(interp,result);
     }
 
-    gc_unprotect(interp);
+    
 
     return result;
 }
@@ -1638,8 +1641,7 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
 
 
     push_parse_state(interp, fin);
-
-
+    
     gc_protect(interp);
 
     /* create our implicit begin form */
@@ -1666,7 +1668,6 @@ object_type *prim_load(interp_core_type *interp, object_type *args) {
 
     pop_parse_state(interp);
 
-
     interp->running=1;
 
     fclose(fin);
@@ -1690,7 +1691,7 @@ object_type *prim_provide(interp_core_type *interp, object_type *args) {
 	return true;
     }
 
-    gc_protect(interp);
+    
 
     result=cons(interp, create_symbol(interp, "quote-list"), args);
 
@@ -1700,7 +1701,7 @@ object_type *prim_provide(interp_core_type *interp, object_type *args) {
 		     create_symbol(interp,"exported-list"), /* internal symbol */
 		     cons(interp, result, interp->empty_list)));
 
-    gc_unprotect(interp);
+    
     
     return result;
 }
@@ -1779,12 +1780,12 @@ object_type *prim_load_plugin(interp_core_type *interp, object_type *args) {
         return false;
     }
 
-    gc_protect(interp);
+    
 
     /* bind the symbols */
     bind_symbol_list(interp, library_bindings, &(interp->cur_env));
 
-    gc_unprotect(interp);
+    
 
     return true;
 }
@@ -1872,12 +1873,12 @@ object_type *prim_read_char(interp_core_type *interp, object_type *args) {
 	return eof_object;
     }
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c;
 
-    gc_unprotect(interp);
+    
 
     return obj;
 }
@@ -1907,12 +1908,12 @@ object_type *prim_peek_char(interp_core_type *interp, object_type *args) {
 	return eof_object;
     }
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, CHAR);
     obj->value.char_val=c;
 
-    gc_unprotect(interp);
+    
 
     return obj;
 }
@@ -1940,13 +1941,13 @@ object_type *prim_open_input_file(interp_core_type *interp, object_type *args) {
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, PORT);
     obj->value.port_val.port=fin;
     obj->value.port_val.input=1;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -1974,13 +1975,13 @@ object_type *prim_open_output_file(interp_core_type *interp, object_type *args) 
 	return false;
     }
 
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, PORT);
     obj->value.port_val.port=fin;
     obj->value.port_val.output=1;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 }
@@ -1989,13 +1990,13 @@ object_type *prim_open_output_file(interp_core_type *interp, object_type *args) 
 object_type *prim_stderr(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
     
-    gc_protect(interp);
+    
 
     obj=alloc_object(interp, PORT);
     obj->value.port_val.port=stderr;
     obj->value.port_val.output=1;
 
-    gc_unprotect(interp);
+    
     
     return obj;
 
@@ -2005,13 +2006,10 @@ object_type *prim_stderr(interp_core_type *interp, object_type *args) {
 object_type *prim_stdout(interp_core_type *interp, object_type *args) {
     object_type *obj=0;
     
-    gc_protect(interp);
 
     obj=alloc_object(interp, PORT);
     obj->value.port_val.port=stdout;
     obj->value.port_val.output=1;
-
-    gc_unprotect(interp);
     
     return obj;
 

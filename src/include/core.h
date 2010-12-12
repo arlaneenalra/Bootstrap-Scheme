@@ -23,8 +23,10 @@ typedef enum {
     BOOL,
     CHAR,
     STRING,
+    
     VECTOR,
     TUPLE,
+    
     SYM,
     PORT,
 
@@ -171,7 +173,6 @@ typedef struct interp_core {
 
     /* Object we are currently working on */
     object_type *current;
-
 
     /* Used by the parser to generate lists */
     object_type *state_stack;

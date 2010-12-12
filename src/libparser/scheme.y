@@ -5,6 +5,7 @@
 #include "core.h"
 #include "util.h"
 #include "parser_internal.h"
+#include "gc_funcs.h"
 
 #include "scheme.h"
 #include "lexer.h"
@@ -125,7 +126,11 @@ int parse_internal(interp_core_type *interp, void *scanner) {
 
     interp->parsing=1;
 
+    gc_protect(interp);
+
     ret_val=yyparse(interp, scanner);
+
+    gc_unprotect(interp);
 
     /* put it back to what it was before we started */
     interp->parsing=parsing_flag;

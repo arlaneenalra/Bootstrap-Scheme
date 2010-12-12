@@ -8,8 +8,35 @@
 #define GC_PRE_ALLOC_BLOCK 100
 
 void free_all(object_type *list);
+void free_internal(object_type *obj);
 void set_next_mark_objects(gc_core_type * gc);
 void mark_objects(gc_mark_type mark, object_type *obj);
+uint64_t count_list(object_type *list);
+
+/* return the number of objects in a list of objects */
+uint64_t count_list(object_type *list) {
+    uint64_t count=0;
+    
+    while(list) {
+	count++;
+	list=list->next;
+    }
+    return count;
+}
+
+/* Output some useful statistics about the garbage collector */
+void gc_stats(gc_core_type * gc) {
+    uint64_t active=count_list(gc->active_list);
+    uint64_t dead=count_list(gc->dead_list);
+    uint64_t protected=count_list(gc->protected_list);
+    uint64_t perm=count_list(gc->perm_list);
+    uint64_t total=active+dead+protected+perm;
+    
+
+    printf("GC:Active: %" PRIi64 ", Dead: %" PRIi64 ", Protected: %" PRIi64 ", "
+	   "Permenant: %" PRIi64 ", Total Objects: %" PRIi64  ", Roots: %i, Depth: %" PRIi64 "\n", 
+	   active, dead, protected, perm, total, gc->root_number, gc->protect_count);
+}
 
 /* figure out what the next mark is going to be */
 void set_next_mark_objects(gc_core_type * gc) {
@@ -33,6 +60,12 @@ void mark_objects(gc_mark_type mark, object_type *obj) {
 	    mark_objects(mark, cdr(obj)); /* walk the other branch */	    
 	    obj=car(obj);
 	    break;
+            
+        case CLOSURE: /* walk the internals of a closure */
+            mark_objects(mark, obj->value.closure.param);
+            mark_objects(mark, obj->value.closure.body);
+            mark_objects(mark, obj->value.closure.env);
+            break;
 
 	case VECTOR:
 	    /* walk all elements of the vector */
@@ -49,17 +82,6 @@ void mark_objects(gc_mark_type mark, object_type *obj) {
     }
 }
 
-/* return the number of objects in a list of objects */
-uint64_t count_list(object_type *list) {
-    uint64_t count=0;
-    
-    while(list) {
-	count++;
-	list=list->next;
-    }
-    return count;
-}
-
 /* allocate a block of objects that can be used for gc_alloc_object */
 void alloc_block(gc_core_type *gc, int num) {
     object_type * obj=0;
@@ -69,20 +91,9 @@ void alloc_block(gc_core_type *gc, int num) {
 	obj->next=gc->dead_list;
 	gc->dead_list=obj;
     }
-}
 
-/* Output some useful statistics about the garbage collector */
-void gc_stats(gc_core_type * gc) {
-    uint64_t active=count_list(gc->active_list);
-    uint64_t dead=count_list(gc->dead_list);
-    uint64_t protected=count_list(gc->protected_list);
-    uint64_t perm=count_list(gc->perm_list);
-    uint64_t total=active+dead+protected+perm;
-    
-
-    printf("GC:Active: %" PRIi64 ", Dead: %" PRIi64 ", Protected: %" PRIi64 ", "
-	   "Permenant: %" PRIi64 ", Total Objects: %" PRIi64  ", Roots: %i, Depth: %" PRIi64 "\n", 
-	   active, dead, protected, perm, total, gc->root_number, gc->protect_count);
+    printf("Stats");
+    gc_stats(gc);
 }
 
 /* run a manual sweep */
@@ -96,10 +107,12 @@ void gc_sweep(gc_core_type *gc) {
     gc_stats(gc);
 
     /* if we are under protection, don't sweep */
-    /* if(gc->protect_count>0) {
+    if(gc->protect_count>0) {
 	printf("Protected\n");
 	return;
-	}*/
+    } else {
+        cause_bt();
+    }
     
     /* setup the next mark */
     set_next_mark_objects(gc);
@@ -136,6 +149,9 @@ void gc_sweep(gc_core_type *gc) {
 	    
 	} else {
 	    /* otherwise, add it to the dead list */
+
+            free_internal(obj); /* make sure we don't leave strings, etc allocated. */
+
 	    obj->next=gc->dead_list;
 	    gc->dead_list=obj;
 	}
@@ -149,16 +165,16 @@ void gc_sweep(gc_core_type *gc) {
 
 /* Turn allocated object protection on */
 void gc_protect(interp_core_type *interp) {
-    gc_stats(interp->gc);
     interp->gc->protect_count++;
+    printf("PR:");
+    gc_stats(interp->gc);
+
 }
 
 /* Turn off allocated object protection */
 void gc_unprotect(interp_core_type *interp) {
     object_type *obj=0;
     gc_core_type *gc=interp->gc;
-
-    gc_stats(gc);
 
     gc->protect_count--;
     
@@ -175,16 +191,22 @@ void gc_unprotect(interp_core_type *interp) {
 	
 	while(obj) {
 	    gc->protected_list=obj->next;
-	    obj->next=gc->active_list;
+
 	    
 	    /* we need to remark them since there could have
 	       been a gc since protection was turned on */
 	    if(obj->mark!=PERM) {
 		obj->mark=gc->mark;
-	    }
+                /* attach to active list */
+                obj->next=gc->active_list;
+                gc->active_list=obj;
+                
+	    } else {
+                /* attach object to the perm list */
+                obj->next=gc->perm_list;
+                gc->perm_list=obj;
+            }
 	    
-	    /* attach and move to the next object */
-	    gc->active_list=obj;
 	    obj=gc->protected_list;
 	}
 
@@ -193,6 +215,9 @@ void gc_unprotect(interp_core_type *interp) {
 	    gc_sweep(gc);
 	}
     }
+
+    printf("DN:");
+    gc_stats(gc);
 }
 
 /* create an instance of our garbage collector */
@@ -270,26 +295,31 @@ void free_all(object_type *list) {
 
     while(list) {
 	next=list->next;
-
-	/* handle any internal objects */
-	switch(list->type) {
-	case STRING:
-	case SYM:
-	    free(list->value.string_val);
-	    break;
-	    
-	case VECTOR:
-	    if(list->value.vector.vector) {
-		free(list->value.vector.vector);
-	    }
-	    break;
-
-	default:
-	    break;
-	}
+        
+        free_internal(list);
 
 	free(list);
 	list=next;
+    }
+}
+
+/* free the internals of an object */
+void free_internal(object_type *obj) {
+    /* handle any internal objects */
+    switch(obj->type) {
+    case STRING:
+    case SYM:
+        free(obj->value.string_val);
+        break;
+	    
+    case VECTOR:
+        if(obj->value.vector.vector) {
+            free(obj->value.vector.vector);
+        }
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -298,6 +328,7 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
     object_type *obj=0;
     gc_core_type *gc=interp->gc;
 
+    
     /* check to see if we have any dead objects */
     if(!gc->dead_list) {
         gc_sweep(gc);
@@ -305,7 +336,7 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 
     /* Are there any dead objects out there now? */
     if(gc->dead_list) {
-
+       
 	/* pop an object off the top of the dead list */
 	obj=gc->dead_list;
 	gc->dead_list=obj->next;
@@ -344,6 +375,9 @@ object_type *alloc_object(interp_core_type *interp, object_type_enum obj_type) {
 	obj->next=gc->protected_list;
 	gc->protected_list=obj;
     }
+
+    printf("AL:");
+    gc_stats(gc);
 
     return obj;    
 }
@@ -407,13 +441,18 @@ scanner_stack_type *alloc_scanner() {
 /* Create a new string instance */
 object_type *create_string(interp_core_type *interp, char *str) {
     object_type *obj=0;
+    char *c=0;
+
+    gc_protect(interp);
 
     /* create a new buffer for the string value */
-    char *c=alloc_string(interp, strlen(str));
+    c=alloc_string(interp, strlen(str));
     strcpy(c, str);
 
     obj=alloc_object(interp, STRING);
     obj->value.string_val=c;
+
+    gc_unprotect(interp);
 	
     return obj;
 }

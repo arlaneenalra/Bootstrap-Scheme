@@ -18,11 +18,14 @@ object_type * call_load(interp_core_type *interp, char *filename) {
 	fail("Unable to locate libraries");
     }
 
+    gc_protect(interp);
+
     /* build a call to load */
     load_call=cons(interp, create_symbol(interp, "load"),
 		   cons(interp, create_string(interp, filename),
 			interp->empty_list));
 
+    gc_unprotect(interp);
 
     return eval(interp, load_call);
 }
