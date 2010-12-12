@@ -2,6 +2,7 @@
 #include "util.h"
 #include "scheme_funcs.h"
 
+#include "gc_funcs.h"
 #include "eval_internal.h"
 
 /* #include "parser_internal.h"*/
@@ -32,7 +33,7 @@ object_type *eval_list(interp_core_type *interp, object_type *args) {
     
     evaled_args=interp->empty_list;
     next=args;
-    
+
     while(!is_empty_list(interp, next)) {
 	evaled=eval(interp, car(next));
 	

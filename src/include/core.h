@@ -143,7 +143,6 @@ typedef struct symbol_table {
     object_type *list;
 } symbol_table_type;
 
-
 /* used to keep track of a stack of lexers */
 typedef struct scanner_stack {
     void * scanner;

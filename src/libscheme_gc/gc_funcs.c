@@ -32,7 +32,6 @@ void gc_stats(gc_core_type * gc) {
     uint64_t perm=count_list(gc->perm_list);
     uint64_t total=active+dead+protected+perm;
     
-
     printf("GC:Active: %" PRIi64 ", Dead: %" PRIi64 ", Protected: %" PRIi64 ", "
 	   "Permenant: %" PRIi64 ", Total Objects: %" PRIi64  ", Roots: %i, Depth: %" PRIi64 "\n", 
 	   active, dead, protected, perm, total, gc->root_number, gc->protect_count);
@@ -191,7 +190,6 @@ void gc_unprotect(interp_core_type *interp) {
 	
 	while(obj) {
 	    gc->protected_list=obj->next;
-
 	    
 	    /* we need to remark them since there could have
 	       been a gc since protection was turned on */
@@ -211,9 +209,7 @@ void gc_unprotect(interp_core_type *interp) {
 	}
 
 	/* if there are no dead objects, let's do a collections */
-	if(!gc->dead_list) {
-	    gc_sweep(gc);
-	}
+        gc_sweep(gc);    
     }
 
     printf("DN:");

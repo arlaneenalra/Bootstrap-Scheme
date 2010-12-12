@@ -78,8 +78,12 @@ void push_environment(interp_core_type *interp, object_type *env) {
 
     TRACE("Peu");
     
+    gc_protect(interp);
+
     /* replace it with the passed in stack */
     interp->cur_env=cons(interp, interp->empty_list, env);
+
+    gc_unprotect(interp);
 }
 
 /* Create an instance of the Quote symbol */

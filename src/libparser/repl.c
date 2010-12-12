@@ -44,17 +44,19 @@ void load_main(interp_core_type *interp) {
 
 /* a c based repl */
 void repl_c(interp_core_type *interp) {
-    load_main(interp);
+    object_type *obj=0;
 
+    load_main(interp);
+    
     /* while the interpreter is running */
     while(interp->running) {
-    	object_type *obj=0;
-
+        obj=0;
     	printf(">");
 
     	obj=parse(interp, stdin);
 	
     	if(interp->running) {
+
     	    obj=eval(interp, obj);
 	
     	    /* if there was no error, output the result */
