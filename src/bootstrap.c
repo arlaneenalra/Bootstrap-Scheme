@@ -2,13 +2,16 @@
 #include <stdio.h>
 #include <gc.h>
 
+#include "util.h"
 #include "core.h"
 
 
 int main(int argc, char **argv) {
     interp_core_type * interp=0;
-    
+
     GC_INIT();
+
+    attach_sig_handlers();
 
     interp=create_interp();
     
