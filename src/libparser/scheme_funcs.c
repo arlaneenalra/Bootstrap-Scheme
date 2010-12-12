@@ -1610,7 +1610,11 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
     } else {
 	fin=car(args)->value.port_val.port;
     }
-    
+
+    if(has_error(interp)) {
+        printf("E1");
+    }
+
     push_parse_state(interp, fin);
 
     parsed=parse_chain(interp);
@@ -1619,7 +1623,16 @@ object_type *prim_read(interp_core_type *interp, object_type *args) {
 	parsed=eof_object;
     }
 
+    if(has_error(interp)) {
+        printf("E2");
+    }
+
     pop_parse_state(interp);
+
+    if(has_error(interp)) {
+        printf("E3");
+    }
+
 
     interp->running=1;
 

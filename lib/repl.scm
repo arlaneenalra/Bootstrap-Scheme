@@ -1,6 +1,6 @@
 ;; A simple REPL
 
-(define env (interaction-environment))
+(define env (environment))
 
 (define (handler e) 
   (display "An exception has occured: ")
@@ -15,10 +15,11 @@
   
   (with-exception-handler 
    handler
-   (write (eval (read) env)))
-   
+   (write (eval (read) env))
+
    (newline)
-   (repl))
+
+   (repl)))
   
 (display "We're metacircular baby!")
 (newline)
