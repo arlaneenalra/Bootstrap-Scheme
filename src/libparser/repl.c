@@ -56,10 +56,9 @@ void repl_c(interp_core_type *interp) {
 	
     	    /* if there was no error, output the result */
     	    if(!has_error(interp)) {
-    		output(interp, obj);
-    	    } else {
     		printf("There was an error executing the given expression");
     	    }
+            output(interp, interp->exception ? interp->exception : obj);
     	}
     	printf("\n");
     }

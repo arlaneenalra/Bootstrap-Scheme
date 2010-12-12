@@ -1,8 +1,9 @@
 #include "core.h"
-#include "util.h"
 #include "scheme_funcs.h"
 
 #include "eval_internal.h"
+#include "gc_funcs.h"
+#include "util.h"
 
 /* #include "parser_internal.h"*/
 
@@ -14,10 +15,8 @@ object_type *eval_symbol(interp_core_type *interp, object_type *obj) {
 
     /* Check the binding */
     if(binding==0) {
-	printf("\nUnbound Variable: %s@%p\n", obj->value.string_val, (void *)obj);
-
-	/* Unbound variable */
-	interp->error=1;
+        set_exception(interp, "Unbound Variable: %s@%p\n",
+                      obj->value.string_val, (void *)obj);
 	return false;
     }
     return cdr(binding);

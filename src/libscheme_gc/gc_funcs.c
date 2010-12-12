@@ -63,7 +63,6 @@ char *alloc_string(interp_core_type *interp, size_t len) {
 	fail("Unable to allocate string!");
     }
 
-    
     return c;
 }
 
@@ -91,7 +90,7 @@ scanner_stack_type *alloc_scanner() {
 }
 
 /* Create a new string instance */
-object_type *create_string(interp_core_type *interp, char *str) {
+object_type *create_string(interp_core_type *interp, const char *str) {
     object_type *obj=0;
 
     /* create a new buffer for the string value */

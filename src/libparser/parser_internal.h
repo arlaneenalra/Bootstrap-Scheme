@@ -32,8 +32,6 @@ void add_vector(interp_core_type *interp);
 void add_empty_vector(interp_core_type *interp);
 void add_symbol(interp_core_type *interp, char *str);
 
-
-object_type *create_string(interp_core_type *interp, char *str);
 object_type *create_symbol(interp_core_type *interp, char *str);
 
 void chain_state(interp_core_type *interp);

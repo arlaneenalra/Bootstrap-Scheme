@@ -350,6 +350,7 @@ void reset(interp_core_type *interp) {
     interp->current=interp->empty_list;
     clear_state_stack(interp);
     interp->error=0;
+    interp->exception=false;
 
     TRACE("RESET\n");
 }

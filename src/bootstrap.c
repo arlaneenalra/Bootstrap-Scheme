@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <gc.h>
 
-#include "util.h"
 #include "core.h"
-
+#include "util.h"
 
 int main(int argc, char **argv) {
     interp_core_type * interp=0;

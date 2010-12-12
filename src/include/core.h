@@ -155,6 +155,9 @@ typedef struct interp_core {
     /* Top level environment */
     object_type *top_env;
     
+    /* Do we have an exception ? */
+    object_type *exception;
+
     /* List of all symbols in the system */
     symbol_table_type symbols;
 
@@ -186,6 +189,7 @@ void output(interp_core_type *interp, object_type *obj);
 void output_stream(interp_core_type *interp, object_type *obj, FILE *fout);
 
 bool has_error(interp_core_type *interp);
+void set_exception(interp_core_type *interp, const char *msg);
 
 void end_of_file(interp_core_type *interp);
 
