@@ -27,9 +27,4 @@
               handler
               (lambda () #f)))
             #f)
- (make-test ((with-exception-handler 
-              handler
-              (false)))
-            #f)
- 
 )
