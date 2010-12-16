@@ -3,6 +3,7 @@
 
 #include "core.h"
 
+
 typedef struct binding {
     char *symbol;
     fn_type primitive;
@@ -18,6 +19,5 @@ void bind_symbol(interp_core_type *interp, object_type *obj,
 void bind_symbol_list(interp_core_type *interp, 
 		      binding_type *binding_list, object_type **env);
 object_type *get_binding(interp_core_type *interp, object_type *sym);
-
 
 #endif
