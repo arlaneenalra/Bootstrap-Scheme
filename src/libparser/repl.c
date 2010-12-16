@@ -72,6 +72,7 @@ void repl(interp_core_type *interp, int scheme) {
 
     printf("Simple Bootstrapper\n");
     printf("sizeof(object_type) %" PRIi64 "\n", (uint64_t)sizeof(object_type));
+    printf("sizeof(object_type) %" PRIi64 "\n", (uint64_t)sizeof(long double));
 
     if(scheme) {
         top_level_program(interp, "lib/repl.scm");

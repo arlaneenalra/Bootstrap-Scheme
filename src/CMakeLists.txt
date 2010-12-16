@@ -2,6 +2,8 @@
 add_subdirectory(libparser)
 add_subdirectory(libeval)
 add_subdirectory(libscheme_gc)
+add_subdirectory(libscheme_symbol)
+
 add_subdirectory(libexception)
 
 include_directories(libparser libeval libscheme_gc)
@@ -13,7 +15,7 @@ link_directories(${libparser_BIN_DIR}/libparser
 
 add_executable(bootstrap bootstrap.c)
 
-target_link_libraries(bootstrap parser eval scheme_gc gc)
+target_link_libraries(bootstrap parser eval scheme_gc scheme_symbol gc)
 
 
 include(${PROJECT_SOURCE_DIR}/CMakeIncludes.txt)

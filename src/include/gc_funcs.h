@@ -14,5 +14,12 @@ scanner_stack_type *alloc_scanner();
 /*void gc_all(interp_core_type *interp);*/
 
 
+object_type *create_primitive(interp_core_type *interp, 
+			      fn_type primitive,
+			      bool eval_first, bool eval_end);
+
+object_type *create_string(interp_core_type *interp, const char *str);
+
+object_type *clone(interp_core_type *interp, object_type *obj);
 
 #endif

@@ -8,6 +8,7 @@
 #define TRACE(x)
 #endif
 
+#include "symbol.h"
 /* include the bohem gc and our gc stuff */
 #include <gc.h> 
 #include "gc_funcs.h"
@@ -31,8 +32,6 @@ void add_quote(interp_core_type *interp);
 void add_vector(interp_core_type *interp);
 void add_empty_vector(interp_core_type *interp);
 void add_symbol(interp_core_type *interp, char *str);
-
-object_type *create_symbol(interp_core_type *interp, char *str);
 
 void chain_state(interp_core_type *interp);
 void push_state(interp_core_type *interp);

@@ -179,8 +179,6 @@ void reset(interp_core_type *interp);
 void push_parse_state(interp_core_type *interp, FILE *in);
 void pop_parse_state(interp_core_type *interp);
 
-object_type *clone(interp_core_type *interp, object_type *obj);
-
 int parse_internal(interp_core_type *interp, void *scanner);
 
 object_type *eval(interp_core_type *interp, object_type *obj);

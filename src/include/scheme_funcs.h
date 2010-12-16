@@ -1,6 +1,7 @@
 #ifndef __SCHEME_FUNCS__
 #define __SCHEME_FUNCS__
 
+#include "symbol.h"
 
 #define car(obj) obj->value.tuple.car
 #define cdr(obj) obj->value.tuple.cdr
@@ -26,23 +27,8 @@
 #define peek_scanner interp->scanner->scanner
 #define peek_previous interp->scanner->previous
 
-typedef struct binding {
-    char *symbol;
-    fn_type primitive;
-    bool eval_first;
-    bool eval_end;
-} binding_type;
-
 object_type *cons(interp_core_type *interp, object_type *car,object_type *cdr);
 object_type *quote(interp_core_type *interp, object_type *obj);
-void bind_argument_list(interp_core_type *interp, object_type *sym_list, 
-			object_type *value_list);
-
-void bind_symbol(interp_core_type *interp, object_type *obj, object_type *value,
-		 object_type **env);
-void bind_symbol_list(interp_core_type *interp, binding_type *binding_list,
-		      object_type **env);
-object_type *get_binding(interp_core_type *interp, object_type *sym);
 
 
 bool is_primitive(interp_core_type *interp, object_type *obj);
