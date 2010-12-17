@@ -53,6 +53,7 @@
 	     lib-list))
 
  '( ;; list of libraries to load
+   "lib/exception.scm"
    "lib/string.scm"
    "lib/vector.scm"
    "lib/math.scm"

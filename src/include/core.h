@@ -130,5 +130,6 @@ void set_exception(interp_core_type *interp, const char *msg);
 
 void end_of_file(interp_core_type *interp);
 
+int list_length(interp_core_type * interp, object_type *args); /* Find the length of a passed in list */
 
 #endif

@@ -21,7 +21,6 @@ typedef enum {
 
 /* Function definitions */
 void set(interp_core_type *interp, setting_type_enum setting);
-int list_length(interp_core_type * interp, object_type *args); /* Find the length of a passed in list */
 
 void add_object(interp_core_type *interp, object_type *obj);
 void add_char(interp_core_type *interp, char *str);
