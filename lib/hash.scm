@@ -108,8 +108,13 @@
 ;; key
 (define (hashtable-ref table key default)
   (define entry (do-entry table key default))
-  (define search (mask-hash table hash-key))
-  (define cell (vector-ref (hash-vector table) search)))
+  (define search (mask-hash table (get-hash entry)))
+  (define cell (vector-ref (hash-vector table) search))
+  (define entry-index (find-entry table cell entry))
+  
+  (if (null? entry-index) 
+      default
+      (vector-ref cell entry-index)))
 
 
 ;; Add/set a key in the hashtable
@@ -138,6 +143,12 @@
 
 
 
+(define (test-key table key)
+  (display key)
+  (display " => ")
+  (display (hashtable-ref table key '()))
+  (newline))
+
 ;; create a very crude test case
 (define (test-hash) 
   (let ((table (make-eqv-hashtable)))
@@ -149,6 +160,15 @@
     (hashtable-set! table "z" 50)
     (hashtable-set! table "h" 10)
     (hashtable-set! table "f" 5)
-    (hash-info table)))
+    (hash-info table)
+    
+    (test-key table "h")
+    (test-key table "z")
+    (test-key table "e")
+    (test-key table "f")
+    (test-key table "g")
+    (test-key table "none")
+    
+    ))
 
 #t
