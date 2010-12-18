@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <dlfcn.h>
+#include <math.h>
 
 #include "core.h"
 #include "util.h"
@@ -1087,6 +1088,33 @@ object_type *prim_div_int(interp_core_type *interp, object_type *args) {
     return result;
 }
 
+/* Convert a accomplish a floor */
+object_type *prim_floor(interp_core_type *interp, object_type *args) {
+
+    object_type *num=0;
+    int64_t newnum=0;
+    
+    if(list_length(interp, args)!=1) {
+        interp->error=1;
+        return false;
+    }
+
+    num=car(args);
+    
+    if(num==0 || num->type !=FLOATNUM) {
+        interp->error=1;
+        return false;
+    }
+
+    newnum=llrint(floorl(num->value.float_val));
+
+    num=alloc_object(interp, FIXNUM);
+    num->value.int_val=newnum;
+
+    return num;
+
+}
+
 /* Math in Macros */
 #define OPERATION(oper, name)						\
     object_type *name(interp_core_type *interp, object_type *args) {	\
@@ -1911,6 +1939,8 @@ binding_type primitive_list[]={
     {"vector-length", &prim_vector_length, 1, 1},
     {"vector-ref", &prim_vector_ref, 1, 1},
     {"vector-set!", &prim_vector_set, 1, 1},
+
+    {"floor", &prim_floor, 1, 1},
     
     {0,0} /* Terminate the list */
 };

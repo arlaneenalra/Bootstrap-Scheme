@@ -1,5 +1,5 @@
 
-(provide number? zero?)
+(provide number? zero? fixnum->floatnum)
 
 ;; returns true if the object is a number and 
 ;; false otherwise
@@ -16,3 +16,10 @@
    
    (and (integer? num)
 	(= 0 num))))
+
+;; return a flotnum from a fix num
+(define (fixnum->floatnum num) 
+  (+ 0.0 num))
+
+
+#t
