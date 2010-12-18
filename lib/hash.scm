@@ -4,6 +4,8 @@
 
 ;; a base size for the hash
 (define hash-base-size 4)
+(define hash-scale-factor 2)
+(define max-load-factor 0.7)
 
 ;; a very crappy hash function
 
@@ -19,21 +21,26 @@
 
 ;; construct a hash table
 (define (make-hashtable hash-proc equiv-proc)
-  (list hash-proc equiv-proc (make-vector hash-base-size)))
+  (vector hash-proc equiv-proc (make-vector hash-base-size) 0))
 
 ;; (define (make-eqv-hashtable)
 ;;   (make-hashtable string-hash eqv?))
-(define (make-eqv-hashtable) 
-  (make-hashtable string-hash eqv?))
+(define make-eqv-hashtable 
+  (lambda () (make-hashtable string-hash eqv?)))
 
+  ;; accessors for a hashtable
+  
 (define (hash-proc table)
-  (car table))
+  (vector-ref table 0))
 
 (define (equiv-proc table) 
-  (cadr table))
+  (vector-ref table 1))
 
 (define (hash-vector table)
-  (caddr table))
+  (vector-ref table 2))
+
+(define (hash-entries table)
+  (vector-ref table 3))
 
 (define (hash-info table)
   (newline)
@@ -45,64 +52,103 @@
   (newline)
   (display "vector:")
   (display (hash-vector table))
-  (newline))
+  (newline)
+  (display "entries:")
+  (display (hash-entries table))
+  (newline)
+  )
 
 
 ;; call the appropriate hash/equiv proc
 (define (do-hash table key)
   (let ((proc (hash-proc table)))
-      (cons (proc key) key)))
+    (cons (proc key) key)))
 
-(define (do-equiv proc key entry)
-  (proc (get-key  key) (get-key entry)))
+(define (do-entry table key obj) 
+  (cons (do-hash table key) obj))
 
+;; execute the equality operation
+(define (do-equiv table key entry)
+  ((equiv-proc table) (get-key  key) (get-key entry)))
+
+
+;; Accessors for an entry
 (define (get-hash entry)
   (caar entry))
 
 (define (get-key entry)
   (cdar entry))
 
+(define (get-value entry) 
+  (cadr entry))
+
+;; mask off the part of the hash we don't need
+(define (mask-hash table hash)
+  (remainder hash (vector-length (hash-vector table))))
+
+;; find the location of a specific entry 
+;; in a chain of entries
+(define (find-entry table chain key)
+
+  ;; loops over all entries in a given entry
+  (define (inner size index)
+    (cond
+     ((<= size index) ;; we found nothing 
+      '())
+     ((do-equiv table key (vector-ref chain index))
+      index)
+     (else (inner size (+ 1 index)))))
+
+  ;; check for empty cell
+  (if (vector? chain)
+      (inner (vector-length chain) 0)
+      '()))
+
 ;; look up the value bound to a particular
 ;; key
-;; (define (hashtable-ref table key default))
+(define (hashtable-ref table key default)
+  (define entry (do-entry table key default))
+  (define search (mask-hash table hash-key))
+  (define cell (vector-ref (hash-vector table) search)))
+
 
 ;; Add/set a key in the hashtable
 (define (hashtable-set! table key obj)
   
   ;; setup the entry and search key
   ;; It would be better to do this with letrec (I think?)x
-  (define entry (cons (do-hash table key) obj))
-  (define search (remainder (get-hash entry) hash-base-size))
+  (define entry (do-entry table key obj))
+  (define search (mask-hash table (get-hash entry)))
   (define cell (vector-ref (hash-vector table) search))
-  
-  (cond
-   ((or
-     (eqv? cell '())
-     (do-equiv (equiv-proc table) entry cell))
-    (begin 
-      (vector-set! (hash-vector table) search entry)))
-   (else #f)))
-
-  ;; ;; check to see if the cell is set
-  ;; (cond 
-  ;;  ((or
-  ;;    (eq? cell '())
-  ;;    (do-equiv (equiv-proc table) cell entry))
-  ;;   (begin 
-  ;;     (write "SET")
-  ;;     (vector-set! (hash-vector table) search entry)))
-   
-  ;;  (else
-  ;;   #t)))
+  (define entry-index (find-entry table cell entry))
 
 
-(define test-hash (make-eqv-hashtable))
+  (cond 
+   ((null? cell) ;; empty cell
+    (vector-set! (hash-vector table) search (vector entry)))
 
-(hashtable-set! test-hash "t" 1)
-(hashtable-set! test-hash "f" 2)
-(hashtable-set! test-hash "g" 3)
-(hashtable-set! test-hash "h" 4)
+   ((null? entry-index) ;; new value
+    (vector-set! (hash-vector table) search 
+                 (list->vector 
+                  (cons 
+                   entry
+                   (vector->list cell)))))
+   (else ;; existing entry
+    (vector-set! cell entry-index entry))))
 
 
+
+;; create a very crude test case
+(define (test-hash) 
+  (let ((table (make-eqv-hashtable)))
+    (hashtable-set! table "h" 1)
+    (hashtable-set! table "z" 2)
+    (hashtable-set! table "e" 3)
+    (hashtable-set! table "f" 4)
+    (hashtable-set! table "g" 5)
+    (hashtable-set! table "z" 50)
+    (hashtable-set! table "h" 10)
+    (hashtable-set! table "f" 5)
+    (hash-info table)))
 
 #t
